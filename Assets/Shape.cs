@@ -4,15 +4,19 @@ using UnityEngine;
 public class Shape : MonoBehaviour
 { 
     Vector3Int position;
+    Vector2 posXY;
     private SpriteRenderer _spriteRenderer;
     bool isSelected = false;
     bool isUpsideDown = false;
     Color baseColor = Color.white;
     Color selectedColor = Color.red;
+    public bool isFilled = false;
+    public bool isPlayable = false;
 
     public EventHandler ShapeClickedHandler;
     public EventHandler ShapeReleasedHandler;
 
+    #region Properties
     public Vector3Int Position
     {
         get
@@ -26,7 +30,6 @@ public class Shape : MonoBehaviour
         }
     }
 
-    #region Properties
     public bool IsSelected
     {
         get
@@ -69,6 +72,19 @@ public class Shape : MonoBehaviour
             baseColor = value;
         }
     }
+
+    public Vector2 PosXY
+    {
+        get
+        {
+            return posXY;
+        }
+
+        set
+        {
+            posXY = value;
+        }
+    }
     #endregion
 
     // Use this for initialization
@@ -87,6 +103,11 @@ public class Shape : MonoBehaviour
         else
         {
             ChangeColor(BaseColor);
+        }
+
+        if (isPlayable)
+        {
+            ChangeColor(Color.green);
         }
     }
 

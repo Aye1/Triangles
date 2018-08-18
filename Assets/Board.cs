@@ -4,22 +4,25 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Board : MonoBehaviour {
+public class Board : MonoBehaviour
+{
 
     private readonly int minWidth = 9;
     public Shape basicShape;
     private List<Shape> shapes;
     private float sqr3 = Mathf.Sqrt(3);
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         shapes = new List<Shape>();
         CreateBoard();
-	}
-	
-	// Update is called once per frame
-	void Update () {	
-	}
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+    }
 
     public void OnShapeClicked(object shapeSender, EventArgs e)
     {
@@ -58,10 +61,10 @@ public class Board : MonoBehaviour {
 
         for (int j = 0; j < height; j++)
         {
-            int currentWidth = maxWidth - (int)Mathf.Abs(minWidth/2.0f-(j+1))*2;
+            int currentWidth = maxWidth - (int)Mathf.Abs(minWidth / 2.0f - (j + 1)) * 2;
             int imin = (maxWidth - currentWidth) / 2 + offset;
             int imax = imin + currentWidth;
-            
+
             for (int i = imin; i < imax; i++)
             {
                 Shape newShape = Instantiate(basicShape);
@@ -71,10 +74,11 @@ public class Board : MonoBehaviour {
                 int B = (int)Mathf.Ceil((-i - j) / 2.0f);
                 int C = (int)Mathf.Floor(-(i - j) / 2.0f);
                 newShape.Position = new Vector3Int(A, B, C);
+                newShape.PosXY = new Vector2(i, j);
 
                 newShape.IsUpsideDown = ((i + j) % 2 == 0);
 
-                newShape.transform.position = transform.position + new Vector3(i / 2.0f, -j*Mathf.Sqrt(2)/2, newShape.transform.position.z);
+                newShape.transform.position = transform.position + new Vector3(i / 2.0f, -j * Mathf.Sqrt(2) / 2, newShape.transform.position.z);
                 newShape.transform.parent = transform;
                 newShape.ShapeClickedHandler += OnShapeClicked;
                 shapes.Add(newShape);
@@ -82,4 +86,37 @@ public class Board : MonoBehaviour {
         }
     }
 
+    public IEnumerable<Shape> GetPlayableShapes(Piece piece)
+    {
+        IEnumerable<Shape> unfilledShapes = new List<Shape>();
+        unfilledShapes = shapes.Where(s => !s.isFilled);
+
+        IEnumerable<Shape> resShapes = new List<Shape>();
+        resShapes = unfilledShapes.Where(s => IsPiecePlayableOnShape(s, piece, unfilledShapes));
+        ChangeShapesPlayableState(resShapes);
+        return resShapes;
+    }
+
+    private bool IsPiecePlayableOnShape(Shape shape, Piece piece, IEnumerable<Shape> unfilledShapes)
+    {
+        List<Shape> necessaryShapes = new List<Shape>();
+        foreach(Shape s in piece.pieceShapes)
+        {
+            Vector2 searchPos = s.PosXY + shape.PosXY;
+            IEnumerable<Shape> found = unfilledShapes.Where(us => us.PosXY == searchPos 
+                                                            && us.IsUpsideDown == s.IsUpsideDown);
+            if(found.Count() == 0)
+            {
+                return false;
+            }
+            necessaryShapes.Add(found.First());
+        }
+        return true;
+    }
+
+    private void ChangeShapesPlayableState(IEnumerable<Shape> playableShapes)
+    {
+        playableShapes.ToList().ForEach(s => s.isPlayable = true);
+        shapes.Where(s => !playableShapes.Contains(s)).ToList().ForEach(s => s.isPlayable = false);
+    }
 }

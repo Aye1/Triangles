@@ -7,8 +7,11 @@ public class Piece : MonoBehaviour {
 
     public List<Vector4> positionsXY;
     public Shape refShape;
+    public List<Shape> pieceShapes;
 
     private bool isDragged = false;
+    public EventHandler PieceDraggedHandler;
+    public EventHandler PieceReleasedHandler;
 
 	// Use this for initialization
 	void Start () {
@@ -31,7 +34,8 @@ public class Piece : MonoBehaviour {
 
     private void GeneratePiece()
     {
-        foreach(Vector4 pos in positionsXY)
+        pieceShapes = new List<Shape>();
+        foreach (Vector4 pos in positionsXY)
         {
             Shape newShape = Instantiate(refShape);
             newShape.transform.position = transform.position + new Vector3(pos.x / 2.0f, pos.y, pos.z);
@@ -41,16 +45,26 @@ public class Piece : MonoBehaviour {
             newShape.BaseColor = Color.blue;
             newShape.ShapeClickedHandler += OnShapeClicked;
             newShape.ShapeReleasedHandler += OnShapeReleased;
+            newShape.PosXY = pos;
+            pieceShapes.Add(newShape);
         }
     }
 
     private void OnShapeClicked(object sender, EventArgs e)
     {
         isDragged = true;
+        if (PieceDraggedHandler != null)
+        {
+            PieceDraggedHandler(this, new EventArgs());
+        } 
     }
 
     private void OnShapeReleased(object sender, EventArgs e)
     {
         isDragged = false;
+        if (PieceReleasedHandler != null)
+        {
+            PieceReleasedHandler(this, new EventArgs());
+        }
     }
 }
