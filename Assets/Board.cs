@@ -1,23 +1,52 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Board : MonoBehaviour {
 
     private readonly int minWidth = 9;
     public Shape basicShape;
-
+    private List<Shape> shapes;
     private float sqr3 = Mathf.Sqrt(3);
 
 	// Use this for initialization
 	void Start () {
+        shapes = new List<Shape>();
         CreateBoard();
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		
+	void Update () {	
 	}
+
+    public void OnShapeClicked(object shapeSender, EventArgs e)
+    {
+        Shape shape = shapeSender as Shape;
+        Debug.Log("Shape at pos " + shape.Position.ToString() + " clicked");
+        List<Shape> validatedShapes = new List<Shape>();
+        validatedShapes = CheckLine(validatedShapes, shape.Position.x, 0);
+        validatedShapes = CheckLine(validatedShapes, shape.Position.y, 1);
+        validatedShapes = CheckLine(validatedShapes, shape.Position.z, 2);
+        FlipValidatedLines(validatedShapes);
+    }
+
+    private List<Shape> CheckLine(List<Shape> valShapes, int index, int pos)
+    {
+        IEnumerable<Shape> toValidate = shapes.Where<Shape>(shape => shape.Position[pos] == index);
+        bool lineValidated = toValidate.All(shape => shape.IsSelected);
+        if (lineValidated)
+        {
+            valShapes.AddRange(toValidate);
+        }
+        return valShapes;
+    }
+
+    private void FlipValidatedLines(List<Shape> valShapes)
+    {
+        valShapes.ForEach(shape => shape.IsSelected = false);
+    }
 
     private void CreateBoard()
     {
@@ -30,26 +59,27 @@ public class Board : MonoBehaviour {
         for (int j = 0; j < height; j++)
         {
             int currentWidth = maxWidth - (int)Mathf.Abs(minWidth/2.0f-(j+1))*2;
-            //int imin = (maxWidth - currentWidth) / 2 + offset;
-            //int imax = imin + currentWidth;
-            int imin = 0;
-            int imax = 10;
+            int imin = (maxWidth - currentWidth) / 2 + offset;
+            int imax = imin + currentWidth;
+            
             for (int i = imin; i < imax; i++)
             {
                 Shape newShape = Instantiate(basicShape);
                 Vector2 vecB = new Vector2(sqr3 * i / 2, -j / 2);
                 Vector2 vecC = new Vector2(-sqr3 * i / 2, -j / 2);
-                float A = j;
-                float B = Mathf.Ceil((-i - j) / 2.0f);
-                float C = Mathf.Floor(-(i - j) / 2.0f);
-                newShape.Position = new Vector3(A, (int)B, (int)C);
-                if ((i+j) % 2 == 0)
-                {
-                    newShape.transform.Rotate(0.0f, 0.0f, 180.0f);
-                }
-                newShape.transform.position = new Vector3(i / 2.0f, -j*Mathf.Sqrt(2)/2, newShape.transform.position.z);
+                int A = j;
+                int B = (int)Mathf.Ceil((-i - j) / 2.0f);
+                int C = (int)Mathf.Floor(-(i - j) / 2.0f);
+                newShape.Position = new Vector3Int(A, B, C);
+
+                newShape.IsUpsideDown = ((i + j) % 2 == 0);
+
+                newShape.transform.position = transform.position + new Vector3(i / 2.0f, -j*Mathf.Sqrt(2)/2, newShape.transform.position.z);
                 newShape.transform.parent = transform;
+                newShape.ShapeClickedHandler += OnShapeClicked;
+                shapes.Add(newShape);
             }
         }
     }
+
 }

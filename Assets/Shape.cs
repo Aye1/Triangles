@@ -1,13 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
-public class Shape : MonoBehaviour {
-
-    Vector3 position;
+public class Shape : MonoBehaviour
+{ 
+    Vector3Int position;
     private SpriteRenderer _spriteRenderer;
+    bool isSelected = false;
+    bool isUpsideDown = false;
+    Color baseColor = Color.white;
+    Color selectedColor = Color.red;
 
-    public Vector3 Position
+    public EventHandler ShapeClickedHandler;
+    public EventHandler ShapeReleasedHandler;
+
+    public Vector3Int Position
     {
         get
         {
@@ -20,18 +26,90 @@ public class Shape : MonoBehaviour {
         }
     }
 
+    #region Properties
+    public bool IsSelected
+    {
+        get
+        {
+            return isSelected;
+        }
+
+        set
+        {
+            isSelected = value;
+        }
+    }
+
+    public bool IsUpsideDown
+    {
+        get
+        {
+            return isUpsideDown;
+        }
+
+        set
+        {
+            if (isUpsideDown != value)
+            {
+                isUpsideDown = value;
+                transform.Rotate(0.0f, 0.0f, 180.0f);
+            }
+        }
+    }
+
+    public Color BaseColor
+    {
+        get
+        {
+            return baseColor;
+        }
+
+        set
+        {
+            baseColor = value;
+        }
+    }
+    #endregion
+
     // Use this for initialization
-    void Start() {
+    void Start()
+    {
         _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
-    void Update() {
-        ChangeColor();
-	}
-
-    private void ChangeColor()
+    void Update()
     {
-        _spriteRenderer.color = new Color(Mathf.Abs(Position.x)/10.0f, Mathf.Abs(Position.y) / 10.0f, Mathf.Abs(Position.z)/10.0f);
+        if (IsSelected)
+        {
+            ChangeColor(selectedColor);
+        }
+        else
+        {
+            ChangeColor(BaseColor);
+        }
+    }
+
+    void OnMouseDown()
+    {
+        IsSelected = !IsSelected;
+
+        if (ShapeClickedHandler != null)
+        {
+            ShapeClickedHandler(this, new EventArgs());
+        }
+    }
+
+    private void OnMouseUp()
+    {
+        if (ShapeReleasedHandler != null)
+        {
+            ShapeReleasedHandler(this, new EventArgs());
+        }
+    }
+
+    private void ChangeColor(Color color)
+    {
+        _spriteRenderer.color = color;
     }
 }
