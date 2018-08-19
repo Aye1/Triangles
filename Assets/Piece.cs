@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Piece : MonoBehaviour {
@@ -14,7 +15,7 @@ public class Piece : MonoBehaviour {
     public EventHandler PieceReleasedHandler;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         GeneratePiece();
 	}
 	
@@ -66,5 +67,14 @@ public class Piece : MonoBehaviour {
         {
             PieceReleasedHandler(this, new EventArgs());
         }
+    }
+
+    public void DestroyPiece()
+    {
+        foreach(Shape s in pieceShapes)
+        {
+            Destroy(s.gameObject);
+        }
+        Destroy(this.gameObject);
     }
 }

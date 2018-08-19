@@ -6,12 +6,12 @@ public class Shape : MonoBehaviour
     Vector3Int position;
     Vector2 posXY;
     private SpriteRenderer _spriteRenderer;
-    bool isSelected = false;
     bool isUpsideDown = false;
     Color baseColor = Color.white;
     Color selectedColor = Color.red;
     public bool isFilled = false;
     public bool isPlayable = false;
+    public bool tmpBool = false;
 
     public EventHandler ShapeClickedHandler;
     public EventHandler ShapeReleasedHandler;
@@ -27,19 +27,6 @@ public class Shape : MonoBehaviour
         set
         {
             position = value;
-        }
-    }
-
-    public bool IsSelected
-    {
-        get
-        {
-            return isSelected;
-        }
-
-        set
-        {
-            isSelected = value;
         }
     }
 
@@ -96,25 +83,25 @@ public class Shape : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (IsSelected)
-        {
-            ChangeColor(selectedColor);
-        }
-        else
-        {
-            ChangeColor(BaseColor);
-        }
-
+        ChangeColor(Color.white);
         if (isPlayable)
         {
             ChangeColor(Color.green);
         }
+        /*if (tmpBool)
+        {
+            ChangeColor(Color.cyan);
+        } */
+        if (isFilled)
+        {
+            ChangeColor(Color.red);
+        }
+        tmpBool = false;
+        isPlayable = false;
     }
 
     void OnMouseDown()
     {
-        IsSelected = !IsSelected;
-
         if (ShapeClickedHandler != null)
         {
             ShapeClickedHandler(this, new EventArgs());

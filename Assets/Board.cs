@@ -7,10 +7,17 @@ using UnityEngine;
 public class Board : MonoBehaviour
 {
 
-    private readonly int minWidth = 9;
-    public Shape basicShape;
+    private readonly int _minWidth = 9;
+    private readonly float _paddingX = 0.5f;
+    private readonly float _paddingY = Mathf.Sqrt(2) / 2.0f;
+    private readonly float sqr3 = Mathf.Sqrt(3);
+
     private List<Shape> shapes;
-    private float sqr3 = Mathf.Sqrt(3);
+    private IEnumerable<Shape> unfilledShapes;
+    private IEnumerable<Shape> playableShapes;
+
+    public Shape basicShape;
+
 
     // Use this for initialization
     void Start()
@@ -24,7 +31,8 @@ public class Board : MonoBehaviour
     {
     }
 
-    public void OnShapeClicked(object shapeSender, EventArgs e)
+    // Called when any shape is clicked
+    /*public void OnShapeClicked(object shapeSender, EventArgs e)
     {
         Shape shape = shapeSender as Shape;
         Debug.Log("Shape at pos " + shape.Position.ToString() + " clicked");
@@ -33,12 +41,19 @@ public class Board : MonoBehaviour
         validatedShapes = CheckLine(validatedShapes, shape.Position.y, 1);
         validatedShapes = CheckLine(validatedShapes, shape.Position.z, 2);
         FlipValidatedLines(validatedShapes);
-    }
+    }*/
 
+    /// <summary>
+    /// Checks if a line in complete
+    /// </summary>
+    /// <param name="valShapes">List of the shapes which create a line and should be removed</param>
+    /// <param name="index">Index of the current shape on the line analysed</param>
+    /// <param name="pos">Id of the line analysed (0=A, 1=B, 2=C)</param>
+    /// <returns></returns>
     private List<Shape> CheckLine(List<Shape> valShapes, int index, int pos)
     {
         IEnumerable<Shape> toValidate = shapes.Where<Shape>(shape => shape.Position[pos] == index);
-        bool lineValidated = toValidate.All(shape => shape.IsSelected);
+        bool lineValidated = toValidate.All(shape => shape.isFilled);
         if (lineValidated)
         {
             valShapes.AddRange(toValidate);
@@ -46,22 +61,29 @@ public class Board : MonoBehaviour
         return valShapes;
     }
 
+    /// <summary>
+    /// Puts shapes which form lines to their basic state
+    /// </summary>
+    /// <param name="valShapes">The list of shapes which form lines</param>
     private void FlipValidatedLines(List<Shape> valShapes)
     {
-        valShapes.ForEach(shape => shape.IsSelected = false);
+        valShapes.ForEach(shape => shape.isFilled = false);
     }
 
+    /// <summary>
+    /// Initializes the board
+    /// </summary>
     private void CreateBoard()
     {
-        int height = minWidth - 1;
-        int maxWidth = 2 * minWidth - 3;
+        int height = _minWidth - 1;
+        int maxWidth = 2 * _minWidth - 3;
 
         // Décalage de 1 pour rester sur la bonne parité de grille
         int offset = height / 2 % 2 == 0 ? 1 : 0;
 
         for (int j = 0; j < height; j++)
         {
-            int currentWidth = maxWidth - (int)Mathf.Abs(minWidth / 2.0f - (j + 1)) * 2;
+            int currentWidth = maxWidth - (int)Mathf.Abs(_minWidth / 2.0f - (j + 1)) * 2;
             int imin = (maxWidth - currentWidth) / 2 + offset;
             int imax = imin + currentWidth;
 
@@ -78,45 +100,122 @@ public class Board : MonoBehaviour
 
                 newShape.IsUpsideDown = ((i + j) % 2 == 0);
 
-                newShape.transform.position = transform.position + new Vector3(i / 2.0f, -j * Mathf.Sqrt(2) / 2, newShape.transform.position.z);
+                newShape.transform.position = transform.position + new Vector3(i*_paddingX, -j * _paddingY, newShape.transform.position.z);
                 newShape.transform.parent = transform;
-                newShape.ShapeClickedHandler += OnShapeClicked;
                 shapes.Add(newShape);
+                unfilledShapes = shapes;
             }
         }
     }
 
-    public IEnumerable<Shape> GetPlayableShapes(Piece piece)
+    /// <summary>
+    /// Returns all playable shapes for the current piece
+    /// </summary>
+    /// <param name="piece">The currently selected piece</param>
+    /// <returns></returns>
+    public IEnumerable<Shape> FindPlayableShapes(Piece piece)
     {
-        IEnumerable<Shape> unfilledShapes = new List<Shape>();
         unfilledShapes = shapes.Where(s => !s.isFilled);
 
         IEnumerable<Shape> resShapes = new List<Shape>();
-        resShapes = unfilledShapes.Where(s => IsPiecePlayableOnShape(s, piece, unfilledShapes));
-        ChangeShapesPlayableState(resShapes);
+        resShapes = unfilledShapes.Where(s => IsPiecePlayableOnShape(s, piece));
+        playableShapes = resShapes;
         return resShapes;
     }
 
-    private bool IsPiecePlayableOnShape(Shape shape, Piece piece, IEnumerable<Shape> unfilledShapes)
+    /// <summary>
+    /// Determines whether the piece can be played on a particular shape
+    /// </summary>
+    /// <param name="shape"></param>
+    /// <param name="piece"></param>
+    /// <returns></returns>
+    private bool IsPiecePlayableOnShape(Shape shape, Piece piece)
     {
-        List<Shape> necessaryShapes = new List<Shape>();
-        foreach(Shape s in piece.pieceShapes)
-        {
-            Vector2 searchPos = s.PosXY + shape.PosXY;
-            IEnumerable<Shape> found = unfilledShapes.Where(us => us.PosXY == searchPos 
-                                                            && us.IsUpsideDown == s.IsUpsideDown);
-            if(found.Count() == 0)
-            {
-                return false;
-            }
-            necessaryShapes.Add(found.First());
-        }
-        return true;
+        IEnumerable<Shape> necessaryShapes = GetNecessaryShapesForPiece(shape, piece, unfilledShapes);
+        return necessaryShapes.Count() == piece.pieceShapes.Count;
     }
 
-    private void ChangeShapesPlayableState(IEnumerable<Shape> playableShapes)
+    /// <summary>
+    /// Returns the list of shapes necessary to fit the piece, starting with the current shape
+    /// </summary>
+    /// <param name="shape">The base shape to create the piece</param>
+    /// <param name="piece">The piece to fit</param>
+    /// <param name="shapeList">The list of shapes in which to pick</param>
+    /// <returns>A (possibly incomplete) list of shapes fitting the piece</returns>
+    private IEnumerable<Shape> GetNecessaryShapesForPiece(Shape shape, Piece piece, IEnumerable<Shape> shapeList)
+    {
+        List<Shape> necessaryShapes = new List<Shape>();
+        foreach (Shape s in piece.pieceShapes)
+        {
+            Vector2 searchPos = s.PosXY + shape.PosXY;
+            IEnumerable<Shape> found = shapeList.Where(us => us.PosXY == searchPos
+                                                            && us.IsUpsideDown == s.IsUpsideDown);
+            if (found.Count() != 0)
+            {
+                necessaryShapes.Add(found.First());
+            }
+        }
+        return necessaryShapes;
+    }
+
+    /*private void ChangeShapesPlayableState(IEnumerable<Shape> playableShapes)
     {
         playableShapes.ToList().ForEach(s => s.isPlayable = true);
         shapes.Where(s => !playableShapes.Contains(s)).ToList().ForEach(s => s.isPlayable = false);
+    }*/
+
+    public void DisplayPieceHover(Piece piece)
+    {
+        Shape hoveredShape = GetShapeAtPos(piece.transform.position);
+        if(playableShapes.Contains(hoveredShape))
+        {
+            GetNecessaryShapesForPiece(hoveredShape, piece, shapes).All(s => s.isPlayable = true);
+        }
+    } 
+    
+    public Shape GetShapeAtPos(Vector3 pos)
+    {
+        Shape resShape = null;
+        Vector3 offset = transform.position;
+        Vector2 posOnBoard = new Vector2((pos - offset).x/_paddingX, -(pos-offset).y/_paddingY);
+        IEnumerable<Shape> foundShapes = shapes.Where(s => Mathf.Abs(s.PosXY.x - posOnBoard.x) < 0.5f
+                                                        && Mathf.Abs(s.PosXY.y - posOnBoard.y) < 0.5f);
+        if (foundShapes.Count() != 0)
+        {
+            foundShapes.All(s => s.tmpBool = true);
+            resShape = foundShapes.First();
+            Debug.Log("Hover on shape at pos " + resShape.PosXY);
+        }
+        return resShape;
+    }
+
+    /// <summary>
+    /// Puts the piece on the board
+    /// </summary>
+    /// <param name="piece">The piece to put</param>
+    /// <returns>True if the piece is really put, false else</returns>
+    public bool PutPiece(Piece piece)
+    {
+        Shape hoveredShape = GetShapeAtPos(piece.transform.position);
+        if (playableShapes.Contains(hoveredShape))
+        {
+            IEnumerable<Shape> addedShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
+            addedShapes.All(s => s.isFilled = true);
+            ValidateLines(addedShapes);
+            return true;
+        }
+        return false;
+    }
+
+    private void ValidateLines(IEnumerable<Shape> addedShapes)
+    {
+        List<Shape> validatedShapes = new List<Shape>();
+        foreach (Shape sh in addedShapes)
+        {
+            validatedShapes = CheckLine(validatedShapes, sh.Position.x, 0);
+            validatedShapes = CheckLine(validatedShapes, sh.Position.y, 1);
+            validatedShapes = CheckLine(validatedShapes, sh.Position.z, 2);
+        }
+        FlipValidatedLines(validatedShapes);
     }
 }

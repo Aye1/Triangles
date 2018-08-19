@@ -64,6 +64,7 @@
     <Compile Include="Assets\Board.cs" />
     <Compile Include="Assets\GameManager.cs" />
     <Compile Include="Assets\Piece.cs" />
+    <Compile Include="Assets\PieceManager.cs" />
     <Compile Include="Assets\Shape.cs" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>E:/Dev/Unity Projects/Triangle/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
