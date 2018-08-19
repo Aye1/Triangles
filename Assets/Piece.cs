@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class Piece : MonoBehaviour {
@@ -10,12 +8,31 @@ public class Piece : MonoBehaviour {
     public Shape refShape;
     public List<Shape> pieceShapes;
 
+    private Color pieceColor;
     private bool isDragged = false;
+
     public EventHandler PieceDraggedHandler;
     public EventHandler PieceReleasedHandler;
 
-	// Use this for initialization
-	void Awake () {
+    public Color PieceColor
+    {
+        get
+        {
+            return pieceColor;
+        }
+
+        set
+        {
+            if (pieceColor != value)
+            {
+                pieceColor = value;
+                SetShapesColor();
+            }
+        }
+    }
+
+    // Use this for initialization
+    void Awake () {
         GeneratePiece();
 	}
 	
@@ -76,5 +93,13 @@ public class Piece : MonoBehaviour {
             Destroy(s.gameObject);
         }
         Destroy(this.gameObject);
+    }
+
+    private void SetShapesColor()
+    {
+       foreach (Shape s in pieceShapes)
+        {
+            s.BaseColor = pieceColor;
+        }
     }
 }

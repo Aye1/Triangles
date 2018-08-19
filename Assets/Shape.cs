@@ -7,8 +7,9 @@ public class Shape : MonoBehaviour
     Vector2 posXY;
     private SpriteRenderer _spriteRenderer;
     bool isUpsideDown = false;
-    Color baseColor = Color.white;
+    Color baseColor = new Color(0.19f, 0.25f, 0.25f);
     Color selectedColor = Color.red;
+    Color filledColor;
     public bool isFilled = false;
     public bool isPlayable = false;
     public bool tmpBool = false;
@@ -56,7 +57,10 @@ public class Shape : MonoBehaviour
 
         set
         {
-            baseColor = value;
+            if (baseColor != value)
+            {
+                baseColor = value;
+            }
         }
     }
 
@@ -72,6 +76,19 @@ public class Shape : MonoBehaviour
             posXY = value;
         }
     }
+
+    public Color FilledColor
+    {
+        get
+        {
+            return filledColor;
+        }
+
+        set
+        {
+            filledColor = value;
+        }
+    }
     #endregion
 
     // Use this for initialization
@@ -83,10 +100,12 @@ public class Shape : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ChangeColor(Color.white);
+        ChangeColor(BaseColor);
         if (isPlayable)
         {
-            ChangeColor(Color.green);
+            Color alphaColor = filledColor;
+            alphaColor.a = 0.7f;
+            ChangeColor(alphaColor);
         }
         /*if (tmpBool)
         {
@@ -94,7 +113,7 @@ public class Shape : MonoBehaviour
         } */
         if (isFilled)
         {
-            ChangeColor(Color.red);
+            ChangeColor(FilledColor);
         }
         tmpBool = false;
         isPlayable = false;

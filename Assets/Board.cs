@@ -7,7 +7,7 @@ using UnityEngine;
 public class Board : MonoBehaviour
 {
 
-    private readonly int _minWidth = 7;
+    private readonly int _minWidth = 9;
     private readonly float sqr3 = Mathf.Sqrt(3);
 
     private List<Shape> shapes;
@@ -28,18 +28,6 @@ public class Board : MonoBehaviour
     void Update()
     {
     }
-
-    // Called when any shape is clicked
-    /*public void OnShapeClicked(object shapeSender, EventArgs e)
-    {
-        Shape shape = shapeSender as Shape;
-        Debug.Log("Shape at pos " + shape.Position.ToString() + " clicked");
-        List<Shape> validatedShapes = new List<Shape>();
-        validatedShapes = CheckLine(validatedShapes, shape.Position.x, 0);
-        validatedShapes = CheckLine(validatedShapes, shape.Position.y, 1);
-        validatedShapes = CheckLine(validatedShapes, shape.Position.z, 2);
-        FlipValidatedLines(validatedShapes);
-    }*/
 
     /// <summary>
     /// Checks if a line in complete
@@ -169,7 +157,9 @@ public class Board : MonoBehaviour
         Shape hoveredShape = GetShapeAtPos(piece.transform.position);
         if(playableShapes.Contains(hoveredShape))
         {
-            GetNecessaryShapesForPiece(hoveredShape, piece, shapes).All(s => s.isPlayable = true);
+            IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
+            hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
+            hoveredShapes.ToList().ForEach(s => s.FilledColor = piece.PieceColor);
         }
     } 
     
@@ -200,7 +190,9 @@ public class Board : MonoBehaviour
         if (playableShapes.Contains(hoveredShape))
         {
             IEnumerable<Shape> addedShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
-            addedShapes.All(s => s.isFilled = true);
+            Color pColor = piece.PieceColor;
+            addedShapes.ToList().ForEach(s => s.isFilled = true);
+            addedShapes.ToList().ForEach(s => s.FilledColor = pColor);
             ValidateLines(addedShapes);
             return true;
         }

@@ -8,6 +8,7 @@ public class PieceManager : MonoBehaviour {
 
     private List<Piece> pieces;
     private Random _randomGen;
+    public List<Color> colors;
 
 	// Use this for initialization
 	void Awake () {
@@ -31,8 +32,19 @@ public class PieceManager : MonoBehaviour {
         {
             int index = _randomGen.Next(0, pieces.Count);
             Piece newPiece = Instantiate(pieces.ToArray()[index]);
+            newPiece.PieceColor = GetNextColor();
             return newPiece;
         }
         return null;
+    }
+
+    private Color GetNextColor()
+    {
+        if (colors != null)
+        {
+            int index = _randomGen.Next(0, colors.Count);
+            return colors[index];
+        }
+        return Color.white;
     }
 }
