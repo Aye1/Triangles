@@ -9,13 +9,20 @@ public class GameManager : MonoBehaviour {
     private PieceManager _pieceManager;
     private Piece _draggedPiece;
 
+    private Vector3[] _piecePositions = {new Vector3(-4.0f, 2.5f, 0.0f),
+        new Vector3(-4.0f, 0.0f, 0.0f),
+        new Vector3(-4.0f, -2.5f, 0.0f) };
+
+    private Piece[] _pieceSlots;
+
     public bool debugPieceDraggedPosition = false;
 
 	// Use this for initialization
 	void Start () {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
-        GetNewPiece();
+        _pieceSlots = new Piece[3];
+        GetThreePieces();
 	}
 	
 	// Update is called once per frame
@@ -45,18 +52,46 @@ public class GameManager : MonoBehaviour {
     {
         if(_board.PutPiece(_draggedPiece))
         {
+            int idPos = GetDestroyingPieceSlotId(_draggedPiece);
             CleanDestroyPiece(_draggedPiece);
-            GetNewPiece();
+            Piece newPiece = GetNewPiece();
+            newPiece.transform.position = _piecePositions[idPos];
+            _pieceSlots[idPos] = newPiece;
+        } else
+        {
+            _draggedPiece.transform.position = _piecePositions[GetDestroyingPieceSlotId(_draggedPiece)];
         }
         _draggedPiece = null;
     }
 
-    private void GetNewPiece()
+    private void GetThreePieces()
+    {
+        for(int i=0; i<_piecePositions.Length; i++)
+        {
+            Piece newPiece = GetNewPiece();
+            newPiece.transform.position = _piecePositions[i];
+            _pieceSlots[i] = newPiece;
+        }
+    }
+
+    private int GetDestroyingPieceSlotId(Piece piece)
+    {
+        for(int i=0; i<_pieceSlots.Length; i++)
+        {
+            if (_pieceSlots[i] == piece)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private Piece GetNewPiece()
     {
         Piece newPiece = _pieceManager.GetNextPiece();
         newPiece.transform.parent = transform;
-        newPiece.transform.position = new Vector3(-4.0f, -3.0f, 0.0f);
         ListenToPieceEvent(newPiece);
+        return newPiece;
     }
 
     private void CleanDestroyPiece(Piece piece)
