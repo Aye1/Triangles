@@ -7,8 +7,6 @@ public class GameManager : MonoBehaviour {
 
     private Board _board;
     private PieceManager _pieceManager;
-    public Piece piece;
-
     private Piece _draggedPiece;
 
     public bool debugPieceDraggedPosition = false;
@@ -17,8 +15,7 @@ public class GameManager : MonoBehaviour {
 	void Start () {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
-        piece.PieceDraggedHandler += OnPieceDragged;
-        piece.PieceReleasedHandler += OnPieceReleased;
+        GetNewPiece();
 	}
 	
 	// Update is called once per frame
@@ -49,12 +46,17 @@ public class GameManager : MonoBehaviour {
         if(_board.PutPiece(_draggedPiece))
         {
             CleanDestroyPiece(_draggedPiece);
-            Piece newPiece = _pieceManager.GetNextPiece();
-            newPiece.transform.parent = transform;
-            newPiece.transform.position = new Vector3(-4.0f, 0.0f, 0.0f);
-            ListenToPieceEvent(newPiece);
+            GetNewPiece();
         }
         _draggedPiece = null;
+    }
+
+    private void GetNewPiece()
+    {
+        Piece newPiece = _pieceManager.GetNextPiece();
+        newPiece.transform.parent = transform;
+        newPiece.transform.position = new Vector3(-4.0f, -3.0f, 0.0f);
+        ListenToPieceEvent(newPiece);
     }
 
     private void CleanDestroyPiece(Piece piece)

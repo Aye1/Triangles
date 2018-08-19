@@ -8,8 +8,6 @@ public class Board : MonoBehaviour
 {
 
     private readonly int _minWidth = 9;
-    private readonly float _paddingX = 0.5f;
-    private readonly float _paddingY = Mathf.Sqrt(2) / 2.0f;
     private readonly float sqr3 = Mathf.Sqrt(3);
 
     private List<Shape> shapes;
@@ -100,7 +98,7 @@ public class Board : MonoBehaviour
 
                 newShape.IsUpsideDown = ((i + j) % 2 == 0);
 
-                newShape.transform.position = transform.position + new Vector3(i*_paddingX, -j * _paddingY, newShape.transform.position.z);
+                newShape.transform.position = transform.position + new Vector3(i*Config.paddingX, -j*Config.paddingY, newShape.transform.position.z);
                 newShape.transform.parent = transform;
                 shapes.Add(newShape);
                 unfilledShapes = shapes;
@@ -177,7 +175,7 @@ public class Board : MonoBehaviour
     {
         Shape resShape = null;
         Vector3 offset = transform.position;
-        Vector2 posOnBoard = new Vector2((pos - offset).x/_paddingX, -(pos-offset).y/_paddingY);
+        Vector2 posOnBoard = new Vector2((pos - offset).x/Config.paddingX, -(pos-offset).y/Config.paddingY);
         IEnumerable<Shape> foundShapes = shapes.Where(s => Mathf.Abs(s.PosXY.x - posOnBoard.x) < 0.5f
                                                         && Mathf.Abs(s.PosXY.y - posOnBoard.y) < 0.5f);
         if (foundShapes.Count() != 0)

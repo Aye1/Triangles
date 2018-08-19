@@ -22,7 +22,7 @@ public class PieceManager : MonoBehaviour {
     {
         if (pieces != null)
         {
-            int index = _randomGen.Next(0, pieces.Count-1);
+            int index = _randomGen.Next(0, pieces.Count);
             Piece newPiece = Instantiate(pieces.ToArray()[index]);
             return newPiece;
         }

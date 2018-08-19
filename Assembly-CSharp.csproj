@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Board.cs" />
+    <Compile Include="Assets\Config.cs" />
     <Compile Include="Assets\GameManager.cs" />
     <Compile Include="Assets\Piece.cs" />
     <Compile Include="Assets\PieceManager.cs" />

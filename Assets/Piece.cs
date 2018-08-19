@@ -39,7 +39,7 @@ public class Piece : MonoBehaviour {
         foreach (Vector4 pos in positionsXY)
         {
             Shape newShape = Instantiate(refShape);
-            newShape.transform.position = transform.position + new Vector3(pos.x / 2.0f, pos.y, pos.z);
+            newShape.transform.position = transform.position + new Vector3(pos.x*Config.paddingX, -pos.y*Config.paddingY, pos.z);
             newShape.IsUpsideDown = pos.w == 1.0f;
             newShape.transform.parent = transform;
 
