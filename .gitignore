@@ -7,6 +7,7 @@ Assets/AssetStoreTools*
 
 # Custom ignores
 *.psd
+*.psd.meta
 
 # Visual Studio cache directory
 .vs/
