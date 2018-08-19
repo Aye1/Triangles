@@ -1,9 +1,12 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
+
+    public TextMeshProUGUI textScore;
+    public TextMeshProUGUI gameOverScore;
+    public int _globalScore;
 
     private Board _board;
     private PieceManager _pieceManager;
@@ -17,12 +20,15 @@ public class GameManager : MonoBehaviour {
 
     public bool debugPieceDraggedPosition = false;
 
+
 	// Use this for initialization
 	void Start () {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
         _pieceSlots = new Piece[3];
+        gameOverScore.alpha = 0.0f;
         GetThreePieces();
+        ComputeScore();
 	}
 	
 	// Update is called once per frame
@@ -33,6 +39,13 @@ public class GameManager : MonoBehaviour {
         }
         tmppiecedragged();
 	}
+
+    void ComputeScore()
+    {
+        _globalScore += _board.numberFlippedShapes;
+            _board.numberFlippedShapes = 0;
+        textScore.text = "Score : " + _globalScore;
+    }
 
     private void tmppiecedragged()
     {
@@ -57,7 +70,11 @@ public class GameManager : MonoBehaviour {
             Piece newPiece = GetNewPiece();
             newPiece.transform.position = _piecePositions[idPos];
             _pieceSlots[idPos] = newPiece;
-        } else
+
+            ComputeScore();
+            ManageGameOver();
+        }
+        else
         {
             _draggedPiece.transform.position = _piecePositions[GetDestroyingPieceSlotId(_draggedPiece)];
         }
@@ -94,6 +111,28 @@ public class GameManager : MonoBehaviour {
         return newPiece;
     }
 
+    private void ManageGameOver()
+    {
+        if (!CheckCanPlay())
+        {
+            Debug.Log("Game Over");
+            ChangeVisibility(gameOverScore);
+        }
+    }
+
+    private bool CheckCanPlay()
+    {
+        bool canPlay = false;
+        foreach (Piece p in _pieceSlots)
+        {
+            if (p != null)
+            {
+                canPlay = canPlay || _board.CheckCanPlay(p);
+            }
+        }
+        return canPlay;
+    }
+
     private void CleanDestroyPiece(Piece piece)
     {
         piece.PieceDraggedHandler -= OnPieceDragged;
@@ -105,5 +144,19 @@ public class GameManager : MonoBehaviour {
     {
         newPiece.PieceDraggedHandler += OnPieceDragged;
         newPiece.PieceReleasedHandler += OnPieceReleased;
+    }
+
+    private void ChangeVisibility(TextMeshProUGUI text)
+    {
+        text.alpha = 1.0f - text.alpha;
+    }
+
+    public void ShuffleShapes()
+    {
+        foreach(Piece p in _pieceSlots)
+        {
+            CleanDestroyPiece(p);
+        }
+        GetThreePieces();
     }
 }

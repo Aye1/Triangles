@@ -7,7 +7,7 @@ using UnityEngine;
 public class Board : MonoBehaviour
 {
 
-    private readonly int _minWidth = 9;
+    private readonly int _minWidth = 7;
     private readonly float sqr3 = Mathf.Sqrt(3);
 
     private List<Shape> shapes;
@@ -15,10 +15,10 @@ public class Board : MonoBehaviour
     private IEnumerable<Shape> playableShapes;
 
     public Shape basicShape;
-
+    public int numberFlippedShapes = 0;
 
     // Use this for initialization
-    void Start()
+    void Awake()
     {
         shapes = new List<Shape>();
         CreateBoard();
@@ -66,6 +66,8 @@ public class Board : MonoBehaviour
     private void FlipValidatedLines(List<Shape> valShapes)
     {
         valShapes.ForEach(shape => shape.isFilled = false);
+
+        numberFlippedShapes = valShapes.Count;
     }
 
     /// <summary>
@@ -182,7 +184,7 @@ public class Board : MonoBehaviour
         {
             foundShapes.All(s => s.tmpBool = true);
             resShape = foundShapes.First();
-            Debug.Log("Hover on shape at pos " + resShape.PosXY);
+            //Debug.Log("Hover on shape at pos " + resShape.PosXY);
         }
         return resShape;
     }
@@ -215,5 +217,10 @@ public class Board : MonoBehaviour
             validatedShapes = CheckLine(validatedShapes, sh.Position.z, 2);
         }
         FlipValidatedLines(validatedShapes);
+    }
+
+    public bool CheckCanPlay(Piece piece)
+    {
+        return FindPlayableShapes(piece).Count() > 0;
     }
 }
