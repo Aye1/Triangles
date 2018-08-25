@@ -7,7 +7,7 @@ public class Shape : MonoBehaviour
     Vector2 posXY;
     private SpriteRenderer _spriteRenderer;
     bool isUpsideDown = false;
-    Color baseColor = new Color(0.19f, 0.25f, 0.25f);
+    Color baseColor = new Color(0.87f, 0.87f, 0.90f);
     Color selectedColor = Color.red;
     Color filledColor;
     public bool isFilled = false;
@@ -107,10 +107,11 @@ public class Shape : MonoBehaviour
             alphaColor.a = 0.7f;
             ChangeColor(alphaColor);
         }
-        /*if (tmpBool)
+        if (tmpBool)
         {
             ChangeColor(Color.cyan);
-        } */
+            Debug.Log("Tmp position " + transform.position);
+        } 
         if (isFilled)
         {
             ChangeColor(FilledColor);

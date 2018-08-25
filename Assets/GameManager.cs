@@ -12,9 +12,9 @@ public class GameManager : MonoBehaviour {
     private PieceManager _pieceManager;
     private Piece _draggedPiece;
 
-    private Vector3[] _piecePositions = {new Vector3(-4.0f, 2.5f, 0.0f),
-        new Vector3(-4.0f, 0.0f, 0.0f),
-        new Vector3(-4.0f, -2.5f, 0.0f) };
+    private Vector3[] _piecePositions = {new Vector3(-1.5f, -2.5f, -1.0f),
+        new Vector3(0.0f, -2.5f, -1.0f),
+        new Vector3(1.5f, -2.5f, -1.0f) };
 
     private Piece[] _pieceSlots;
 
@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour {
         {
             Debug.Log("Piece dragged at pos " + _draggedPiece.transform.position.ToString());
         }
-        tmppiecedragged();
+        DisplayPieceHover();
 	}
 
     void ComputeScore()
@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour {
         textScore.text = "Score : " + _globalScore;
     }
 
-    private void tmppiecedragged()
+    private void DisplayPieceHover()
     {
         if (_draggedPiece != null)
         {
@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour {
     {
         if(_board.PutPiece(_draggedPiece))
         {
-            int idPos = GetDestroyingPieceSlotId(_draggedPiece);
+            int idPos = GetPieceSlotId(_draggedPiece);
             CleanDestroyPiece(_draggedPiece);
             Piece newPiece = GetNewPiece();
             newPiece.transform.position = _piecePositions[idPos];
@@ -76,7 +76,7 @@ public class GameManager : MonoBehaviour {
         }
         else
         {
-            _draggedPiece.transform.position = _piecePositions[GetDestroyingPieceSlotId(_draggedPiece)];
+            _draggedPiece.transform.position = _piecePositions[GetPieceSlotId(_draggedPiece)];
         }
         _draggedPiece = null;
     }
@@ -91,7 +91,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    private int GetDestroyingPieceSlotId(Piece piece)
+    private int GetPieceSlotId(Piece piece)
     {
         for(int i=0; i<_pieceSlots.Length; i++)
         {
@@ -107,6 +107,7 @@ public class GameManager : MonoBehaviour {
     {
         Piece newPiece = _pieceManager.GetNextPiece();
         newPiece.transform.parent = transform;
+        newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
         ListenToPieceEvent(newPiece);
         return newPiece;
     }

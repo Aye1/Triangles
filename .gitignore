@@ -8,6 +8,8 @@ Assets/AssetStoreTools*
 # Custom ignores
 *.psd
 *.psd.meta
+*Thumbs.db
+*Thumbs.db.meta
 
 # Visual Studio cache directory
 .vs/
