@@ -11,6 +11,7 @@ public class Shape : MonoBehaviour
     Color selectedColor = Color.red;
     Color filledColor;
     public bool isFilled = false;
+    private bool isVisuallyFilled = false;
     public bool isPlayable = false;
     public bool tmpBool = false;
 
@@ -18,7 +19,7 @@ public class Shape : MonoBehaviour
     public EventHandler ShapeReleasedHandler;
 
     #region Properties
-    public Vector3Int Position
+    public Vector3Int PositionABC
     {
         get
         {
@@ -89,6 +90,19 @@ public class Shape : MonoBehaviour
             filledColor = value;
         }
     }
+
+    public bool IsVisuallyFilled
+    {
+        get
+        {
+            return isVisuallyFilled;
+        }
+
+        set
+        {
+            isVisuallyFilled = value;
+        }
+    }
     #endregion
 
     // Use this for initialization
@@ -112,7 +126,7 @@ public class Shape : MonoBehaviour
             ChangeColor(Color.cyan);
             Debug.Log("Tmp position " + transform.position);
         } 
-        if (isFilled)
+        if (IsVisuallyFilled)
         {
             ChangeColor(FilledColor);
         }

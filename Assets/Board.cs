@@ -36,26 +36,36 @@ public class Board : MonoBehaviour
     /// <param name="index">Index of the current shape on the line analysed</param>
     /// <param name="pos">Id of the line analysed (0=A, 1=B, 2=C)</param>
     /// <returns></returns>
-    private List<Shape> CheckLine(List<Shape> valShapes, int index, int pos)
+    private IEnumerable<Shape> CheckLine(int index, int pos)
     {
-        IEnumerable<Shape> toValidate = shapes.Where<Shape>(shape => shape.Position[pos] == index);
+        IEnumerable<Shape> toValidate = shapes.Where<Shape>(shape => shape.PositionABC[pos] == index);
         bool lineValidated = toValidate.All(shape => shape.isFilled);
         if (lineValidated)
         {
-            valShapes.AddRange(toValidate);
+            return toValidate;
         }
-        return valShapes;
+        return null;
     }
 
     /// <summary>
     /// Puts shapes which form lines to their basic state
     /// </summary>
     /// <param name="valShapes">The list of shapes which form lines</param>
-    private void FlipValidatedLines(List<Shape> valShapes)
+    private void FlipValidatedLines(IEnumerable<Shape> valShapes)
     {
-        valShapes.ForEach(shape => shape.isFilled = false);
+        valShapes.ToList().ForEach(shape => shape.isFilled = false);
+        StartCoroutine(VisuallyFlipShapes(valShapes));
 
-        numberFlippedShapes = valShapes.Count;
+        numberFlippedShapes = valShapes.ToList().Count;
+    }
+
+    private IEnumerator VisuallyFlipShapes(IEnumerable<Shape> flipShapes)
+    {
+        foreach (Shape s in flipShapes)
+        {
+            s.IsVisuallyFilled = false;
+            yield return new WaitForSeconds(0.02f);
+        }
     }
 
     /// <summary>
@@ -83,7 +93,7 @@ public class Board : MonoBehaviour
                 int A = j;
                 int B = (int)Mathf.Ceil((-i - j) / 2.0f);
                 int C = (int)Mathf.Floor(-(i - j) / 2.0f);
-                newShape.Position = new Vector3Int(A, B, C);
+                newShape.PositionABC = new Vector3Int(A, B, C);
                 newShape.PosXY = new Vector2(i, j);
 
                 newShape.IsUpsideDown = ((i + j) % 2 == 0);
@@ -152,12 +162,6 @@ public class Board : MonoBehaviour
         return necessaryShapes;
     }
 
-    /*private void ChangeShapesPlayableState(IEnumerable<Shape> playableShapes)
-    {
-        playableShapes.ToList().ForEach(s => s.isPlayable = true);
-        shapes.Where(s => !playableShapes.Contains(s)).ToList().ForEach(s => s.isPlayable = false);
-    }*/
-
     public void DisplayPieceHover(Piece piece)
     {
         Shape hoveredShape = GetShapeAtPos(Input.mousePosition);
@@ -211,6 +215,7 @@ public class Board : MonoBehaviour
             IEnumerable<Shape> addedShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
             Color pColor = piece.PieceColor;
             addedShapes.ToList().ForEach(s => s.isFilled = true);
+            addedShapes.ToList().ForEach(s => s.IsVisuallyFilled = true);
             addedShapes.ToList().ForEach(s => s.FilledColor = pColor);
             ValidateLines(addedShapes);
             return true;
@@ -220,18 +225,36 @@ public class Board : MonoBehaviour
 
     private void ValidateLines(IEnumerable<Shape> addedShapes)
     {
-        List<Shape> validatedShapes = new List<Shape>();
+        List<IEnumerable<Shape>> validatedShapes = new List<IEnumerable<Shape>>();
         foreach (Shape sh in addedShapes)
         {
-            validatedShapes = CheckLine(validatedShapes, sh.Position.x, 0);
-            validatedShapes = CheckLine(validatedShapes, sh.Position.y, 1);
-            validatedShapes = CheckLine(validatedShapes, sh.Position.z, 2);
+            IEnumerable<Shape> curShapes = CheckLine(sh.PositionABC.x, 0);
+            if (curShapes != null)
+            {
+                validatedShapes.Add(curShapes.OrderBy(s => -s.PositionABC.y));
+            }
+            curShapes = CheckLine(sh.PositionABC.y, 1);
+            if (curShapes != null)
+            {
+                validatedShapes.Add(curShapes.OrderBy(s => s.PositionABC.z));
+            }
+            curShapes = CheckLine(sh.PositionABC.z, 2);
+            if (curShapes != null)
+            {
+                validatedShapes.Add(curShapes.OrderBy(s => s.PositionABC.x));
+            }
         }
-        FlipValidatedLines(validatedShapes);
+        validatedShapes.Where(ls => ls != null).ToList().ForEach(ls => FlipValidatedLines(ls));
     }
 
     public bool CheckCanPlay(Piece piece)
     {
         return FindPlayableShapes(piece).Count() > 0;
+    }
+
+    public void ResetBoard()
+    {
+        shapes.ForEach(s => s.isFilled = false);
+        shapes.ForEach(s => s.IsVisuallyFilled = false);
     }
 }

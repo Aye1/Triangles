@@ -1,11 +1,12 @@
 ﻿using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
     public TextMeshProUGUI textScore;
-    public TextMeshProUGUI gameOverScore;
+    public GameObject endGamePopup;
     public int _globalScore;
 
     private Board _board;
@@ -26,9 +27,9 @@ public class GameManager : MonoBehaviour {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
         _pieceSlots = new Piece[3];
-        gameOverScore.alpha = 0.0f;
         GetThreePieces();
         ComputeScore();
+        HideGameObject(endGamePopup);
 	}
 	
 	// Update is called once per frame
@@ -38,13 +39,13 @@ public class GameManager : MonoBehaviour {
             Debug.Log("Piece dragged at pos " + _draggedPiece.transform.position.ToString());
         }
         DisplayPieceHover();
-	}
+        textScore.text = "Score : " + _globalScore;
+    }
 
     void ComputeScore()
     {
         _globalScore += _board.numberFlippedShapes;
-            _board.numberFlippedShapes = 0;
-        textScore.text = "Score : " + _globalScore;
+        _board.numberFlippedShapes = 0;
     }
 
     private void DisplayPieceHover()
@@ -117,7 +118,7 @@ public class GameManager : MonoBehaviour {
         if (!CheckCanPlay())
         {
             Debug.Log("Game Over");
-            ChangeVisibility(gameOverScore);
+            DisplayGameObject(endGamePopup);
         }
     }
 
@@ -147,9 +148,14 @@ public class GameManager : MonoBehaviour {
         newPiece.PieceReleasedHandler += OnPieceReleased;
     }
 
-    private void ChangeVisibility(TextMeshProUGUI text)
+    private void DisplayGameObject(GameObject obj)
     {
-        text.alpha = 1.0f - text.alpha;
+        obj.SetActive(true);
+    }
+
+    private void HideGameObject(GameObject obj)
+    {
+        obj.SetActive(false);
     }
 
     public void ShuffleShapes()
@@ -159,5 +165,25 @@ public class GameManager : MonoBehaviour {
             CleanDestroyPiece(p);
         }
         GetThreePieces();
+        ManageGameOver();
+    }
+
+    public void ShuffleShapesInPopup()
+    {
+        ShuffleShapes();
+        HideGameObject(endGamePopup);
+    }
+
+    public void Restart()
+    {
+        _globalScore = 0;
+        ShuffleShapes();
+        _board.ResetBoard();
+        HideGameObject(endGamePopup);
+    }
+
+    public void GoToMainMenuScreen()
+    {
+        SceneManager.LoadScene(0);
     }
 }
