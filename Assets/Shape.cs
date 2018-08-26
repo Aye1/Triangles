@@ -12,8 +12,10 @@ public class Shape : MonoBehaviour
     Color filledColor;
     public bool isFilled = false;
     private bool isVisuallyFilled = false;
+    private bool isHighlighted = false;
     public bool isPlayable = false;
     public bool tmpBool = false;
+    public SpriteRenderer halo;
 
     public EventHandler ShapeClickedHandler;
     public EventHandler ShapeReleasedHandler;
@@ -103,6 +105,19 @@ public class Shape : MonoBehaviour
             isVisuallyFilled = value;
         }
     }
+
+    public bool IsHighlighted
+    {
+        get
+        {
+            return isHighlighted;
+        }
+
+        set
+        {
+            isHighlighted = value;
+        }
+    }
     #endregion
 
     // Use this for initialization
@@ -130,6 +145,7 @@ public class Shape : MonoBehaviour
         {
             ChangeColor(FilledColor);
         }
+        halo.enabled = IsHighlighted;
         tmpBool = false;
         isPlayable = false;
     }

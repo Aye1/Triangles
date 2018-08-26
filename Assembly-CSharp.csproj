@@ -67,6 +67,7 @@
     <Compile Include="Assets\GameManager.cs" />
     <Compile Include="Assets\Piece.cs" />
     <Compile Include="Assets\PieceManager.cs" />
+    <Compile Include="Assets\PulsingObject.cs" />
     <Compile Include="Assets\SceneController.cs" />
     <Compile Include="Assets\Shape.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />

@@ -2,16 +2,20 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Threading;
 
 public class GameManager : MonoBehaviour {
 
     public TextMeshProUGUI textScore;
     public GameObject endGamePopup;
+    public GameObject pausePopup;
     public int _globalScore;
 
     private Board _board;
     private PieceManager _pieceManager;
     private Piece _draggedPiece;
+
+    private Timer _helpTimer;
 
     private Vector3[] _piecePositions = {new Vector3(-1.5f, -2.5f, -1.0f),
         new Vector3(0.0f, -2.5f, -1.0f),
@@ -30,6 +34,8 @@ public class GameManager : MonoBehaviour {
         GetThreePieces();
         ComputeScore();
         HideGameObject(endGamePopup);
+        HideGameObject(pausePopup);
+        LaunchHelpTimer();
 	}
 	
 	// Update is called once per frame
@@ -60,6 +66,7 @@ public class GameManager : MonoBehaviour {
     {
         _draggedPiece = sender as Piece;
         _board.FindPlayableShapes(_draggedPiece);
+        ResetHelpTimer();
     }
 
     private void OnPieceReleased(object sender, EventArgs e)
@@ -80,6 +87,7 @@ public class GameManager : MonoBehaviour {
             _draggedPiece.transform.position = _piecePositions[GetPieceSlotId(_draggedPiece)];
         }
         _draggedPiece = null;
+        ResetHelpTimer();
     }
 
     private void GetThreePieces()
@@ -122,14 +130,19 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    private bool CheckCanPlay()
+    private bool CheckCanPlay(bool shouldHighlight=false)
     {
         bool canPlay = false;
         foreach (Piece p in _pieceSlots)
         {
             if (p != null)
             {
-                canPlay = canPlay || _board.CheckCanPlay(p);
+                bool canPlayPiece = _board.CheckCanPlay(p);
+                if (shouldHighlight)
+                {
+                    p.Highlight(canPlayPiece);
+                }
+                canPlay = canPlay || canPlayPiece;
             }
         }
         return canPlay;
@@ -166,12 +179,13 @@ public class GameManager : MonoBehaviour {
         }
         GetThreePieces();
         ManageGameOver();
+        ResetHelpTimer();
     }
 
     public void ShuffleShapesInPopup()
     {
-        ShuffleShapes();
         HideGameObject(endGamePopup);
+        ShuffleShapes();
     }
 
     public void Restart()
@@ -185,5 +199,47 @@ public class GameManager : MonoBehaviour {
     public void GoToMainMenuScreen()
     {
         SceneManager.LoadScene(0);
+    }
+
+    public void DisplayPauseMenu()
+    {
+        DisplayGameObject(pausePopup);
+        Time.timeScale = 0.0f;
+    }
+
+    public void HidePauseMenu()
+    {
+        HideGameObject(pausePopup);
+        Time.timeScale = 1.0f;
+    }
+
+    private void LaunchHelpTimer()
+    {
+        _helpTimer = new Timer(OnHelpTimerFinished, null, 5000, 0);
+        Debug.Log("Launch timer");
+    }
+
+    private void ResetHelpTimer()
+    {
+        _helpTimer.Dispose();
+        LaunchHelpTimer();
+        UnHighlightAllPieces();
+    }
+
+    private void OnHelpTimerFinished(object state)
+    {
+        Debug.Log("Timer finished");
+        CheckCanPlay(true);
+    }
+
+    private void UnHighlightAllPieces()
+    {
+        foreach (Piece p in _pieceSlots)
+        {
+            if (p != null)
+            {
+                p.Highlight(false);
+            }
+        }
     }
 }

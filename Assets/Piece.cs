@@ -102,4 +102,12 @@ public class Piece : MonoBehaviour {
             s.BaseColor = pieceColor;
         }
     }
+
+    public void Highlight(bool highlight)
+    {
+        foreach (Shape s in pieceShapes)
+        {
+            s.IsHighlighted = highlight;
+        }
+    }
 }
