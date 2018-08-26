@@ -110,10 +110,8 @@ public class Board : MonoBehaviour
     /// <returns></returns>
     public IEnumerable<Shape> FindPlayableShapes(Piece piece)
     {
-        unfilledShapes = shapes.Where(s => !s.isFilled);
-
         IEnumerable<Shape> resShapes = new List<Shape>();
-        resShapes = unfilledShapes.Where(s => IsPiecePlayableOnShape(s, piece));
+        resShapes = shapes.Where(s => IsPiecePlayableOnShape(s, piece));
         playableShapes = resShapes;
         return resShapes;
     }
@@ -126,6 +124,7 @@ public class Board : MonoBehaviour
     /// <returns></returns>
     private bool IsPiecePlayableOnShape(Shape shape, Piece piece)
     {
+        unfilledShapes = shapes.Where(s => !s.isFilled);
         IEnumerable<Shape> necessaryShapes = GetNecessaryShapesForPiece(shape, piece, unfilledShapes);
         return necessaryShapes.Count() == piece.pieceShapes.Count;
     }
