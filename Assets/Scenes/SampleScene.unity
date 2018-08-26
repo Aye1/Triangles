@@ -2964,7 +2964,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 772416203}
-        m_MethodName: ShuffleShapes
+        m_MethodName: ShuffleUntilPlayable
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

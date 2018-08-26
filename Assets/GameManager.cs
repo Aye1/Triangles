@@ -171,27 +171,40 @@ public class GameManager : MonoBehaviour {
         obj.SetActive(false);
     }
 
-    public void ShuffleShapes()
+    /// <summary>
+    /// Shuffles shapes. 
+    /// Should not be called directly. 
+    /// Call ShuffleUntilPlayable instead.
+    /// </summary>
+    private void ShuffleShapes()
     {
         foreach(Piece p in _pieceSlots)
         {
             CleanDestroyPiece(p);
         }
         GetThreePieces();
-        ManageGameOver();
+    }
+
+    public void ShuffleUntilPlayable()
+    {
+        ShuffleShapes();
+        while (!CheckCanPlay())
+        {
+            ShuffleShapes();
+        }
         ResetHelpTimer();
     }
 
     public void ShuffleShapesInPopup()
     {
         HideGameObject(endGamePopup);
-        ShuffleShapes();
+        ShuffleUntilPlayable();
     }
 
     public void Restart()
     {
         _globalScore = 0;
-        ShuffleShapes();
+        ShuffleUntilPlayable();
         _board.ResetBoard();
         HideGameObject(endGamePopup);
     }
