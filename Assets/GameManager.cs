@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour {
     public GameObject pausePopup;
     public int _globalScore;
 
+    private int _shuffleCount = 0;
+
     private Board _board;
     private PieceManager _pieceManager;
     private Piece _draggedPiece;
@@ -25,9 +27,22 @@ public class GameManager : MonoBehaviour {
 
     public bool debugPieceDraggedPosition = false;
 
+    public int ShuffleCount
+    {
+        get
+        {
+            return _shuffleCount;
+        }
 
-	// Use this for initialization
-	void Start () {
+        set
+        {
+            _shuffleCount = value;
+        }
+    }
+
+
+    // Use this for initialization
+    void Start () {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
         _pieceSlots = new Piece[3];
