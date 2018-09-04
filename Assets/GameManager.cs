@@ -7,6 +7,7 @@ using System.Threading;
 public class GameManager : MonoBehaviour {
 
     public TextMeshProUGUI textScore;
+    public TextMeshProUGUI textShuffle;
     public GameObject endGamePopup;
     public GameObject pausePopup;
     public int _globalScore;
@@ -61,11 +62,13 @@ public class GameManager : MonoBehaviour {
         }
         DisplayPieceHover();
         textScore.text = "Score : " + _globalScore;
+        textShuffle.text = "Shuffle : " + _shuffleCount;
     }
 
     void ComputeScore()
     {
         _globalScore += _board.numberFlippedShapes;
+        _shuffleCount += _board.numberFlippedLines;
         _board.numberFlippedShapes = 0;
     }
 
@@ -219,6 +222,7 @@ public class GameManager : MonoBehaviour {
     public void Restart()
     {
         _globalScore = 0;
+        _shuffleCount = 0;
         ShuffleUntilPlayable();
         _board.ResetBoard();
         HideGameObject(endGamePopup);

@@ -6,6 +6,8 @@ using UnityEngine.Advertisements;
 public class RewardedVideoManager : MonoBehaviour {
 
     private bool _isRewardedVideoAvailable = false;
+    private uint _numberRewardedVideo = 0;
+    public static uint NumberMaxRewardedVideoInGame = 1;
 
     public EventHandler OnVideoCompleted;
 
@@ -43,9 +45,18 @@ public class RewardedVideoManager : MonoBehaviour {
 
     public void DisplayRewardedVideo()
     {
-        ShowOptions options = new ShowOptions();
-        options.resultCallback = HandleDisplayResult;
-        Advertisement.Show("rewardedVideo", options);
+        if (_numberRewardedVideo <= NumberMaxRewardedVideoInGame)
+        {
+            ShowOptions options = new ShowOptions();
+            options.resultCallback = HandleDisplayResult;
+            Advertisement.Show("rewardedVideo", options);
+            _numberRewardedVideo++;
+        }
+    }
+
+    public bool IsVideoAvailable()
+    {
+        return _isRewardedVideoAvailable && (_numberRewardedVideo <= NumberMaxRewardedVideoInGame);
     }
 
     private void HandleDisplayResult(ShowResult result)

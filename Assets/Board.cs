@@ -16,6 +16,7 @@ public class Board : MonoBehaviour
 
     public Shape basicShape;
     public int numberFlippedShapes = 0;
+    public int numberFlippedLines = 0;
 
     // Use this for initialization
     void Awake()
@@ -244,6 +245,13 @@ public class Board : MonoBehaviour
                 validatedShapes.Add(curShapes.OrderBy(s => s.PositionABC.x));
             }
         }
+
+        
+        if(validatedShapes.Count - 1 >= 0)
+        {
+            numberFlippedLines = validatedShapes.Count - 1;
+        }
+
         validatedShapes.Where(ls => ls != null).ToList().ForEach(ls => FlipValidatedLines(ls));
     }
 
