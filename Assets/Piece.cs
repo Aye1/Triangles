@@ -8,6 +8,8 @@ public class Piece : MonoBehaviour {
     public Shape refShape;
     public List<Shape> pieceShapes;
 
+    public float dragPositionOffset = 1.0f;
+
     private Color pieceColor;
     private bool isDragged = false;
 
@@ -46,7 +48,7 @@ public class Piece : MonoBehaviour {
         if (isDragged)
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            transform.position = new Vector3(mousePos.x, mousePos.y, -1);
+            transform.position = new Vector3(mousePos.x, mousePos.y + dragPositionOffset, -1);
         }
     }
 

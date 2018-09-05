@@ -165,7 +165,7 @@ public class Board : MonoBehaviour
 
     public void DisplayPieceHover(Piece piece)
     {
-        Shape hoveredShape = GetShapeAtPos(Input.mousePosition);
+        Shape hoveredShape = GetShapeAtPos(piece.transform.position, false);
         if(playableShapes.Contains(hoveredShape))
         {
             IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
@@ -190,10 +190,10 @@ public class Board : MonoBehaviour
         return resShape;
     }*/
 
-    public Shape GetShapeAtPos(Vector3 pos)
+    public Shape GetShapeAtPos(Vector3 pos, bool shouldConvertToWorldPosition)
     {
         Shape resShape = null;
-        Vector3 realPos = Camera.main.ScreenToWorldPoint(pos);
+        Vector3 realPos = shouldConvertToWorldPosition ? Camera.main.ScreenToWorldPoint(pos) : pos;
         Vector2 pos2D = new Vector2(realPos.x, realPos.y);
         RaycastHit2D hit = Physics2D.Raycast(pos2D, Vector2.zero, Mathf.Infinity, Physics.DefaultRaycastLayers, 0.0f);
         if(hit.collider != null)
@@ -210,7 +210,7 @@ public class Board : MonoBehaviour
     /// <returns>True if the piece is really put, false else</returns>
     public bool PutPiece(Piece piece)
     {
-        Shape hoveredShape = GetShapeAtPos(Input.mousePosition);
+        Shape hoveredShape = GetShapeAtPos(piece.transform.position, false);
         if (playableShapes.Contains(hoveredShape))
         {
             IEnumerable<Shape> addedShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
