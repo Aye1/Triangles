@@ -17,6 +17,7 @@ public class Board : MonoBehaviour
     public Shape basicShape;
     public int numberFlippedShapes = 0;
     public int numberFlippedLines = 0;
+    public int lastNumberValidatedLines = 0;
 
     // Use this for initialization
     void Awake()
@@ -224,35 +225,36 @@ public class Board : MonoBehaviour
         return false;
     }
 
-    private void ValidateLines(IEnumerable<Shape> addedShapes)
+    private int ValidateLines(IEnumerable<Shape> addedShapes)
     {
         List<IEnumerable<Shape>> validatedShapes = new List<IEnumerable<Shape>>();
+        int validatedLines = 0;
         foreach (Shape sh in addedShapes)
         {
             IEnumerable<Shape> curShapes = CheckLine(sh.PositionABC.x, 0);
             if (curShapes != null)
             {
                 validatedShapes.Add(curShapes.OrderBy(s => -s.PositionABC.y));
+                validatedLines++;
             }
             curShapes = CheckLine(sh.PositionABC.y, 1);
             if (curShapes != null)
             {
                 validatedShapes.Add(curShapes.OrderBy(s => s.PositionABC.z));
+                validatedLines++;
             }
             curShapes = CheckLine(sh.PositionABC.z, 2);
             if (curShapes != null)
             {
                 validatedShapes.Add(curShapes.OrderBy(s => s.PositionABC.x));
+                validatedLines++;
             }
         }
 
-        
-        if(validatedShapes.Count - 1 >= 0)
-        {
-            numberFlippedLines = validatedShapes.Count - 1;
-        }
-
+        //TODO: at the moment validated lines can be added twice, if two added shapes of the same piece are in the same line
         validatedShapes.Where(ls => ls != null).ToList().ForEach(ls => FlipValidatedLines(ls));
+        lastNumberValidatedLines = validatedLines;
+        return validatedLines;
     }
 
     public bool CheckCanPlay(Piece piece)

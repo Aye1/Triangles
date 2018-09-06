@@ -13,6 +13,13 @@ public class RewardedVideoManager : MonoBehaviour {
 
     public bool isTestMode;
 
+    private static RewardedVideoManager _instance;
+
+    #region Properties
+    public static RewardedVideoManager Instance {
+        get { return _instance; }
+    }
+
     public bool IsRewardedVideoAvailable
     {
         get
@@ -32,6 +39,17 @@ public class RewardedVideoManager : MonoBehaviour {
             }
         }
     }
+    #endregion
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this) {
+            Destroy(this.gameObject);
+        } else 
+        {
+            _instance = this;
+        }
+    }
 
     // Use this for initialization
     void Start () {
@@ -45,7 +63,7 @@ public class RewardedVideoManager : MonoBehaviour {
 
     public void DisplayRewardedVideo()
     {
-        if (_numberRewardedVideo <= NumberMaxRewardedVideoInGame)
+        if (IsVideoAvailable())
         {
             ShowOptions options = new ShowOptions();
             options.resultCallback = HandleDisplayResult;
@@ -56,7 +74,11 @@ public class RewardedVideoManager : MonoBehaviour {
 
     public bool IsVideoAvailable()
     {
-        return _isRewardedVideoAvailable && (_numberRewardedVideo <= NumberMaxRewardedVideoInGame);
+        return _isRewardedVideoAvailable && !HasReachedMaxRewardedVideoNumber();
+    }
+
+    public bool HasReachedMaxRewardedVideoNumber() {
+        return _numberRewardedVideo >= NumberMaxRewardedVideoInGame;
     }
 
     private void HandleDisplayResult(ShowResult result)

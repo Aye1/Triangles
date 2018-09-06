@@ -7,12 +7,12 @@ public class RewardedVideoButton : MonoBehaviour {
 
     RewardedVideoManager _rewardedVideoManager;
     Button _thisButton;
-    public string defeatText = "No More Shuffle available";
+    public string noMoreShufflesText = "No More Shuffle available";
 
 
 // Use this for initialization
 void Start () {
-        _rewardedVideoManager = FindObjectOfType<RewardedVideoManager>();
+        _rewardedVideoManager = RewardedVideoManager.Instance;
         _thisButton = GetComponent<Button>();
         _thisButton.interactable = false;
         BindAction();
@@ -25,10 +25,15 @@ void Start () {
 	
 	// Update is called once per frame
 	void Update () {
-        if (_rewardedVideoManager != null)
+        ManageInteractability();
+    }
+
+    private void ManageInteractability() {
+        bool isInteractable = _rewardedVideoManager != null && _rewardedVideoManager.IsVideoAvailable();
+        _thisButton.interactable = isInteractable;
+        if (!isInteractable)
         {
-            _thisButton.interactable = _rewardedVideoManager.IsVideoAvailable();
-            GetComponentInChildren<Text>().text = defeatText;
+            GetComponentInChildren<Text>().text = noMoreShufflesText;
         }
     }
 }

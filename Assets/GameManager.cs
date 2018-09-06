@@ -68,7 +68,6 @@ public class GameManager : MonoBehaviour {
     void ComputeScore()
     {
         _globalScore += _board.numberFlippedShapes;
-        _shuffleCount += _board.numberFlippedLines;
         _board.numberFlippedShapes = 0;
     }
 
@@ -97,6 +96,7 @@ public class GameManager : MonoBehaviour {
             newPiece.transform.position = _piecePositions[idPos];
             _pieceSlots[idPos] = newPiece;
 
+            _shuffleCount += _board.lastNumberValidatedLines;
             ComputeScore();
             ManageGameOver();
         }
@@ -248,7 +248,7 @@ public class GameManager : MonoBehaviour {
     private void LaunchHelpTimer()
     {
         _helpTimer = new Timer(OnHelpTimerFinished, null, 5000, 0);
-        Debug.Log("Launch timer");
+        //Debug.Log("Launch timer");
     }
 
     private void ResetHelpTimer()
@@ -260,7 +260,7 @@ public class GameManager : MonoBehaviour {
 
     private void OnHelpTimerFinished(object state)
     {
-        Debug.Log("Timer finished");
+        //Debug.Log("Timer finished");
         CheckCanPlay(true);
     }
 
