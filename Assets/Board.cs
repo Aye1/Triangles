@@ -219,42 +219,87 @@ public class Board : MonoBehaviour
             addedShapes.ToList().ForEach(s => s.isFilled = true);
             addedShapes.ToList().ForEach(s => s.IsVisuallyFilled = true);
             addedShapes.ToList().ForEach(s => s.FilledColor = pColor);
-            ValidateLines(addedShapes);
+            ValidateUniqueLines(addedShapes);
             return true;
         }
         return false;
     }
 
+    private IEnumerable<Vector2Int> LinesToValidate(IEnumerable<Shape> addedShapes) {
+        List<Vector2Int> lines = new List<Vector2Int>();
+        foreach (Shape sh in addedShapes) {
+            Vector2Int lineA = new Vector2Int(0, sh.PositionABC.x);
+            Vector2Int lineB = new Vector2Int(1, sh.PositionABC.y);
+            Vector2Int lineC = new Vector2Int(2, sh.PositionABC.z);
+            if(!lines.Contains(lineA)) {
+                lines.Add(lineA);
+            }
+            if (!lines.Contains(lineB))
+            {
+                lines.Add(lineB);
+            }
+            if (!lines.Contains(lineC))
+            {
+                lines.Add(lineC);
+            }
+        }
+        return lines;
+    }
+
+    private void ValidateUniqueLines(IEnumerable<Shape> addedShapes) {
+        IEnumerable<Vector2Int> linesToValidate = LinesToValidate(addedShapes);
+        List<IEnumerable<Shape>> validatedShapes = new List<IEnumerable<Shape>>();
+        int validatedLines = 0;
+
+        foreach (Vector2Int line in linesToValidate) {
+            IEnumerable<Shape> curShapes = CheckLine(line[1], line[0]);
+            if (curShapes != null)
+            {
+                IEnumerable<Shape> validLine = curShapes.OrderBy(s => -s.PositionABC[(line[0] + 1) % 3]);
+                if (!validatedShapes.Contains(validLine))
+                {
+                    validatedLines++;
+
+                }
+                validatedShapes.Add(validLine);
+            }            
+        }
+        validatedShapes.Where(ls => ls != null).ToList().ForEach(ls => FlipValidatedLines(ls));
+        lastNumberValidatedLines = validatedLines;
+    }
+
     private int ValidateLines(IEnumerable<Shape> addedShapes)
     {
+        LinesToValidate(addedShapes);
         List<IEnumerable<Shape>> validatedShapes = new List<IEnumerable<Shape>>();
         int validatedLines = 0;
         foreach (Shape sh in addedShapes)
         {
-            IEnumerable<Shape> curShapes = CheckLine(sh.PositionABC.x, 0);
-            if (curShapes != null)
-            {
-                validatedShapes.Add(curShapes.OrderBy(s => -s.PositionABC.y));
-                validatedLines++;
-            }
-            curShapes = CheckLine(sh.PositionABC.y, 1);
-            if (curShapes != null)
-            {
-                validatedShapes.Add(curShapes.OrderBy(s => s.PositionABC.z));
-                validatedLines++;
-            }
-            curShapes = CheckLine(sh.PositionABC.z, 2);
-            if (curShapes != null)
-            {
-                validatedShapes.Add(curShapes.OrderBy(s => s.PositionABC.x));
-                validatedLines++;
-            }
+            validatedLines = validatedLines + (ValidateOneLine(sh, validatedShapes, validatedLines, 0) ? 1 : 0);
+            validatedLines = validatedLines + (ValidateOneLine(sh, validatedShapes, validatedLines, 1) ? 1 : 0);
+            validatedLines = validatedLines + (ValidateOneLine(sh, validatedShapes, validatedLines, 2) ? 1 : 0);
         }
 
         //TODO: at the moment validated lines can be added twice, if two added shapes of the same piece are in the same line
         validatedShapes.Where(ls => ls != null).ToList().ForEach(ls => FlipValidatedLines(ls));
         lastNumberValidatedLines = validatedLines;
         return validatedLines;
+    }
+
+    private bool ValidateOneLine(Shape sh, List<IEnumerable<Shape>> validatedShapes, int validatedLines, int orderIndex){
+        IEnumerable<Shape> curShapes = CheckLine(sh.PositionABC[orderIndex], orderIndex);
+        if (curShapes != null)
+        {
+            IEnumerable<Shape> validLine = curShapes.OrderBy(s => -s.PositionABC[(orderIndex+1)%3]);
+            if (!validatedShapes.Contains(validLine))
+            {
+                validatedLines++;
+
+            }
+            validatedShapes.Add(validLine);
+            return true;
+        }
+        return false;
     }
 
     public bool CheckCanPlay(Piece piece)

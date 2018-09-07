@@ -210,6 +210,7 @@ public class GameManager : MonoBehaviour {
         {
             ShuffleShapes();
         }
+        ShuffleCount--;
         ResetHelpTimer();
     }
 

@@ -37,7 +37,6 @@ public class ShuffleButton : MonoBehaviour {
             if (_gameManager.ShuffleCount > 0)
             {
                 _gameManager.ShuffleShapesInPopup();
-                _gameManager.ShuffleCount--;
             } else if (_rewardedVideoManager.IsRewardedVideoAvailable)
             {
                 _isWaitingForVideo = true;
@@ -51,6 +50,7 @@ public class ShuffleButton : MonoBehaviour {
         if (_isWaitingForVideo)
         {
             _isWaitingForVideo = false;
+            _gameManager.ShuffleCount++;
             _gameManager.ShuffleShapesInPopup();
         }
     }
