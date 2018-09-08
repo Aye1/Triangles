@@ -61,6 +61,11 @@ public class RewardedVideoManager : MonoBehaviour {
         IsRewardedVideoAvailable = Advertisement.IsReady();
 	}
 
+    public void Reset()
+    {
+        _numberRewardedVideo = 0;
+        _isRewardedVideoAvailable = false;
+    }
     public void DisplayRewardedVideo()
     {
         if (IsVideoAvailable())

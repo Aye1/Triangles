@@ -235,6 +235,7 @@ public class GameManager : MonoBehaviour {
         ShuffleUntilPlayable();
         _board.ResetBoard();
         HideGameObject(endGamePopup);
+        FindObjectOfType<RewardedVideoManager>().Reset();
     }
 
     public void GoToMainMenuScreen()
