@@ -65,6 +65,8 @@
     <Compile Include="Assets\CameraBehavior.cs" />
     <Compile Include="Assets\Config.cs" />
     <Compile Include="Assets\GameManager.cs" />
+    <Compile Include="Assets\Locales.cs" />
+    <Compile Include="Assets\LocalizationManager.cs" />
     <Compile Include="Assets\NewGameButton.cs" />
     <Compile Include="Assets\Piece.cs" />
     <Compile Include="Assets\PieceManager.cs" />

@@ -10,6 +10,7 @@ public class NewGameButton : MonoBehaviour {
 	void Start () {
         _thisButton = GetComponent<Button>();
         _thisButton.onClick.AddListener(OnButtonClicked);
+        _thisButton.GetComponentInChildren<Text>().text = LocalizationManager.Instance.GetLocString("test", Locales.en_GB);
 	}
 	
 	// Update is called once per frame
