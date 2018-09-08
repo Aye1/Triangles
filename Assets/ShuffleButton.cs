@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class ShuffleButton : MonoBehaviour {
 
    protected GameManager _gameManager;
-    protected Button _thisButton;
+   protected Button _thisButton;
 
 
     // Use this for initialization
