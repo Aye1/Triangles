@@ -1,57 +1,45 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Button))]
 public class ShuffleButton : MonoBehaviour {
 
-    RewardedVideoManager _rewardedVideoManager;
-    GameManager _gameManager;
-    Button _thisButton;
+   protected GameManager _gameManager;
+    protected Button _thisButton;
 
-    private bool _isWaitingForVideo = false;
 
     // Use this for initialization
-    void Start () {
-        _rewardedVideoManager = FindObjectOfType<RewardedVideoManager>();
+   protected void Start () {
         _gameManager = FindObjectOfType<GameManager>();
         _thisButton = GetComponent<Button>();
         _thisButton.onClick.AddListener(OnShuffleButtonClick);
-        _rewardedVideoManager.OnVideoCompleted += OnVideoSuccessful;
     }
 
     // Update is called once per frame
     void Update () {
-        ManageInteractable();
+        _thisButton.interactable = IsInteractable();
+        ManageText();
 	}
 
-    private void ManageInteractable()
+    virtual protected bool IsInteractable()
     {
-        _thisButton.interactable = (_gameManager != null && _gameManager.ShuffleCount > 0) || _rewardedVideoManager.IsRewardedVideoAvailable;
+        bool interactable = (_gameManager != null && _gameManager.ShuffleCount > 0);
+        return interactable;
     }
 
-    public void OnShuffleButtonClick()
+    virtual public void OnShuffleButtonClick()
     {
         if(_gameManager != null)
         {
             if (_gameManager.ShuffleCount > 0)
             {
                 _gameManager.ShuffleShapesInPopup();
-            } else if (_rewardedVideoManager.IsRewardedVideoAvailable)
-            {
-                _isWaitingForVideo = true;
-                _rewardedVideoManager.DisplayRewardedVideo();
-            }
+            } 
         }
     }
 
-    private void OnVideoSuccessful(object sender, EventArgs e)
+    virtual protected void ManageText()
     {
-        if (_isWaitingForVideo)
-        {
-            _isWaitingForVideo = false;
-            _gameManager.ShuffleCount++;
-            _gameManager.ShuffleShapesInPopup();
-        }
     }
+    
 }
