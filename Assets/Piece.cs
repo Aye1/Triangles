@@ -8,7 +8,7 @@ public class Piece : MonoBehaviour {
     public Shape refShape;
     public List<Shape> pieceShapes;
 
-    public float dragPositionOffset = 1.0f;
+    public float dragPositionOffset = 1.5f;
 
     private Color pieceColor;
     private bool isDragged = false;

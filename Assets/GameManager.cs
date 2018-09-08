@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour {
     public TextMeshProUGUI textShuffle;
     public GameObject endGamePopup;
     public GameObject pausePopup;
+
     public int _globalScore;
 
     private int _shuffleCount = 0;
@@ -63,6 +64,7 @@ public class GameManager : MonoBehaviour {
         DisplayPieceHover();
         textScore.text = "Score : " + _globalScore;
         textShuffle.text = "Shuffle : " + _shuffleCount;
+
     }
 
     void ComputeScore()
@@ -96,7 +98,10 @@ public class GameManager : MonoBehaviour {
             newPiece.transform.position = _piecePositions[idPos];
             _pieceSlots[idPos] = newPiece;
 
-            _shuffleCount += _board.lastNumberValidatedLines;
+            if (_board.lastNumberValidatedLines > 1)
+            {
+                _shuffleCount += _board.lastNumberValidatedLines - 1;
+            }
             ComputeScore();
             ManageGameOver();
         }
@@ -205,12 +210,15 @@ public class GameManager : MonoBehaviour {
 
     public void ShuffleUntilPlayable()
     {
-        ShuffleShapes();
-        while (!CheckCanPlay())
+        if(ShuffleCount > 0)
         {
             ShuffleShapes();
+            while (!CheckCanPlay())
+            {
+                ShuffleShapes();
+            }
+            ShuffleCount--;
         }
-        ShuffleCount--;
         ResetHelpTimer();
     }
 
