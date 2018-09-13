@@ -120,7 +120,7 @@ public class Board : MonoBehaviour
     /// </summary>
     /// <param name="piece">The currently selected piece</param>
     /// <returns></returns>
-    public IEnumerable<Shape> FindPlayableShapes(Piece piece)
+    public IEnumerable<Shape> FindPlayableShapes(AbstractPiece piece)
     {
         IEnumerable<Shape> resShapes = new List<Shape>();
         resShapes = shapes.Where(s => IsPiecePlayableOnShape(s, piece));
@@ -134,10 +134,18 @@ public class Board : MonoBehaviour
     /// <param name="shape"></param>
     /// <param name="piece"></param>
     /// <returns></returns>
-    private bool IsPiecePlayableOnShape(Shape shape, Piece piece)
+    private bool IsPiecePlayableOnShape(Shape shape, AbstractPiece piece)
     {
-        unfilledShapes = shapes.Where(s => !s.isFilled);
-        IEnumerable<Shape> necessaryShapes = GetNecessaryShapesForPiece(shape, piece, unfilledShapes);
+        IEnumerable<Shape> listShapes;
+        if (piece is Piece)
+        {
+            listShapes = shapes.Where(s => !s.isFilled);
+        }
+        else
+        {
+            listShapes = shapes;
+        }
+        IEnumerable<Shape> necessaryShapes = GetNecessaryShapesForPiece(shape, piece, listShapes);
         return necessaryShapes.Count() == piece.pieceShapes.Count;
     }
 
@@ -148,7 +156,7 @@ public class Board : MonoBehaviour
     /// <param name="piece">The piece to fit</param>
     /// <param name="shapeList">The list of shapes in which to pick</param>
     /// <returns>A (possibly incomplete) list of shapes fitting the piece</returns>
-    private IEnumerable<Shape> GetNecessaryShapesForPiece(Shape shape, Piece piece, IEnumerable<Shape> shapeList)
+    private IEnumerable<Shape> GetNecessaryShapesForPiece(Shape shape, AbstractPiece piece, IEnumerable<Shape> shapeList)
     {
         List<Shape> necessaryShapes = new List<Shape>();
         foreach (Shape s in piece.pieceShapes)
@@ -164,14 +172,23 @@ public class Board : MonoBehaviour
         return necessaryShapes;
     }
 
-    public void DisplayPieceHover(Piece piece)
+    public void DisplayPieceHover(AbstractPiece piece)
     {
         Shape hoveredShape = GetShapeAtPos(piece.transform.position, false);
-        if(playableShapes.Contains(hoveredShape))
+        if(piece is Piece && playableShapes.Contains(hoveredShape))
         {
             IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
             hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
             hoveredShapes.ToList().ForEach(s => s.FilledColor = piece.PieceColor);
+            hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
+        }
+
+     else if(piece is PieceBonusDestroy && shapes.Contains(hoveredShape))
+        {
+            IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
+            hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
+            hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
+
         }
     } 
     
@@ -209,10 +226,10 @@ public class Board : MonoBehaviour
     /// </summary>
     /// <param name="piece">The piece to put</param>
     /// <returns>True if the piece is really put, false else</returns>
-    public bool PutPiece(Piece piece)
+    public bool PutPiece(AbstractPiece piece)
     {
         Shape hoveredShape = GetShapeAtPos(piece.transform.position, false);
-        if (playableShapes.Contains(hoveredShape))
+        if (piece is Piece && playableShapes.Contains(hoveredShape))
         {
             IEnumerable<Shape> addedShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
             Color pColor = piece.PieceColor;
@@ -220,6 +237,14 @@ public class Board : MonoBehaviour
             addedShapes.ToList().ForEach(s => s.IsVisuallyFilled = true);
             addedShapes.ToList().ForEach(s => s.FilledColor = pColor);
             ValidateUniqueLines(addedShapes);
+            return true;
+        }
+        
+    else if(piece is PieceBonusDestroy && shapes.Contains(hoveredShape))
+    {
+            IEnumerable<Shape> addedShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
+            addedShapes.ToList().ForEach(s => s.isFilled = false);
+            addedShapes.ToList().ForEach(s => s.IsVisuallyFilled = false);
             return true;
         }
         return false;

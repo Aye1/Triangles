@@ -7,6 +7,7 @@ using Random = System.Random;
 public class PieceManager : MonoBehaviour {
 
     private List<Piece> pieces;
+    public PieceBonusDestroy pieceBonusDestroy;
     private Random _randomGen;
     public List<Color> colors;
 
@@ -33,6 +34,16 @@ public class PieceManager : MonoBehaviour {
             int index = _randomGen.Next(0, pieces.Count);
             Piece newPiece = Instantiate(pieces.ToArray()[index]);
             newPiece.PieceColor = GetNextColor();
+            return newPiece;
+        }
+        return null;
+    }
+
+    public PieceBonusDestroy GetBonusDestroyPiece()
+    {
+        if (pieceBonusDestroy != null)
+        {
+            PieceBonusDestroy newPiece = Instantiate(pieceBonusDestroy);
             return newPiece;
         }
         return null;

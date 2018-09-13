@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour {
 
     private Board _board;
     private PieceManager _pieceManager;
-    private Piece _draggedPiece;
+    private AbstractPiece _draggedPiece;
 
     private Timer _helpTimer;
 
@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour {
         new Vector3(1.5f, -2.5f, -1.0f) };
 
     private Piece[] _pieceSlots;
-
+    private Vector3 _pieceBonusDestroyPosition = new Vector3(-2f, -4f, -1.0f);
     public bool debugPieceDraggedPosition = false;
 
     public int ShuffleCount
@@ -49,6 +49,7 @@ public class GameManager : MonoBehaviour {
         _pieceManager = FindObjectOfType<PieceManager>();
         _pieceSlots = new Piece[3];
         GetThreePieces();
+        GetBonusPiece();
         ComputeScore();
         HideGameObject(endGamePopup);
         HideGameObject(pausePopup);
@@ -83,7 +84,7 @@ public class GameManager : MonoBehaviour {
 
     private void OnPieceDragged(object sender, EventArgs e)
     {
-        _draggedPiece = sender as Piece;
+        _draggedPiece = sender as AbstractPiece;
         _board.FindPlayableShapes(_draggedPiece);
         ResetHelpTimer();
     }
@@ -92,7 +93,7 @@ public class GameManager : MonoBehaviour {
     {
         if(_board.PutPiece(_draggedPiece))
         {
-            int idPos = GetPieceSlotId(_draggedPiece);
+            int idPos = GetPieceSlotId(_draggedPiece as Piece);
             CleanDestroyPiece(_draggedPiece);
             Piece newPiece = GetNewPiece();
             newPiece.transform.position = _piecePositions[idPos];
@@ -107,7 +108,7 @@ public class GameManager : MonoBehaviour {
         }
         else
         {
-            _draggedPiece.transform.position = _piecePositions[GetPieceSlotId(_draggedPiece)];
+            _draggedPiece.transform.position = _piecePositions[GetPieceSlotId(_draggedPiece as Piece)];
         }
         _draggedPiece = null;
         ResetHelpTimer();
@@ -120,6 +121,34 @@ public class GameManager : MonoBehaviour {
             Piece newPiece = GetNewPiece();
             newPiece.transform.position = _piecePositions[i];
             _pieceSlots[i] = newPiece;
+        }
+    }
+
+    private void GetBonusPiece()
+    {
+        PieceBonusDestroy newPiece = _pieceManager.GetBonusDestroyPiece();
+        newPiece.transform.parent = transform;
+        newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
+        newPiece.transform.position = _pieceBonusDestroyPosition;
+        ListenToPieceBonusDestroyEvent(newPiece);
+    }
+
+    private void OnPieceBonusDestroyDragged(object sender, EventArgs e)
+    {
+        _draggedPiece = sender as AbstractPiece;
+        _board.FindPlayableShapes(_draggedPiece);
+    }
+
+    private void OnPieceBonusDestroyReleased(object sender, EventArgs e)
+    {
+        if (_board.PutPiece(_draggedPiece))
+        {
+            CleanDestroyPiece(_draggedPiece);                    
+            ManageGameOver();
+        }
+        else
+        {
+            _draggedPiece.transform.position = _pieceBonusDestroyPosition;
         }
     }
 
@@ -171,7 +200,7 @@ public class GameManager : MonoBehaviour {
         return canPlay;
     }
 
-    private void CleanDestroyPiece(Piece piece)
+    private void CleanDestroyPiece(AbstractPiece piece)
     {
         piece.PieceDraggedHandler -= OnPieceDragged;
         piece.PieceReleasedHandler -= OnPieceReleased;
@@ -182,6 +211,11 @@ public class GameManager : MonoBehaviour {
     {
         newPiece.PieceDraggedHandler += OnPieceDragged;
         newPiece.PieceReleasedHandler += OnPieceReleased;
+    }
+    private void ListenToPieceBonusDestroyEvent(AbstractPiece newPiece)
+    {
+        newPiece.PieceDraggedHandler += OnPieceBonusDestroyDragged;
+        newPiece.PieceReleasedHandler += OnPieceBonusDestroyReleased;
     }
 
     private void DisplayGameObject(GameObject obj)

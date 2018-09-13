@@ -9,6 +9,7 @@ public class Shape : MonoBehaviour
     bool isUpsideDown = false;
     Color baseColor = new Color(0.87f, 0.87f, 0.90f);
     Color selectedColor = Color.red;
+    Color hoveredColor;
     Color filledColor;
     public bool isFilled = false;
     private bool isVisuallyFilled = false;
@@ -118,6 +119,19 @@ public class Shape : MonoBehaviour
             isHighlighted = value;
         }
     }
+
+    public Color HoveredColor
+    {
+        get
+        {
+            return hoveredColor;
+        }
+
+        set
+        {
+            hoveredColor = value;
+        }
+    }
     #endregion
 
     // Use this for initialization
@@ -132,16 +146,11 @@ public class Shape : MonoBehaviour
         ChangeColor(BaseColor);
         if (isPlayable)
         {
-            Color alphaColor = filledColor;
+            Color alphaColor = HoveredColor;
             alphaColor.a = 0.7f;
             ChangeColor(alphaColor);
         }
-        if (tmpBool)
-        {
-            ChangeColor(Color.cyan);
-            Debug.Log("Tmp position " + transform.position);
-        } 
-        if (IsVisuallyFilled)
+        else if (IsVisuallyFilled)
         {
             ChangeColor(FilledColor);
         }
