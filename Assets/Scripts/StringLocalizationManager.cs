@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LocalizationManager : MonoBehaviour {
+public class StringLocalizationManager : MonoBehaviour {
 
 
     private Dictionary<string, Dictionary<string, string>> _allLocalizedStrings;
     private readonly string _stringNotFound = "Unknown string";
-    private static LocalizationManager _instance;
+    private static StringLocalizationManager _instance;
 
     public bool isReady = false;
 
-    public static LocalizationManager Instance 
+    public static StringLocalizationManager Instance 
     {
         get { return _instance; }
     }

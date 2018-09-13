@@ -8,12 +8,15 @@ public class GameManager : MonoBehaviour {
 
     public TextMeshProUGUI textScore;
     public TextMeshProUGUI textShuffle;
+    public TextMeshProUGUI textHighScore;
     public GameObject endGamePopup;
     public GameObject pausePopup;
 
-    public int _globalScore;
+    public int globalScore;
 
     private int _shuffleCount = 0;
+    private int _highScore = 0;
+    private string highScoreKey = "highScore";
 
     private Board _board;
     private PieceManager _pieceManager;
@@ -29,6 +32,7 @@ public class GameManager : MonoBehaviour {
     private Vector3 _pieceBonusDestroyPosition = new Vector3(-2f, -4f, -1.0f);
     public bool debugPieceDraggedPosition = false;
 
+    #region Properties
     public int ShuffleCount
     {
         get
@@ -42,12 +46,27 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    public int HighScore
+    {
+        get
+        {
+            return _highScore;
+        }
+
+        set
+        {
+            _highScore = value;
+        }
+    }
+    #endregion
+
 
     // Use this for initialization
     void Start () {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
         _pieceSlots = new Piece[3];
+        GetSavedHighScore();
         GetThreePieces();
         GetBonusPiece();
         ComputeScore();
@@ -55,6 +74,13 @@ public class GameManager : MonoBehaviour {
         HideGameObject(pausePopup);
         LaunchHelpTimer();
 	}
+
+    private void GetSavedHighScore() 
+    {
+        if(PlayerPrefs.HasKey(highScoreKey)) {
+            HighScore = PlayerPrefs.GetInt(highScoreKey);
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -63,15 +89,24 @@ public class GameManager : MonoBehaviour {
             Debug.Log("Piece dragged at pos " + _draggedPiece.transform.position.ToString());
         }
         DisplayPieceHover();
-        textScore.text = "Score : " + _globalScore;
+        textScore.text = "Score : " + globalScore;
         textShuffle.text = "Shuffle : " + _shuffleCount;
-
+        textHighScore.text = "High Score : " + HighScore;
     }
 
     void ComputeScore()
     {
-        _globalScore += _board.numberFlippedShapes;
+        globalScore += _board.numberFlippedShapes;
         _board.numberFlippedShapes = 0;
+        CheckHighScore();
+    }
+
+    private void CheckHighScore() 
+    {
+        if(globalScore > HighScore) {
+            HighScore = globalScore;
+            PlayerPrefs.SetInt(highScoreKey, HighScore);
+        }
     }
 
     private void DisplayPieceHover()
@@ -264,7 +299,7 @@ public class GameManager : MonoBehaviour {
 
     public void Restart()
     {
-        _globalScore = 0;
+        globalScore = 0;
         _shuffleCount = 0;
         ShuffleUntilPlayable();
         _board.ResetBoard();
