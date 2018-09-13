@@ -63,8 +63,4 @@ public class LocalizationManager : MonoBehaviour {
         }
         return _stringNotFound;
     }
-
-    private void ReadDataFromCSV() {
-
-    }
 }
