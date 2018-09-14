@@ -336,5 +336,7 @@ public class Board : MonoBehaviour
     {
         shapes.ForEach(s => s.isFilled = false);
         shapes.ForEach(s => s.IsVisuallyFilled = false);
+        unfilledShapes = shapes;
+        playableShapes = null;
     }
 }

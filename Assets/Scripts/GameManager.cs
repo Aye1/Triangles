@@ -70,8 +70,8 @@ public class GameManager : MonoBehaviour {
         GetThreePieces();
         GetBonusPiece();
         ComputeScore();
-        HideGameObject(endGamePopup);
-        HideGameObject(pausePopup);
+        UIHelper.HideGameObject(endGamePopup);
+        UIHelper.HideGameObject(pausePopup);
         LaunchHelpTimer();
 	}
 
@@ -213,7 +213,7 @@ public class GameManager : MonoBehaviour {
         if (!CheckCanPlay())
         {
             Debug.Log("Game Over");
-            DisplayGameObject(endGamePopup);
+            UIHelper.DisplayGameObject(endGamePopup);
         }
     }
 
@@ -253,16 +253,6 @@ public class GameManager : MonoBehaviour {
         newPiece.PieceReleasedHandler += OnPieceBonusDestroyReleased;
     }
 
-    private void DisplayGameObject(GameObject obj)
-    {
-        obj.SetActive(true);
-    }
-
-    private void HideGameObject(GameObject obj)
-    {
-        obj.SetActive(false);
-    }
-
     /// <summary>
     /// Shuffles shapes. 
     /// Should not be called directly. 
@@ -293,7 +283,7 @@ public class GameManager : MonoBehaviour {
 
     public void ShuffleShapesInPopup()
     {
-        HideGameObject(endGamePopup);
+        UIHelper.HideGameObject(endGamePopup);
         ShuffleUntilPlayable();
     }
 
@@ -303,7 +293,8 @@ public class GameManager : MonoBehaviour {
         _shuffleCount = 0;
         ShuffleUntilPlayable();
         _board.ResetBoard();
-        HideGameObject(endGamePopup);
+        UIHelper.HideGameObject(endGamePopup);
+        UIHelper.HideGameObject(pausePopup);
         FindObjectOfType<RewardedVideoManager>().Reset();
     }
 
@@ -314,13 +305,13 @@ public class GameManager : MonoBehaviour {
 
     public void DisplayPauseMenu()
     {
-        DisplayGameObject(pausePopup);
+        UIHelper.DisplayGameObject(pausePopup);
         Time.timeScale = 0.0f;
     }
 
     public void HidePauseMenu()
     {
-        HideGameObject(pausePopup);
+        UIHelper.HideGameObject(pausePopup);
         Time.timeScale = 1.0f;
     }
 
@@ -332,7 +323,10 @@ public class GameManager : MonoBehaviour {
 
     private void ResetHelpTimer()
     {
-        _helpTimer.Dispose();
+        if (_helpTimer != null)
+        {
+            _helpTimer.Dispose();
+        }
         LaunchHelpTimer();
         UnHighlightAllPieces();
     }
