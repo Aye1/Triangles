@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour {
         ComputeScore();
         UIHelper.HideGameObject(endGamePopup);
         UIHelper.HideGameObject(pausePopup);
-        LaunchHelpTimer();
+        //LaunchHelpTimer();
 	}
 
     private void GetSavedHighScore() 
@@ -113,7 +113,8 @@ public class GameManager : MonoBehaviour {
     {
         if (_draggedPiece != null)
         {
-            _board.DisplayPieceHover(_draggedPiece);
+            //_board.DisplayPieceHover(_draggedPiece);
+            _board.DisplayFirstPlayablePieceHover(_draggedPiece);
         }
     }
 
@@ -327,7 +328,7 @@ public class GameManager : MonoBehaviour {
         {
             _helpTimer.Dispose();
         }
-        LaunchHelpTimer();
+        //LaunchHelpTimer();
         UnHighlightAllPieces();
     }
 

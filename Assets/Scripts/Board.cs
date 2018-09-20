@@ -101,11 +101,11 @@ public class Board : MonoBehaviour
                 newShape.IsUpsideDown = ((i + j) % 2 == 0);
 
                 Vector3 locScale = transform.lossyScale;
-               
-                newShape.transform.localScale = Vector3.Scale(locScale,newShape.transform.localScale);
 
-                Vector3 shapePosition = transform.position + new Vector3(i*Config.paddingX, 
-                    -j*Config.paddingY, 
+                newShape.transform.localScale = Vector3.Scale(locScale, newShape.transform.localScale);
+
+                Vector3 shapePosition = transform.position + new Vector3(i * Config.paddingX,
+                    -j * Config.paddingY,
                     newShape.transform.position.z);
                 newShape.transform.position = Vector3.Scale(shapePosition, locScale);
                 newShape.transform.parent = transform;
@@ -174,8 +174,9 @@ public class Board : MonoBehaviour
 
     public void DisplayPieceHover(AbstractPiece piece)
     {
+        Shape firstShape = piece.pieceShapes.First();
         Shape hoveredShape = GetShapeAtPos(piece.transform.position, false);
-        if(piece is Piece && playableShapes.Contains(hoveredShape))
+        if (piece is Piece && playableShapes.Contains(hoveredShape))
         {
             IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
             hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
@@ -183,15 +184,41 @@ public class Board : MonoBehaviour
             hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
         }
 
-     else if(piece is PieceBonusDestroy && shapes.Contains(hoveredShape))
+        else if (piece is PieceBonusDestroy && shapes.Contains(hoveredShape))
         {
             IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
             hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
             hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
 
         }
-    } 
-    
+    }
+
+    public void DisplayFirstPlayablePieceHover(AbstractPiece piece)
+    {
+        /*Shape[] currShapes = GetAllShapesInNeighbourhood(piece.transform.position, false);
+        if (currShapes != null)
+        {
+            foreach (Shape sh in currShapes)
+            {
+                if (piece is Piece && playableShapes.Contains(sh))
+                {
+                    IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(sh, piece, shapes);
+                    hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
+                    hoveredShapes.ToList().ForEach(s => s.FilledColor = piece.PieceColor);
+                    hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
+                    return;
+                }
+            }
+        }*/
+        Shape playableShape = GetPlayableShapeInNeighbourhood(piece as Piece, false);
+        if (playableShape != null) {
+            IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(playableShape, piece, shapes);
+            hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
+            hoveredShapes.ToList().ForEach(s => s.FilledColor = piece.PieceColor);
+            hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
+        }
+    }
+
     /*public Shape GetShapeAtPos(Vector3 pos)
     {
         Shape resShape = null;
@@ -214,11 +241,61 @@ public class Board : MonoBehaviour
         Vector3 realPos = shouldConvertToWorldPosition ? Camera.main.ScreenToWorldPoint(pos) : pos;
         Vector2 pos2D = new Vector2(realPos.x, realPos.y);
         RaycastHit2D hit = Physics2D.Raycast(pos2D, Vector2.zero, Mathf.Infinity, Physics.DefaultRaycastLayers, 0.0f);
-        if(hit.collider != null)
+        RaycastHit2D[] hits = Physics2D.RaycastAll(pos2D, Vector2.zero, Mathf.Infinity, Physics.DefaultRaycastLayers, 0.0f);
+        if (hit.collider != null)
         {
             resShape = hit.collider.gameObject.GetComponent<Shape>();
         }
+
         return resShape;
+    }
+
+    /// <summary>
+    /// Gets the first playable shape in the neighbourhood of the dragged piece.
+    /// </summary>
+    /// <returns>The playable shape in neighbourhood.</returns>
+    /// <param name="piece">Piece.</param>
+    /// <param name="shouldConvertToWorldPosition">If set to <c>true</c> should convert to world position.</param>
+    public Shape GetPlayableShapeInNeighbourhood(Piece piece, bool shouldConvertToWorldPosition)
+    {
+        Shape[] currShapes = GetAllShapesInNeighbourhood(piece.transform.position, false);
+        if (currShapes != null)
+        {
+            foreach (Shape sh in currShapes)
+            {
+                if (piece is Piece && playableShapes.Contains(sh))
+                {
+                    return sh;
+                }
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Gets all shapes in neighbourhood of the current position (i.e. all pieces found with a raycast)
+    /// </summary>
+    /// <returns>The all shapes in neighbourhood.</returns>
+    /// <param name="pos">Position.</param>
+    /// <param name="shouldConvertToWorldPosition">If set to <c>true</c> should convert to world position.</param>
+    public Shape[] GetAllShapesInNeighbourhood(Vector3 pos, bool shouldConvertToWorldPosition)
+    {
+        Shape[] resShapes = null;
+        Vector3 realPos = shouldConvertToWorldPosition ? Camera.main.ScreenToWorldPoint(pos) : pos;
+        Vector2 pos2D = new Vector2(realPos.x, realPos.y);
+        RaycastHit2D[] hits = Physics2D.RaycastAll(pos2D, Vector2.zero, Mathf.Infinity, Physics.DefaultRaycastLayers, 0.0f);
+        Debug.Log("Hit count: " + hits.Length.ToString());
+        if (hits.Length > 0)
+        {
+            resShapes = new Shape[hits.Length];
+            int i = 0;
+            foreach (RaycastHit2D hit in hits)
+            {
+                resShapes[i] = hit.collider.gameObject.GetComponent<Shape>();
+                i++;
+            }
+        }
+        return resShapes;
     }
 
     /// <summary>
@@ -229,19 +306,21 @@ public class Board : MonoBehaviour
     public bool PutPiece(AbstractPiece piece)
     {
         Shape hoveredShape = GetShapeAtPos(piece.transform.position, false);
-        if (piece is Piece && playableShapes.Contains(hoveredShape))
+
+        if (piece is Piece) {
+            Shape playableShape = GetPlayableShapeInNeighbourhood(piece as Piece, false);
+            if (playableShape != null) {
+                IEnumerable<Shape> addedShapes = GetNecessaryShapesForPiece(playableShape, piece, shapes);
+                Color pColor = piece.PieceColor;
+                addedShapes.ToList().ForEach(s => s.isFilled = true);
+                addedShapes.ToList().ForEach(s => s.IsVisuallyFilled = true);
+                addedShapes.ToList().ForEach(s => s.FilledColor = pColor);
+                ValidateUniqueLines(addedShapes);
+                return true;
+            }
+        }       
+        else if(piece is PieceBonusDestroy && shapes.Contains(hoveredShape))
         {
-            IEnumerable<Shape> addedShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
-            Color pColor = piece.PieceColor;
-            addedShapes.ToList().ForEach(s => s.isFilled = true);
-            addedShapes.ToList().ForEach(s => s.IsVisuallyFilled = true);
-            addedShapes.ToList().ForEach(s => s.FilledColor = pColor);
-            ValidateUniqueLines(addedShapes);
-            return true;
-        }
-        
-    else if(piece is PieceBonusDestroy && shapes.Contains(hoveredShape))
-    {
             IEnumerable<Shape> addedShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
             addedShapes.ToList().ForEach(s => s.isFilled = false);
             addedShapes.ToList().ForEach(s => s.IsVisuallyFilled = false);
@@ -305,7 +384,6 @@ public class Board : MonoBehaviour
             validatedLines = validatedLines + (ValidateOneLine(sh, validatedShapes, validatedLines, 2) ? 1 : 0);
         }
 
-        //TODO: at the moment validated lines can be added twice, if two added shapes of the same piece are in the same line
         validatedShapes.Where(ls => ls != null).ToList().ForEach(ls => FlipValidatedLines(ls));
         lastNumberValidatedLines = validatedLines;
         return validatedLines;

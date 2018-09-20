@@ -40,23 +40,8 @@ public class StringLocalizationManager : MonoBehaviour {
     }
 
     private void LoadLocalizedStrings() {
-        /*_allLocalizedStrings = new Dictionary<string, Dictionary<string, string>>();
-        foreach(string locale in GetLocalesList()) {
-            _allLocalizedStrings.Add(locale, LoadOneLocale(locale));
-        }*/
         _allLocalizedStrings = LoadDicoFromCSV();
         isReady = true;
-    }
-
-    private Dictionary<string, string> LoadOneLocale(string locale) {
-        Dictionary<string, string> currentLocaleDico = new Dictionary<string, string>();
-        if (Locales.fr_FR.Equals(locale))
-        {
-            currentLocaleDico.Add("test", "Test Français");
-        } else if (Locales.en_GB.Equals(locale)) {
-            currentLocaleDico.Add("test", "English Test");
-        }
-        return currentLocaleDico;
     }
 
     public string GetLocString(string key, string locale) 
