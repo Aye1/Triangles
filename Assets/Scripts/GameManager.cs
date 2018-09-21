@@ -8,12 +8,15 @@ public class GameManager : MonoBehaviour {
 
     public TextMeshProUGUI textScore;
     public TextMeshProUGUI textShuffle;
+    public TextMeshProUGUI textHighScore;
     public GameObject endGamePopup;
     public GameObject pausePopup;
 
-    public int _globalScore;
+    public int globalScore;
 
     private int _shuffleCount = 0;
+    private int _highScore = 0;
+    private string highScoreKey = "highScore";
 
     private Board _board;
     private PieceManager _pieceManager;
@@ -29,6 +32,7 @@ public class GameManager : MonoBehaviour {
     private Vector3 _pieceBonusDestroyPosition = new Vector3(-2f, -4f, -1.0f);
     public bool debugPieceDraggedPosition = false;
 
+    #region Properties
     public int ShuffleCount
     {
         get
@@ -42,19 +46,41 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    public int HighScore
+    {
+        get
+        {
+            return _highScore;
+        }
+
+        set
+        {
+            _highScore = value;
+        }
+    }
+    #endregion
+
 
     // Use this for initialization
     void Start () {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
         _pieceSlots = new Piece[3];
+        GetSavedHighScore();
         GetThreePieces();
         GetBonusPiece();
         ComputeScore();
-        HideGameObject(endGamePopup);
-        HideGameObject(pausePopup);
-        LaunchHelpTimer();
+        UIHelper.HideGameObject(endGamePopup);
+        UIHelper.HideGameObject(pausePopup);
+        //LaunchHelpTimer();
 	}
+
+    private void GetSavedHighScore() 
+    {
+        if(PlayerPrefs.HasKey(highScoreKey)) {
+            HighScore = PlayerPrefs.GetInt(highScoreKey);
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -63,22 +89,32 @@ public class GameManager : MonoBehaviour {
             Debug.Log("Piece dragged at pos " + _draggedPiece.transform.position.ToString());
         }
         DisplayPieceHover();
-        textScore.text = "Score : " + _globalScore;
+        textScore.text = "Score : " + globalScore;
         textShuffle.text = "Shuffle : " + _shuffleCount;
-
+        textHighScore.text = "High Score : " + HighScore;
     }
 
     void ComputeScore()
     {
-        _globalScore += _board.numberFlippedShapes;
+        globalScore += _board.numberFlippedShapes;
         _board.numberFlippedShapes = 0;
+        CheckHighScore();
+    }
+
+    private void CheckHighScore() 
+    {
+        if(globalScore > HighScore) {
+            HighScore = globalScore;
+            PlayerPrefs.SetInt(highScoreKey, HighScore);
+        }
     }
 
     private void DisplayPieceHover()
     {
         if (_draggedPiece != null)
         {
-            _board.DisplayPieceHover(_draggedPiece);
+            //_board.DisplayPieceHover(_draggedPiece);
+            _board.DisplayFirstPlayablePieceHover(_draggedPiece);
         }
     }
 
@@ -178,7 +214,7 @@ public class GameManager : MonoBehaviour {
         if (!CheckCanPlay())
         {
             Debug.Log("Game Over");
-            DisplayGameObject(endGamePopup);
+            UIHelper.DisplayGameObject(endGamePopup);
         }
     }
 
@@ -218,16 +254,6 @@ public class GameManager : MonoBehaviour {
         newPiece.PieceReleasedHandler += OnPieceBonusDestroyReleased;
     }
 
-    private void DisplayGameObject(GameObject obj)
-    {
-        obj.SetActive(true);
-    }
-
-    private void HideGameObject(GameObject obj)
-    {
-        obj.SetActive(false);
-    }
-
     /// <summary>
     /// Shuffles shapes. 
     /// Should not be called directly. 
@@ -258,17 +284,18 @@ public class GameManager : MonoBehaviour {
 
     public void ShuffleShapesInPopup()
     {
-        HideGameObject(endGamePopup);
+        UIHelper.HideGameObject(endGamePopup);
         ShuffleUntilPlayable();
     }
 
     public void Restart()
     {
-        _globalScore = 0;
+        globalScore = 0;
         _shuffleCount = 0;
         ShuffleUntilPlayable();
         _board.ResetBoard();
-        HideGameObject(endGamePopup);
+        UIHelper.HideGameObject(endGamePopup);
+        UIHelper.HideGameObject(pausePopup);
         FindObjectOfType<RewardedVideoManager>().Reset();
     }
 
@@ -279,13 +306,13 @@ public class GameManager : MonoBehaviour {
 
     public void DisplayPauseMenu()
     {
-        DisplayGameObject(pausePopup);
+        UIHelper.DisplayGameObject(pausePopup);
         Time.timeScale = 0.0f;
     }
 
     public void HidePauseMenu()
     {
-        HideGameObject(pausePopup);
+        UIHelper.HideGameObject(pausePopup);
         Time.timeScale = 1.0f;
     }
 
@@ -297,8 +324,11 @@ public class GameManager : MonoBehaviour {
 
     private void ResetHelpTimer()
     {
-        _helpTimer.Dispose();
-        LaunchHelpTimer();
+        if (_helpTimer != null)
+        {
+            _helpTimer.Dispose();
+        }
+        //LaunchHelpTimer();
         UnHighlightAllPieces();
     }
 

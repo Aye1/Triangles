@@ -8,6 +8,7 @@ abstract public class AbstractPiece : MonoBehaviour {
     public List<Shape> pieceShapes;
 
     public float dragPositionOffset = 1.5f;
+    //public float dragPositionOffset = 0.0f;
 
     public EventHandler PieceDraggedHandler;
     public EventHandler PieceReleasedHandler;
