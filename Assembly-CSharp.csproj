@@ -62,8 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\dreamlo\DreamloLeaderBoard.cs" />
-    <Compile Include="Assets\LeaderBoardEntry.cs" />
-    <Compile Include="Assets\LeaderboardPopup.cs" />
     <Compile Include="Assets\Scripts\AbstractPiece.cs" />
     <Compile Include="Assets\Scripts\Board.cs" />
     <Compile Include="Assets\Scripts\CameraBehavior.cs" />
@@ -71,7 +69,9 @@
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Helpers\SimpleObjectPool.cs" />
     <Compile Include="Assets\Scripts\Helpers\UIHelper.cs" />
+    <Compile Include="Assets\Scripts\LeaderBoardEntry.cs" />
     <Compile Include="Assets\Scripts\LeaderboardManager.cs" />
+    <Compile Include="Assets\Scripts\LeaderboardPopup.cs" />
     <Compile Include="Assets\Scripts\Locales.cs" />
     <Compile Include="Assets\Scripts\NewGameButton.cs" />
     <Compile Include="Assets\Scripts\Piece.cs" />
@@ -86,6 +86,7 @@
     <Compile Include="Assets\Scripts\ShuffleButton.cs" />
     <Compile Include="Assets\Scripts\ShuffleButtonWithRewarded.cs" />
     <Compile Include="Assets\Scripts\SoundManager.cs" />
+    <Compile Include="Assets\Scripts\StartupManager.cs" />
     <Compile Include="Assets\Scripts\StringLocalizationManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />

@@ -30,6 +30,10 @@ public class SceneController : MonoBehaviour {
     
     public void GoToGameScreen()
     {
+        SceneManager.LoadScene(2);
+    }
+
+    public void GoToMenuScreen() {
         SceneManager.LoadScene(1);
     }
 }

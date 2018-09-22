@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
+[Serializable]
 public class Shape : MonoBehaviour
 { 
     Vector3Int position;
@@ -20,6 +21,8 @@ public class Shape : MonoBehaviour
 
     public EventHandler ShapeClickedHandler;
     public EventHandler ShapeReleasedHandler;
+    public EventHandler ShapeCollidingHandler;
+    public EventHandler ShapeExitCollisionHandler;
 
     #region Properties
     public Vector3Int PositionABC
@@ -179,4 +182,28 @@ public class Shape : MonoBehaviour
     {
         _spriteRenderer.color = color;
     }
+
+    public class CollisionEventArgs : EventArgs {
+        public GameObject OtherObject { get; set; }
+        public Piece CurrentPiece { get; set; }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(ShapeCollidingHandler != null) {
+            CollisionEventArgs args = new CollisionEventArgs();
+            args.OtherObject = collision.gameObject;
+            ShapeCollidingHandler(this, args);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if(ShapeExitCollisionHandler != null) {
+            CollisionEventArgs args = new CollisionEventArgs();
+            args.OtherObject = collision.gameObject;
+            ShapeExitCollisionHandler(this, args);
+        }
+    }
+
 }

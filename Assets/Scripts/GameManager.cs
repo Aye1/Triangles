@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour {
     private Board _board;
     private PieceManager _pieceManager;
     private AbstractPiece _draggedPiece;
+    //private AbstractPiece _hoverDraggedPiece;
 
     private Timer _helpTimer;
 
@@ -88,7 +89,7 @@ public class GameManager : MonoBehaviour {
         {
             Debug.Log("Piece dragged at pos " + _draggedPiece.transform.position.ToString());
         }
-        DisplayPieceHover();
+        //DisplayPieceHover();
         textScore.text = "Score : " + globalScore;
         textShuffle.text = "Shuffle : " + _shuffleCount;
         textHighScore.text = "High Score : " + HighScore;
@@ -109,18 +110,19 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    private void DisplayPieceHover()
+    /*private void DisplayPieceHover()
     {
         if (_draggedPiece != null)
         {
             //_board.DisplayPieceHover(_draggedPiece);
             _board.DisplayFirstPlayablePieceHover(_draggedPiece);
         }
-    }
+    }*/
 
     private void OnPieceDragged(object sender, EventArgs e)
     {
         _draggedPiece = sender as AbstractPiece;
+        _board.currentDraggedPiece = _draggedPiece;
         _board.FindPlayableShapes(_draggedPiece);
         ResetHelpTimer();
     }
@@ -147,6 +149,7 @@ public class GameManager : MonoBehaviour {
             _draggedPiece.transform.position = _piecePositions[GetPieceSlotId(_draggedPiece as Piece)];
         }
         _draggedPiece = null;
+        _board.currentDraggedPiece = null;
         ResetHelpTimer();
     }
 
@@ -188,6 +191,22 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    private void OnPieceCollision(object sender, EventArgs e)
+    {
+        Shape.CollisionEventArgs args = e as Shape.CollisionEventArgs;
+        Shape collisionShape = args.OtherObject.GetComponent<Shape>();
+        if(_board.IsPiecePlayableOnShape(collisionShape, args.CurrentPiece)){
+            //_board.DisplayPieceOnShape(args.CurrentPiece, collisionShape);
+            _board.AddShapeToCurrentlyPlayable(collisionShape);
+        }
+    }
+
+    private void OnPieceExitCollision(object sender, EventArgs e){
+        Shape.CollisionEventArgs args = e as Shape.CollisionEventArgs;
+        Shape collisionShape = args.OtherObject.GetComponent<Shape>();
+        _board.RemoveShapeToCurrentPlayable(collisionShape);
+    }
+    
     private int GetPieceSlotId(Piece piece)
     {
         for(int i=0; i<_pieceSlots.Length; i++)
@@ -240,6 +259,8 @@ public class GameManager : MonoBehaviour {
     {
         piece.PieceDraggedHandler -= OnPieceDragged;
         piece.PieceReleasedHandler -= OnPieceReleased;
+        piece.PieceCollidingHandler -= OnPieceCollision;
+        piece.PieceExitCollisionHandler -= OnPieceExitCollision;
         piece.DestroyPiece();
     }
 
@@ -247,6 +268,8 @@ public class GameManager : MonoBehaviour {
     {
         newPiece.PieceDraggedHandler += OnPieceDragged;
         newPiece.PieceReleasedHandler += OnPieceReleased;
+        newPiece.PieceCollidingHandler += OnPieceCollision;
+        newPiece.PieceExitCollisionHandler += OnPieceExitCollision;
     }
     private void ListenToPieceBonusDestroyEvent(AbstractPiece newPiece)
     {
@@ -348,4 +371,5 @@ public class GameManager : MonoBehaviour {
             }
         }
     }
+
 }
