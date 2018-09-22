@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour {
         ComputeScore();
         UIHelper.HideGameObject(endGamePopup);
         UIHelper.HideGameObject(pausePopup);
-        //LaunchHelpTimer();
+        LaunchHelpTimer();
 	}
 
     private void GetSavedHighScore() 
@@ -89,7 +89,6 @@ public class GameManager : MonoBehaviour {
         {
             Debug.Log("Piece dragged at pos " + _draggedPiece.transform.position.ToString());
         }
-        //DisplayPieceHover();
         textScore.text = "Score : " + globalScore;
         textShuffle.text = "Shuffle : " + _shuffleCount;
         textHighScore.text = "High Score : " + HighScore;
@@ -109,15 +108,6 @@ public class GameManager : MonoBehaviour {
             PlayerPrefs.SetInt(highScoreKey, HighScore);
         }
     }
-
-    /*private void DisplayPieceHover()
-    {
-        if (_draggedPiece != null)
-        {
-            //_board.DisplayPieceHover(_draggedPiece);
-            _board.DisplayFirstPlayablePieceHover(_draggedPiece);
-        }
-    }*/
 
     private void OnPieceDragged(object sender, EventArgs e)
     {
@@ -196,7 +186,6 @@ public class GameManager : MonoBehaviour {
         Shape.CollisionEventArgs args = e as Shape.CollisionEventArgs;
         Shape collisionShape = args.OtherObject.GetComponent<Shape>();
         if(_board.IsPiecePlayableOnShape(collisionShape, args.CurrentPiece)){
-            //_board.DisplayPieceOnShape(args.CurrentPiece, collisionShape);
             _board.AddShapeToCurrentlyPlayable(collisionShape);
         }
     }
@@ -351,7 +340,7 @@ public class GameManager : MonoBehaviour {
         {
             _helpTimer.Dispose();
         }
-        //LaunchHelpTimer();
+        LaunchHelpTimer();
         UnHighlightAllPieces();
     }
 

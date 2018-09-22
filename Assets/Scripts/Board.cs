@@ -14,7 +14,6 @@ public class Board : MonoBehaviour
     private List<Shape> shapes;
     private IEnumerable<Shape> unfilledShapes;
     private IEnumerable<Shape> playableShapes;
-    //private List<KeyValuePair<Shape, Piece>> _currentHoveredPlayableShapes;
     private List<Shape> _currentHoveredPlayablePositions;
 
     public Shape basicShape;
@@ -23,11 +22,12 @@ public class Board : MonoBehaviour
     public int lastNumberValidatedLines = 0;
     public AbstractPiece currentDraggedPiece;
 
+    public bool debugHoveredPlayablePositions;
+
     // Use this for initialization
     void Awake()
     {
         shapes = new List<Shape>();
-        //_currentHoveredPlayableShapes = new List<KeyValuePair<Shape,Piece>>();
         _currentHoveredPlayablePositions = new List<Shape>();
         CreateBoard();
     }
@@ -35,14 +35,28 @@ public class Board : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //DisplayFirstPlayablePiece();
         DisplayClosestPlayablePiece();
+    }
+
+    // Debug method
+    // When called, displays all the playable shapes in color
+    private void DebugDisplayAllPlayableShapes() {
+        if(debugHoveredPlayablePositions) {
+            foreach(Shape sh in _currentHoveredPlayablePositions) {
+                sh.isPlayable = true;
+                sh.HoveredColor = Color.magenta;
+            }
+            Shape closest = GetClosestPlayableShape();
+            if (closest != null)
+            {
+                closest.HoveredColor = Color.yellow;
+            }
+        }
     }
 
     /// <summary>
     /// Checks if a line in complete
     /// </summary>
-    /// <param name="valShapes">List of the shapes which create a line and should be removed</param>
     /// <param name="index">Index of the current shape on the line analysed</param>
     /// <param name="pos">Id of the line analysed (0=A, 1=B, 2=C)</param>
     /// <returns></returns>
@@ -155,12 +169,13 @@ public class Board : MonoBehaviour
             // Probably for DetroyPiece, to check with Jade
             listShapes = shapes;
         }
-        IEnumerable<Shape> necessaryShapes = GetNecessaryShapesForPiece(shape, piece, listShapes);
+        IEnumerable<Shape> necessaryShapes = GetNecessaryShapesForPieceWithFirstShape(shape, piece, listShapes);
         return necessaryShapes.Count() == piece.pieceShapes.Count;
     }
 
     /// <summary>
     /// Returns the list of shapes necessary to fit the piece, starting with the current shape
+    /// /!\ You probably want to use GetNecessaryShapesForPieceWithFirstShape
     /// </summary>
     /// <param name="shape">The base shape to create the piece</param>
     /// <param name="piece">The piece to fit</param>
@@ -182,13 +197,42 @@ public class Board : MonoBehaviour
         return necessaryShapes;
     }
 
-    public void DisplayPieceHover(AbstractPiece piece)
+    /// <summary>
+    /// Returns the list of shapes necessary to fit the piece, starting with the current shape on the board
+    /// and the first shape of the pice
+    /// </summary>
+    /// <param name="shape">The base shape to create the piece</param>
+    /// <param name="piece">The piece to fit</param>
+    /// <param name="shapeList">The list of shapes in which to pick</param>
+    /// <returns>A (possibly incomplete) list of shapes fitting the piece</returns>
+    private IEnumerable<Shape> GetNecessaryShapesForPieceWithFirstShape(Shape shape, AbstractPiece piece, IEnumerable<Shape> shapeList)
+    {
+        List<Shape> necessaryShapes = new List<Shape>();
+        Shape firstShape = piece.firstShape;
+
+        foreach (Shape s in piece.pieceShapes)
+        {
+            Vector2 searchPos = s.PosXY + shape.PosXY - firstShape.PosXY;
+            IEnumerable<Shape> found = shapeList.Where(us => us.PosXY == searchPos
+                                                            && us.IsUpsideDown == s.IsUpsideDown);
+            if (found.Count() != 0)
+            {
+                necessaryShapes.Add(found.First());
+            }
+        }
+        return necessaryShapes;
+    }
+
+    /* To remove when we are sure it's useless
+     * public void DisplayPieceHover(AbstractPiece piece)
     {
         Shape firstShape = piece.pieceShapes.First();
         Shape hoveredShape = GetShapeAtPos(piece.transform.position, false);
         if (piece is Piece && playableShapes.Contains(hoveredShape))
         {
-            IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
+            //IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
+            IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPieceWithFirstShape(hoveredShape, piece, shapes);
+
             hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
             hoveredShapes.ToList().ForEach(s => s.FilledColor = piece.PieceColor);
             hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
@@ -201,7 +245,7 @@ public class Board : MonoBehaviour
             hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
 
         }
-    }
+    }*/
 
     /*public void DisplayFirstPlayablePieceHover(AbstractPiece piece)
     {
@@ -215,7 +259,8 @@ public class Board : MonoBehaviour
     }*/
 
     public void DisplayPieceOnShape(AbstractPiece piece, Shape sh) {
-        IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(sh, piece, shapes);
+        IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPieceWithFirstShape(sh, piece, shapes);
+
         hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
         hoveredShapes.ToList().ForEach(s => s.FilledColor = piece.PieceColor);
         hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
@@ -232,7 +277,7 @@ public class Board : MonoBehaviour
     }
 
     public void DisplayClosestPlayablePiece() {
-            Shape playableShape = GetClosestPlayableShape();
+        Shape playableShape = GetClosestPlayableShape();
         if(playableShape != null) {
             DisplayPieceOnShape(currentDraggedPiece, playableShape);
         }
@@ -242,10 +287,10 @@ public class Board : MonoBehaviour
         if (_currentHoveredPlayablePositions.Count > 0)
         {
             Shape playableShape = _currentHoveredPlayablePositions.First();
-            float minDist = Vector3.Distance(playableShape.transform.position, currentDraggedPiece.firstShape.transform.position);
+            float minDist = Vector3.Distance(GetShapeCenterPosition(playableShape), GetShapeCenterPosition(currentDraggedPiece.firstShape));
             foreach (Shape sh in _currentHoveredPlayablePositions)
             {
-                float currentDist = Vector3.Distance(sh.transform.position, currentDraggedPiece.firstShape.transform.position);
+                float currentDist = Vector3.Distance(GetShapeCenterPosition(sh), GetShapeCenterPosition(currentDraggedPiece.firstShape));
                 if (currentDist < minDist)
                 {
                     minDist = currentDist;
@@ -257,35 +302,17 @@ public class Board : MonoBehaviour
         return null;
     }
 
-    /*public Shape GetShapeAtPos(Vector3 pos)
-    {
-        Shape resShape = null;
-        Vector3 offset = transform.position;
-        Vector2 posOnBoard = new Vector2((pos - offset).x/Config.paddingX, -(pos-offset).y/Config.paddingY);
-        IEnumerable<Shape> foundShapes = shapes.Where(s => Mathf.Abs(s.PosXY.x - posOnBoard.x) < 0.5f
-                                                        && Mathf.Abs(s.PosXY.y - posOnBoard.y) < 0.5f);
-        if (foundShapes.Count() != 0)
-        {
-            foundShapes.All(s => s.tmpBool = true);
-            resShape = foundShapes.First();
-            //Debug.Log("Hover on shape at pos " + resShape.PosXY);
+    // Gets the position of the center of the piece
+    // The center is different from the pivot center
+    private Vector3 GetShapeCenterPosition(Shape sh) {
+        Vector3 pos = sh.transform.position;
+        float offset = 0.16f;
+        if (sh.IsUpsideDown) {
+            pos = new Vector3(sh.transform.position.x, sh.transform.position.y - offset, sh.transform.position.z);
+        } else {
+            pos = new Vector3(sh.transform.position.x, sh.transform.position.y + offset, sh.transform.position.z);
         }
-        return resShape;
-    }*/
-
-    public Shape GetShapeAtPos(Vector3 pos, bool shouldConvertToWorldPosition)
-    {
-        Shape resShape = null;
-        Vector3 realPos = shouldConvertToWorldPosition ? Camera.main.ScreenToWorldPoint(pos) : pos;
-        Vector2 pos2D = new Vector2(realPos.x, realPos.y);
-        RaycastHit2D hit = Physics2D.Raycast(pos2D, Vector2.zero, Mathf.Infinity, Physics.DefaultRaycastLayers, 0.0f);
-        RaycastHit2D[] hits = Physics2D.RaycastAll(pos2D, Vector2.zero, Mathf.Infinity, Physics.DefaultRaycastLayers, 0.0f);
-        if (hit.collider != null)
-        {
-            resShape = hit.collider.gameObject.GetComponent<Shape>();
-        }
-
-        return resShape;
+        return pos;
     }
 
     /// <summary>
@@ -297,13 +324,10 @@ public class Board : MonoBehaviour
     {
         //Shape hoveredShape = GetShapeAtPos(piece.transform.position, false);
         if (piece is Piece) {
-            //Shape playableShape = GetPlayableShapeInNeighbourhood(piece as Piece, false);
             Shape playableShape = GetClosestPlayableShape();
-
-            //if (playableShape != null && playableShapes.Contains(hoveredShape)) {
             if (playableShape != null) {
-                //IEnumerable<Shape> addedShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
-                IEnumerable<Shape> addedShapes = GetNecessaryShapesForPiece(playableShape, piece, shapes);
+                IEnumerable<Shape> addedShapes = GetNecessaryShapesForPieceWithFirstShape(playableShape, piece, shapes);
+
                 _currentHoveredPlayablePositions.Clear();
 
                 Color pColor = piece.PieceColor;

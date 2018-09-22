@@ -748,6 +748,8 @@ MonoBehaviour:
   numberFlippedShapes: 0
   numberFlippedLines: 0
   lastNumberValidatedLines: 0
+  currentDraggedPiece: {fileID: 0}
+  debugHoveredPlayablePositions: 0
 --- !u!4 &299588944
 Transform:
   m_ObjectHideFlags: 0

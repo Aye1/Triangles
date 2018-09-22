@@ -24,6 +24,8 @@ public class Shape : MonoBehaviour
     public EventHandler ShapeCollidingHandler;
     public EventHandler ShapeExitCollisionHandler;
 
+    public bool debugIsFirstShape = false;
+
     #region Properties
     public Vector3Int PositionABC
     {
@@ -50,7 +52,8 @@ public class Shape : MonoBehaviour
             if (isUpsideDown != value)
             {
                 isUpsideDown = value;
-                transform.Rotate(0.0f, 0.0f, 180.0f);
+                transform.localScale = new Vector3(transform.localScale.x, -transform.localScale.y, transform.localScale.z);
+                //transform.Rotate(0.0f, 0.0f, 180.0f);
             }
         }
     }
@@ -160,6 +163,12 @@ public class Shape : MonoBehaviour
         halo.enabled = IsHighlighted;
         tmpBool = false;
         isPlayable = false;
+    }
+
+    private void AdaptPositionWithParity() {
+        if (isUpsideDown) {
+            transform.position = new Vector3(transform.position.x, transform.position.y - 0.16f, transform.position.z);
+        }
     }
 
     void OnMouseDown()

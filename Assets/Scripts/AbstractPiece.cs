@@ -11,6 +11,7 @@ abstract public class AbstractPiece : MonoBehaviour {
 
     public float dragPositionOffset = 1.5f;
     //public float dragPositionOffset = 0.0f;
+    public bool debugPrintPosition;
 
     public EventHandler PieceDraggedHandler;
     public EventHandler PieceReleasedHandler;
@@ -66,10 +67,13 @@ abstract public class AbstractPiece : MonoBehaviour {
     {
         if (isDragged)
         {
-            Vector3 shapeSize = firstShape.GetComponent<Renderer>().bounds.size;
-            Vector3 pos = new Vector3(firstShape.PosXY.x * shapeSize.x, firstShape.PosXY.y * shapeSize.y, 0.0f) + Input.mousePosition;
-            Vector3 newPos = Camera.main.ScreenToWorldPoint(pos);
-            transform.position = new Vector3(newPos.x, newPos.y + dragPositionOffset, -1);
+            Vector3 mousePos = Input.mousePosition;
+            Vector3 shapeOffset = new Vector3(-firstShape.PosXY.x * Config.paddingX, firstShape.PosXY.y * Config.paddingY, 0.0f);
+            Vector3 newPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            transform.position = new Vector3(newPos.x, newPos.y + dragPositionOffset, -1) + shapeOffset;
+            if(debugPrintPosition) {
+                Debug.Log("Piece position: " + transform.position);
+            }
         }
     }
 
@@ -89,6 +93,7 @@ abstract public class AbstractPiece : MonoBehaviour {
             pieceShapes.Add(newShape);
         }
         firstShape = pieceShapes.ToArray()[0];
+        firstShape.debugIsFirstShape = true;
     }
 
 
@@ -126,7 +131,9 @@ abstract public class AbstractPiece : MonoBehaviour {
     }
 
     protected void OnShapeExitColliding(object sender, EventArgs e) {
-        if (PieceExitCollisionHandler != null && (Shape)sender == firstShape)
+        Shape movedShape = (Shape)sender;
+        // We only want the first shape to collide
+        if (PieceExitCollisionHandler != null && movedShape == firstShape)
         {
             ((Shape.CollisionEventArgs)e).CurrentPiece = GetComponent<Piece>();
             PieceExitCollisionHandler(this, e);

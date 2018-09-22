@@ -78,13 +78,18 @@ public class StringLocalizationManager : MonoBehaviour {
 
     private string[] GetRawCSVLines() {
         string basePath = Application.dataPath;
-        string completePath = basePath + "/Localization/Resources/Localizations.csv";
-        if (File.Exists(completePath))
-        {
-            string[] rawText = File.ReadAllLines(completePath);
-            return rawText;
+        TextAsset resObj = Resources.Load<TextAsset>("Localizations");
+        if(resObj != null) {
+            return RawToLines(resObj.text);
+        }  else {
+            Debug.Log("Can't find localization file");
         }
         return new string[]{};
+    }
+
+    private string[] RawToLines(string rawText) {
+        string[] separators = { "\r\n" };
+        return rawText.Split(separators, System.StringSplitOptions.None);
     }
 
     private string[][] RawToSplitLines(string[] rawLines) {
