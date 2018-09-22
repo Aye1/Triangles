@@ -26,7 +26,11 @@ public class StartupManager : MonoBehaviour {
     {
         GetServices();
         bool isEverythingLaunched = debugStartupFinished && _locManager.isReady;
-        yield return new WaitUntil(() => isEverythingLaunched);
+        while(!isEverythingLaunched) {
+            isEverythingLaunched = debugStartupFinished && _locManager.isReady;
+            yield return null;
+        }
+        //yield return new WaitUntil(() => isEverythingLaunched);
         startupFinished = true;
     }
 
