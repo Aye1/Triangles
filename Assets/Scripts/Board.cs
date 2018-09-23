@@ -35,7 +35,11 @@ public class Board : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        DisplayClosestPlayablePiece();
+        if(debugHoveredPlayablePositions) {
+            DebugDisplayAllPlayableShapes();
+        } else {
+            DisplayClosestPlayablePiece();
+        }
     }
 
     // Debug method
@@ -223,46 +227,10 @@ public class Board : MonoBehaviour
         return necessaryShapes;
     }
 
-    /* To remove when we are sure it's useless
-     * public void DisplayPieceHover(AbstractPiece piece)
-    {
-        Shape firstShape = piece.pieceShapes.First();
-        Shape hoveredShape = GetShapeAtPos(piece.transform.position, false);
-        if (piece is Piece && playableShapes.Contains(hoveredShape))
-        {
-            //IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
-            IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPieceWithFirstShape(hoveredShape, piece, shapes);
-
-            hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
-            hoveredShapes.ToList().ForEach(s => s.FilledColor = piece.PieceColor);
-            hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
-        }
-
-        else if (piece is PieceBonusDestroy && shapes.Contains(hoveredShape))
-        {
-            IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
-            hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
-            hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
-
-        }
-    }*/
-
-    /*public void DisplayFirstPlayablePieceHover(AbstractPiece piece)
-    {
-        Shape playableShape = GetPlayableShapeInNeighbourhood(piece as Piece, false);
-        if (playableShape != null) {
-            IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPiece(playableShape, piece, shapes);
-            hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
-            hoveredShapes.ToList().ForEach(s => s.FilledColor = piece.PieceColor);
-            hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
-        }
-    }*/
-
     public void DisplayPieceOnShape(AbstractPiece piece, Shape sh) {
         IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPieceWithFirstShape(sh, piece, shapes);
 
         hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
-        hoveredShapes.ToList().ForEach(s => s.FilledColor = piece.PieceColor);
         hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
     }
 
@@ -323,28 +291,27 @@ public class Board : MonoBehaviour
     public bool PutPiece(AbstractPiece piece)
     {
         //Shape hoveredShape = GetShapeAtPos(piece.transform.position, false);
-        if (piece is Piece) {
-            Shape playableShape = GetClosestPlayableShape();
-            if (playableShape != null) {
-                IEnumerable<Shape> addedShapes = GetNecessaryShapesForPieceWithFirstShape(playableShape, piece, shapes);
+        Shape playableShape = GetClosestPlayableShape();
+        if (playableShape != null)
+        {
+            IEnumerable<Shape> addedShapes = GetNecessaryShapesForPieceWithFirstShape(playableShape, piece, shapes);
+            _currentHoveredPlayablePositions.Clear();
 
-                _currentHoveredPlayablePositions.Clear();
-
+            if (piece is Piece)
+            {
                 Color pColor = piece.PieceColor;
                 addedShapes.ToList().ForEach(s => s.isFilled = true);
                 addedShapes.ToList().ForEach(s => s.IsVisuallyFilled = true);
                 addedShapes.ToList().ForEach(s => s.FilledColor = pColor);
                 ValidateUniqueLines(addedShapes);
-                return true;
             }
-        }       
-        /*else if(piece is PieceBonusDestroy && shapes.Contains(hoveredShape))
-        {
-            IEnumerable<Shape> addedShapes = GetNecessaryShapesForPiece(hoveredShape, piece, shapes);
-            addedShapes.ToList().ForEach(s => s.isFilled = false);
-            addedShapes.ToList().ForEach(s => s.IsVisuallyFilled = false);
+            else if (piece is PieceBonusDestroy)
+            {
+                addedShapes.ToList().ForEach(s => s.isFilled = false);
+                addedShapes.ToList().ForEach(s => s.IsVisuallyFilled = false);
+            }
             return true;
-        }*/
+        }
         return false;
     }
 

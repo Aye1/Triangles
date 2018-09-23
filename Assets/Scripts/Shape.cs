@@ -194,7 +194,7 @@ public class Shape : MonoBehaviour
 
     public class CollisionEventArgs : EventArgs {
         public GameObject OtherObject { get; set; }
-        public Piece CurrentPiece { get; set; }
+        public AbstractPiece CurrentPiece { get; set; }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

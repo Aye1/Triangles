@@ -21,7 +21,6 @@ public class GameManager : MonoBehaviour {
     private Board _board;
     private PieceManager _pieceManager;
     private AbstractPiece _draggedPiece;
-    //private AbstractPiece _hoverDraggedPiece;
 
     private Timer _helpTimer;
 
@@ -165,6 +164,7 @@ public class GameManager : MonoBehaviour {
     private void OnPieceBonusDestroyDragged(object sender, EventArgs e)
     {
         _draggedPiece = sender as AbstractPiece;
+        _board.currentDraggedPiece = _draggedPiece;
         _board.FindPlayableShapes(_draggedPiece);
     }
 
@@ -260,10 +260,12 @@ public class GameManager : MonoBehaviour {
         newPiece.PieceCollidingHandler += OnPieceCollision;
         newPiece.PieceExitCollisionHandler += OnPieceExitCollision;
     }
-    private void ListenToPieceBonusDestroyEvent(AbstractPiece newPiece)
+    private void ListenToPieceBonusDestroyEvent(PieceBonusDestroy newPiece)
     {
         newPiece.PieceDraggedHandler += OnPieceBonusDestroyDragged;
         newPiece.PieceReleasedHandler += OnPieceBonusDestroyReleased;
+        newPiece.PieceCollidingHandler += OnPieceCollision;
+        newPiece.PieceExitCollisionHandler += OnPieceExitCollision;
     }
 
     /// <summary>
@@ -313,7 +315,7 @@ public class GameManager : MonoBehaviour {
 
     public void GoToMainMenuScreen()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(1);
     }
 
     public void DisplayPauseMenu()

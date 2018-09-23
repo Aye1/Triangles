@@ -125,7 +125,7 @@ abstract public class AbstractPiece : MonoBehaviour {
 
     protected void OnShapeColliding(object sender, EventArgs e) {
         if (PieceCollidingHandler != null && (Shape)sender == firstShape) {
-            ((Shape.CollisionEventArgs)e).CurrentPiece = GetComponent<Piece>();
+            ((Shape.CollisionEventArgs)e).CurrentPiece = GetComponent<AbstractPiece>();
             PieceCollidingHandler(this, e);
         }
     }
@@ -135,7 +135,7 @@ abstract public class AbstractPiece : MonoBehaviour {
         // We only want the first shape to collide
         if (PieceExitCollisionHandler != null && movedShape == firstShape)
         {
-            ((Shape.CollisionEventArgs)e).CurrentPiece = GetComponent<Piece>();
+            ((Shape.CollisionEventArgs)e).CurrentPiece = GetComponent<AbstractPiece>();
             PieceExitCollisionHandler(this, e);
         }
     }
