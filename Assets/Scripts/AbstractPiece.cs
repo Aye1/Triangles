@@ -68,7 +68,7 @@ abstract public class AbstractPiece : MonoBehaviour {
         if (isDragged)
         {
             Vector3 mousePos = Input.mousePosition;
-            Vector3 shapeOffset = new Vector3(-firstShape.PosXY.x * Config.paddingX, firstShape.PosXY.y * Config.paddingY, 0.0f);
+            Vector3 shapeOffset = new Vector3(-firstShape.PosXY.x * Config.paddingX, firstShape.PosXY.y * Config.paddingY, -2.0f);
             Vector3 newPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             transform.position = new Vector3(newPos.x, newPos.y + dragPositionOffset, -1) + shapeOffset;
             if(debugPrintPosition) {
