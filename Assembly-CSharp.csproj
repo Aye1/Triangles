@@ -65,7 +65,8 @@
     <Compile Include="Assets\Scripts\AbstractPiece.cs" />
     <Compile Include="Assets\Scripts\Board.cs" />
     <Compile Include="Assets\Scripts\CameraBehavior.cs" />
-    <Compile Include="Assets\Scripts\Config.cs" />
+    <Compile Include="Assets\Scripts\Constants\Config.cs" />
+    <Compile Include="Assets\Scripts\Constants\Constants.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Helpers\SimpleObjectPool.cs" />
     <Compile Include="Assets\Scripts\Helpers\UIHelper.cs" />

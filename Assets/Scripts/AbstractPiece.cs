@@ -82,18 +82,21 @@ abstract public class AbstractPiece : MonoBehaviour {
         pieceShapes = new List<Shape>();
         foreach (Vector4 pos in positionsXY)
         {
-            Shape newShape = Instantiate(refShape);
-            newShape.transform.position = transform.position + new Vector3(pos.x * Config.paddingX, -pos.y * Config.paddingY, pos.z);
+            Vector3 position = transform.position + new Vector3(pos.x * Config.paddingX, -pos.y * Config.paddingY, pos.z);
+            Shape newShape = Instantiate(refShape, position, Quaternion.identity);
+
             newShape.IsUpsideDown = pos.w == 1.0f;
             newShape.transform.parent = transform;
 
             newShape.BaseColor = Color.blue;
             RegisterCallback(newShape);
             newShape.PosXY = pos;
+            newShape.gameObject.layer = Constants.pieceLayerId;
             pieceShapes.Add(newShape);
         }
         firstShape = pieceShapes.ToArray()[0];
         firstShape.debugIsFirstShape = true;
+        this.gameObject.layer = Constants.pieceLayerId;
     }
 
 

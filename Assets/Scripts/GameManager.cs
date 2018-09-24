@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour {
         _pieceSlots = new Piece[3];
         GetSavedHighScore();
         GetThreePieces();
-        GetBonusPiece();
+        //GetBonusPiece();
         ComputeScore();
         UIHelper.HideGameObject(endGamePopup);
         UIHelper.HideGameObject(pausePopup);
@@ -120,10 +120,11 @@ public class GameManager : MonoBehaviour {
     {
         if(_board.PutPiece(_draggedPiece))
         {
+            _board.ClearCurrentPiece();
+
             int idPos = GetPieceSlotId(_draggedPiece as Piece);
             CleanDestroyPiece(_draggedPiece);
-            Piece newPiece = GetNewPiece();
-            newPiece.transform.position = _piecePositions[idPos];
+            Piece newPiece = GetNewPiece(_piecePositions[idPos]);
             _pieceSlots[idPos] = newPiece;
 
             if (_board.lastNumberValidatedLines > 1)
@@ -138,7 +139,7 @@ public class GameManager : MonoBehaviour {
             _draggedPiece.transform.position = _piecePositions[GetPieceSlotId(_draggedPiece as Piece)];
         }
         _draggedPiece = null;
-        _board.currentDraggedPiece = null;
+        _board.ClearCurrentPiece();
         ResetHelpTimer();
     }
 
@@ -146,8 +147,7 @@ public class GameManager : MonoBehaviour {
     {
         for(int i=0; i<_piecePositions.Length; i++)
         {
-            Piece newPiece = GetNewPiece();
-            newPiece.transform.position = _piecePositions[i];
+            Piece newPiece = GetNewPiece(_piecePositions[i]);
             _pieceSlots[i] = newPiece;
         }
     }
@@ -208,13 +208,15 @@ public class GameManager : MonoBehaviour {
         return -1;
     }
 
-    private Piece GetNewPiece()
+    private Piece GetNewPiece(Vector3 position)
     {
-        Piece newPiece = _pieceManager.GetNextPiece();
+        Piece newPiece = _pieceManager.GetNextPiece(position); 
         newPiece.transform.parent = transform;
         newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
         ListenToPieceEvent(newPiece);
         return newPiece;
+
+
     }
 
     private void ManageGameOver()
@@ -246,6 +248,7 @@ public class GameManager : MonoBehaviour {
 
     private void CleanDestroyPiece(AbstractPiece piece)
     {
+        _board.ClearCurrentPiece();
         piece.PieceDraggedHandler -= OnPieceDragged;
         piece.PieceReleasedHandler -= OnPieceReleased;
         piece.PieceCollidingHandler -= OnPieceCollision;

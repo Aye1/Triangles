@@ -27,12 +27,12 @@ public class PieceManager : MonoBehaviour {
 		
 	}
 
-    public Piece GetNextPiece()
+    public Piece GetNextPiece(Vector3 position)
     {
         if (pieces != null)
         {
             int index = _randomGen.Next(0, pieces.Count);
-            Piece newPiece = Instantiate(pieces.ToArray()[index]);
+            Piece newPiece = Instantiate(pieces.ToArray()[index], position, Quaternion.identity);
             newPiece.PieceColor = GetNextColor();
             return newPiece;
         }

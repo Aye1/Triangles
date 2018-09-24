@@ -29,7 +29,9 @@ public class Board : MonoBehaviour
     {
         shapes = new List<Shape>();
         _currentHoveredPlayablePositions = new List<Shape>();
-        CreateBoard();
+        // CreateHexagonalBoard();
+        CreateHourglassBoard();
+        ClearCurrentPiece();
     }
 
     // Update is called once per frame
@@ -68,7 +70,7 @@ public class Board : MonoBehaviour
     {
         IEnumerable<Shape> toValidate = shapes.Where<Shape>(shape => shape.PositionABC[pos] == index);
         bool lineValidated = toValidate.All(shape => shape.isFilled);
-        if (lineValidated)
+        if (lineValidated && toValidate.ToList().Count() >=5)
         {
             return toValidate;
         }
@@ -99,7 +101,7 @@ public class Board : MonoBehaviour
     /// <summary>
     /// Initializes the board
     /// </summary>
-    private void CreateBoard()
+    private void CreateHexagonalBoard()
     {
         int height = _minWidth - 1;
         int maxWidth = 2 * _minWidth - 3;
@@ -135,7 +137,58 @@ public class Board : MonoBehaviour
                     -j * Config.paddingY,
                     newShape.transform.position.z);
                 newShape.transform.position = Vector3.Scale(shapePosition, locScale);
+                newShape.transform.parent = transform; 
+                newShape.gameObject.layer = Constants.boardLayerId;
+                shapes.Add(newShape);
+                unfilledShapes = shapes;
+            }
+        }
+    }
+
+    private void CreateHourglassBoard()
+    {
+        int minwidth = 5;
+        int maxwidth = 11;
+        int height = (maxwidth - minwidth) + 2;
+        bool isMinReached = false;
+
+        for (int j = 0; j < height; j++)
+        {
+            int currentWidth = isMinReached ? (int)(minwidth + 2*(j - (height/2.0f))) : (int)(maxwidth - 2*j);
+            if(!isMinReached)
+            {
+                isMinReached = currentWidth == minwidth;
+
+            }
+            int imin = (maxwidth - currentWidth) / 2 +1;
+            int imax = imin + currentWidth;
+
+            for (int i = imin; i < imax; i++)
+            {
+
+                Vector3 shapePosition = transform.position + new Vector3(i * Config.paddingX,
+                    -j * Config.paddingY,
+                    0);
+
+                Shape newShape = Instantiate(basicShape, shapePosition, Quaternion.identity);
+                newShape.gameObject.tag = boardTag;
+                Vector2 vecB = new Vector2(sqr3 * i / 2, -j / 2);
+                Vector2 vecC = new Vector2(-sqr3 * i / 2, -j / 2);
+                int A = j;
+                int B = (int)Mathf.Ceil((-i - j) / 2.0f);
+                int C = (int)Mathf.Floor(-(i - j) / 2.0f);
+                newShape.PositionABC = new Vector3Int(A, B, C);
+                newShape.PosXY = new Vector2(i, j);
+
+                newShape.IsUpsideDown = ((i + j) % 2 == 0);
+
+                Vector3 locScale = transform.lossyScale;
+
+                newShape.transform.localScale = Vector3.Scale(locScale, newShape.transform.localScale);
+
+                newShape.transform.position = Vector3.Scale(shapePosition, locScale);
                 newShape.transform.parent = transform;
+                newShape.gameObject.layer = Constants.boardLayerId;
                 shapes.Add(newShape);
                 unfilledShapes = shapes;
             }
@@ -252,7 +305,7 @@ public class Board : MonoBehaviour
     }
 
     private Shape GetClosestPlayableShape() {
-        if (_currentHoveredPlayablePositions.Count > 0)
+        if (currentDraggedPiece != null && _currentHoveredPlayablePositions.Count > 0)
         {
             Shape playableShape = _currentHoveredPlayablePositions.First();
             float minDist = Vector3.Distance(GetShapeCenterPosition(playableShape), GetShapeCenterPosition(currentDraggedPiece.firstShape));
@@ -283,6 +336,13 @@ public class Board : MonoBehaviour
         return pos;
     }
 
+    public void ClearCurrentPiece()
+    {
+        currentDraggedPiece = null;
+        _currentHoveredPlayablePositions.Clear();
+
+    }
+
     /// <summary>
     /// Puts the piece on the board
     /// </summary>
@@ -295,8 +355,6 @@ public class Board : MonoBehaviour
         if (playableShape != null)
         {
             IEnumerable<Shape> addedShapes = GetNecessaryShapesForPieceWithFirstShape(playableShape, piece, shapes);
-            _currentHoveredPlayablePositions.Clear();
-
             if (piece is Piece)
             {
                 Color pColor = piece.PieceColor;
