@@ -99,7 +99,7 @@ public class Board : MonoBehaviour
     }
 
     /// <summary>
-    /// Initializes the board
+    /// Initializes the hexagonal board
     /// </summary>
     private void CreateHexagonalBoard()
     {
@@ -117,34 +117,14 @@ public class Board : MonoBehaviour
 
             for (int i = imin; i < imax; i++)
             {
-                Shape newShape = Instantiate(basicShape);
-                newShape.gameObject.tag = boardTag;
-                Vector2 vecB = new Vector2(sqr3 * i / 2, -j / 2);
-                Vector2 vecC = new Vector2(-sqr3 * i / 2, -j / 2);
-                int A = j;
-                int B = (int)Mathf.Ceil((-i - j) / 2.0f);
-                int C = (int)Mathf.Floor(-(i - j) / 2.0f);
-                newShape.PositionABC = new Vector3Int(A, B, C);
-                newShape.PosXY = new Vector2(i, j);
-
-                newShape.IsUpsideDown = ((i + j) % 2 == 0);
-
-                Vector3 locScale = transform.lossyScale;
-
-                newShape.transform.localScale = Vector3.Scale(locScale, newShape.transform.localScale);
-
-                Vector3 shapePosition = transform.position + new Vector3(i * Config.paddingX,
-                    -j * Config.paddingY,
-                    newShape.transform.position.z);
-                newShape.transform.position = Vector3.Scale(shapePosition, locScale);
-                newShape.transform.parent = transform; 
-                newShape.gameObject.layer = Constants.boardLayerId;
-                shapes.Add(newShape);
-                unfilledShapes = shapes;
+                CreateBoardShape(i, j);
             }
         }
     }
 
+    /// <summary>
+    /// Initializes the hourglass board
+    /// </summary>
     private void CreateHourglassBoard()
     {
         int minwidth = 5;
@@ -154,45 +134,49 @@ public class Board : MonoBehaviour
 
         for (int j = 0; j < height; j++)
         {
-            int currentWidth = isMinReached ? (int)(minwidth + 2*(j - (height/2.0f))) : (int)(maxwidth - 2*j);
-            if(!isMinReached)
+            int currentWidth = isMinReached ? (int)(minwidth + 2 * (j - (height / 2.0f))) : (int)(maxwidth - 2 * j);
+            if (!isMinReached)
             {
                 isMinReached = currentWidth == minwidth;
 
             }
-            int imin = (maxwidth - currentWidth) / 2 +1;
+            int imin = (maxwidth - currentWidth) / 2 + 1;
             int imax = imin + currentWidth;
 
             for (int i = imin; i < imax; i++)
             {
-
-                Vector3 shapePosition = transform.position + new Vector3(i * Config.paddingX,
-                    -j * Config.paddingY,
-                    0);
-
-                Shape newShape = Instantiate(basicShape, shapePosition, Quaternion.identity);
-                newShape.gameObject.tag = boardTag;
-                Vector2 vecB = new Vector2(sqr3 * i / 2, -j / 2);
-                Vector2 vecC = new Vector2(-sqr3 * i / 2, -j / 2);
-                int A = j;
-                int B = (int)Mathf.Ceil((-i - j) / 2.0f);
-                int C = (int)Mathf.Floor(-(i - j) / 2.0f);
-                newShape.PositionABC = new Vector3Int(A, B, C);
-                newShape.PosXY = new Vector2(i, j);
-
-                newShape.IsUpsideDown = ((i + j) % 2 == 0);
-
-                Vector3 locScale = transform.lossyScale;
-
-                newShape.transform.localScale = Vector3.Scale(locScale, newShape.transform.localScale);
-
-                newShape.transform.position = Vector3.Scale(shapePosition, locScale);
-                newShape.transform.parent = transform;
-                newShape.gameObject.layer = Constants.boardLayerId;
-                shapes.Add(newShape);
-                unfilledShapes = shapes;
+                CreateBoardShape(i, j);
             }
         }
+    }
+
+    /// <summary>
+    /// Creates the board shape.
+    /// </summary>
+    /// <param name="i">The position i in the board.</param>
+    /// <param name="j">The position j in the board.</param>
+    private void CreateBoardShape(int i, int j) {
+        Vector3 pos = transform.position + new Vector3(i * Config.paddingX,
+                    -j * Config.paddingY,
+                    0);
+        Vector3 finalPos = Vector3.Scale(pos, transform.lossyScale);
+        Shape newShape = Instantiate(basicShape, finalPos, Quaternion.identity);
+        newShape.gameObject.tag = Constants.boardTag;
+        newShape.gameObject.layer = Constants.boardLayerId;
+        newShape.PositionABC = posABCfromIJ(i,j);
+        newShape.PosXY = new Vector2(i,j);
+        newShape.IsUpsideDown = (i + j) % 2 == 0;
+        newShape.transform.localScale = Vector3.Scale(transform.lossyScale, newShape.transform.localScale);
+        newShape.transform.parent = transform;
+        shapes.Add(newShape);
+        unfilledShapes = shapes;
+    }
+
+    private Vector3Int posABCfromIJ(int i, int j) {
+        int A = j;
+        int B = (int)Mathf.Ceil((-i - j) / 2.0f);
+        int C = (int)Mathf.Floor(-(i - j) / 2.0f);
+        return new Vector3Int(A, B, C);
     }
 
     /// <summary>
