@@ -29,8 +29,8 @@ public class Board : MonoBehaviour
     {
         shapes = new List<Shape>();
         _currentHoveredPlayablePositions = new List<Shape>();
-        // CreateHexagonalBoard();
-        CreateHourglassBoard();
+        CreateHexagonalBoard();
+        //CreateHourglassBoard();
         ClearCurrentPiece();
     }
 
@@ -106,6 +106,8 @@ public class Board : MonoBehaviour
         int height = _minWidth - 1;
         int maxWidth = 2 * _minWidth - 3;
 
+        Vector2 posOffset = BoardPositionOffset(maxWidth, height);
+
         // Décalage de 1 pour rester sur la bonne parité de grille
         int offset = height / 2 % 2 == 0 ? 1 : 0;
 
@@ -117,7 +119,7 @@ public class Board : MonoBehaviour
 
             for (int i = imin; i < imax; i++)
             {
-                CreateBoardShape(i, j);
+                CreateBoardShape(i, j, posOffset);
             }
         }
     }
@@ -132,6 +134,8 @@ public class Board : MonoBehaviour
         int height = (maxwidth - minwidth) + 2;
         bool isMinReached = false;
 
+        Vector2 offset = BoardPositionOffset(maxwidth, height);
+
         for (int j = 0; j < height; j++)
         {
             int currentWidth = isMinReached ? (int)(minwidth + 2 * (j - (height / 2.0f))) : (int)(maxwidth - 2 * j);
@@ -145,18 +149,16 @@ public class Board : MonoBehaviour
 
             for (int i = imin; i < imax; i++)
             {
-                CreateBoardShape(i, j);
+                CreateBoardShape(i, j, offset);
             }
         }
     }
-
+    
     /// <summary>
     /// Creates the board shape.
     /// </summary>
-    /// <param name="i">The position i in the board.</param>
-    /// <param name="j">The position j in the board.</param>
-    private void CreateBoardShape(int i, int j) {
-        Vector3 pos = transform.position + new Vector3(i * Config.paddingX,
+    private void CreateBoardShape(int i, int j, Vector3 screenOffset) {
+        Vector3 pos = screenOffset +  new Vector3(i * Config.paddingX,
                     -j * Config.paddingY,
                     0);
         Vector3 finalPos = Vector3.Scale(pos, transform.lossyScale);
@@ -177,6 +179,11 @@ public class Board : MonoBehaviour
         int B = (int)Mathf.Ceil((-i - j) / 2.0f);
         int C = (int)Mathf.Floor(-(i - j) / 2.0f);
         return new Vector3Int(A, B, C);
+    }
+
+    private Vector2 BoardPositionOffset(int width, int height) {
+        Vector2 offset = new Vector2(-width * Config.paddingX / 2.0f, (height - 0.5f) * Config.paddingY / 2.0f);
+        return offset;
     }
 
     /// <summary>
