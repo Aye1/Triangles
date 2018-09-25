@@ -24,9 +24,8 @@ public class GameManager : MonoBehaviour {
 
     private Timer _helpTimer;
 
-    private Vector3[] _piecePositions = {new Vector3(-1.5f, -2.5f, -1.0f),
-        new Vector3(0.0f, -2.5f, -1.0f),
-        new Vector3(1.5f, -2.5f, -1.0f) };
+    private Vector3[] _piecePositions;
+
 
     private Piece[] _pieceSlots;
     private Vector3 _pieceBonusDestroyPosition = new Vector3(-2f, -4f, -1.0f);
@@ -66,6 +65,7 @@ public class GameManager : MonoBehaviour {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
         _pieceSlots = new Piece[3];
+        InitPiecePositions();
         GetSavedHighScore();
         GetThreePieces();
         //GetBonusPiece();
@@ -74,6 +74,16 @@ public class GameManager : MonoBehaviour {
         UIHelper.HideGameObject(pausePopup);
         LaunchHelpTimer();
 	}
+
+    private void InitPiecePositions() {
+        _piecePositions = new Vector3[3];
+        _piecePositions[0] = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.25f, Screen.height * 0.2f, 0.0f));
+        _piecePositions[1] = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.5f, Screen.height * 0.2f, 0.0f));
+        _piecePositions[2] = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.75f, Screen.height * 0.2f, 0.0f));
+        _piecePositions[0].z = -1.0f;
+        _piecePositions[1].z = -1.0f;
+        _piecePositions[2].z = -1.0f;
+    }
 
     private void GetSavedHighScore() 
     {

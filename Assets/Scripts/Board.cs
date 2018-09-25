@@ -10,6 +10,9 @@ public class Board : MonoBehaviour
     private readonly int _minWidth = 9;
     private readonly float sqr3 = Mathf.Sqrt(3);
     private readonly string boardTag = "Board";
+    private float _width;
+    private float _height;
+    private Vector3 _shapeSize;
 
     private List<Shape> shapes;
     private IEnumerable<Shape> unfilledShapes;
@@ -24,13 +27,31 @@ public class Board : MonoBehaviour
 
     public bool debugHoveredPlayablePositions;
 
+    public float Width {
+        get {
+            return _width;
+        }
+    }
+
+    public float Height {
+        get {
+            return _height;
+        }
+    }
+
+    public Vector3 ShapeSize {
+        get {
+            return _shapeSize;
+        }
+    }
+
     // Use this for initialization
     void Awake()
     {
         shapes = new List<Shape>();
         _currentHoveredPlayablePositions = new List<Shape>();
-        CreateHexagonalBoard();
-        //CreateHourglassBoard();
+        //CreateHexagonalBoard();
+        CreateHourglassBoard();
         ClearCurrentPiece();
     }
 
@@ -106,8 +127,6 @@ public class Board : MonoBehaviour
         int height = _minWidth - 1;
         int maxWidth = 2 * _minWidth - 3;
 
-        Vector2 posOffset = BoardPositionOffset(maxWidth, height);
-
         // Décalage de 1 pour rester sur la bonne parité de grille
         int offset = height / 2 % 2 == 0 ? 1 : 0;
 
@@ -119,9 +138,12 @@ public class Board : MonoBehaviour
 
             for (int i = imin; i < imax; i++)
             {
-                CreateBoardShape(i, j, posOffset);
+                CreateBoardShape(i, j);
             }
         }
+
+        ComputeBoardDimensions(maxWidth, height);
+        AdjustBoardPosition();
     }
 
     /// <summary>
@@ -133,8 +155,6 @@ public class Board : MonoBehaviour
         int maxwidth = 11;
         int height = (maxwidth - minwidth) + 2;
         bool isMinReached = false;
-
-        Vector2 offset = BoardPositionOffset(maxwidth, height);
 
         for (int j = 0; j < height; j++)
         {
@@ -149,23 +169,25 @@ public class Board : MonoBehaviour
 
             for (int i = imin; i < imax; i++)
             {
-                CreateBoardShape(i, j, offset);
+                CreateBoardShape(i, j);
             }
         }
+        ComputeBoardDimensions(maxwidth, height);
+        AdjustBoardPosition();
     }
     
     /// <summary>
     /// Creates the board shape.
     /// </summary>
-    private void CreateBoardShape(int i, int j, Vector3 screenOffset) {
-        Vector3 pos = screenOffset +  new Vector3(i * Config.paddingX,
+    private void CreateBoardShape(int i, int j) {
+        Vector3 pos = new Vector3(i * Config.paddingX,
                     -j * Config.paddingY,
                     0);
         Vector3 finalPos = Vector3.Scale(pos, transform.lossyScale);
         Shape newShape = Instantiate(basicShape, finalPos, Quaternion.identity);
         newShape.gameObject.tag = Constants.boardTag;
         newShape.gameObject.layer = Constants.boardLayerId;
-        newShape.PositionABC = posABCfromIJ(i,j);
+        newShape.PositionABC = PosABCfromIJ(i,j);
         newShape.PosXY = new Vector2(i,j);
         newShape.IsUpsideDown = (i + j) % 2 == 0;
         newShape.transform.localScale = Vector3.Scale(transform.lossyScale, newShape.transform.localScale);
@@ -174,16 +196,25 @@ public class Board : MonoBehaviour
         unfilledShapes = shapes;
     }
 
-    private Vector3Int posABCfromIJ(int i, int j) {
+    private Vector3Int PosABCfromIJ(int i, int j) {
         int A = j;
         int B = (int)Mathf.Ceil((-i - j) / 2.0f);
         int C = (int)Mathf.Floor(-(i - j) / 2.0f);
         return new Vector3Int(A, B, C);
     }
 
-    private Vector2 BoardPositionOffset(int width, int height) {
-        Vector2 offset = new Vector2(-width * Config.paddingX / 2.0f, (height - 0.5f) * Config.paddingY / 2.0f);
-        return offset;
+    private void ComputeBoardDimensions(int width, int height) {
+        Shape s = gameObject.GetComponentInChildren<Shape>();
+        _shapeSize = s.GetComponent<Renderer>().bounds.size;
+        _width = Config.paddingX * (width + 1);
+        _height = Config.paddingY * (height + 1);
+    }
+
+    private void AdjustBoardPosition() {
+        // Totally empirical values, could probably be computed from the paddings in Config
+        foreach(Shape s in shapes) {
+            s.transform.position = s.transform.position - new Vector3(Width * 0.415f, -(Height-ShapeSize.y-1.75f) * 0.6f, 0.0f);
+        }
     }
 
     /// <summary>
@@ -318,6 +349,7 @@ public class Board : MonoBehaviour
     // The center is different from the pivot center
     private Vector3 GetShapeCenterPosition(Shape sh) {
         Vector3 pos = sh.transform.position;
+        // Offset ~= 2/3 - 0.5
         float offset = 0.16f;
         if (sh.IsUpsideDown) {
             pos = new Vector3(sh.transform.position.x, sh.transform.position.y - offset, sh.transform.position.z);
