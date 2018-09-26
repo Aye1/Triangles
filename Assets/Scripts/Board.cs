@@ -9,7 +9,6 @@ public class Board : MonoBehaviour
 
     private readonly int _minWidth = 9;
     private readonly float sqr3 = Mathf.Sqrt(3);
-    private readonly string boardTag = "Board";
     private float _width;
     private float _height;
     private Vector3 _shapeSize;
@@ -27,42 +26,68 @@ public class Board : MonoBehaviour
 
     public bool debugHoveredPlayablePositions;
 
-    public float Width {
-        get {
+    #region Properties
+    public float Width
+    {
+        get
+        {
             return _width;
         }
     }
 
-    public float Height {
-        get {
+    public float Height
+    {
+        get
+        {
             return _height;
         }
     }
 
-    public Vector3 ShapeSize {
-        get {
+    public Vector3 ShapeSize
+    {
+        get
+        {
             return _shapeSize;
         }
     }
+    #endregion
 
     // Use this for initialization
     void Awake()
     {
         shapes = new List<Shape>();
         _currentHoveredPlayablePositions = new List<Shape>();
-        //CreateHexagonalBoard();
-        CreateHourglassBoard();
+        CreateHexagonalBoard();
+        //CreateHourglassBoard();
+        //CreateBoardFromArray(GetBoardData());
         ClearCurrentPiece();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(debugHoveredPlayablePositions) {
+        if (debugHoveredPlayablePositions)
+        {
             DebugDisplayAllPlayableShapes();
-        } else {
+        }
+        else
+        {
             DisplayClosestPlayablePiece();
         }
+    }
+
+    private int[,] GetBoardData()
+    {
+        int[,] data = new int[,] {
+            {0,0,1,1,1,1,1,1,1,1,1,0,0},
+            {0,1,1,1,1,1,1,1,1,1,1,1,0},
+            {1,1,1,0,0,1,1,1,0,0,1,1,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {0,1,1,1,1,1,1,1,1,1,1,1,0},
+            {0,0,1,1,1,0,1,0,1,1,1,0,0},
+            {0,0,0,1,1,1,1,1,1,1,0,0,0}
+        };
+        return data;
     }
 
     // Debug method
@@ -119,6 +144,7 @@ public class Board : MonoBehaviour
         }
     }
 
+    #region Board Creation
     /// <summary>
     /// Initializes the hexagonal board
     /// </summary>
@@ -175,6 +201,19 @@ public class Board : MonoBehaviour
         ComputeBoardDimensions(maxwidth, height);
         AdjustBoardPosition();
     }
+
+    private void CreateBoardFromArray(int[,] data) {
+        for (int j = 0; j < data.GetLength(1); j++) {
+            for (int i = 0; i < data.GetLength(0); i++)
+            {
+                if (data[i,j] == 1){
+                    CreateBoardShape(j, i);
+                } 
+            }
+        }
+        ComputeBoardDimensions(data.GetLength(1), data.GetLength(0));
+        AdjustBoardPosition();
+    }
     
     /// <summary>
     /// Creates the board shape.
@@ -216,6 +255,7 @@ public class Board : MonoBehaviour
             s.transform.position = s.transform.position - new Vector3(Width * 0.415f, -(Height-ShapeSize.y-1.75f) * 0.6f, 0.0f);
         }
     }
+    #endregion
 
     /// <summary>
     /// Returns all playable shapes for the current piece
