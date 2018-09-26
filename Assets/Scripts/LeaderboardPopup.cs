@@ -41,6 +41,7 @@ public class LeaderboardPopup : MonoBehaviour {
             entry.score.score = i * 100;
 
             newEntry.transform.SetParent(contentPanel);
+            newEntry.transform.position = new Vector3(newEntry.transform.position.x, newEntry.transform.position.y, -1.0f);
         }
     }
 }
