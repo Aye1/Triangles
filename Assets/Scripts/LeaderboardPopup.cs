@@ -4,12 +4,11 @@ public class LeaderboardPopup : MonoBehaviour {
 
     public int entryCount;
     public Transform contentPanel;
-    private LeaderboardManager _lbManager;
+    public LeaderboardManager lbManager;
     public SimpleObjectPool entriesPool;
 
 	// Use this for initialization
 	void Start () {
-        _lbManager = FindObjectOfType<LeaderboardManager>();
         RefreshDisplay();
 	}
 	
@@ -25,23 +24,47 @@ public class LeaderboardPopup : MonoBehaviour {
     }
 
     private void RemoveEntries() {
-        while(contentPanel.childCount > 0) {
-            GameObject toRemove = transform.GetChild(0).gameObject;
+        int loopCount = 0;
+        int maxLoopCount = 1000;
+        while(contentPanel.childCount > 0 && loopCount <= maxLoopCount) {
+            GameObject toRemove = contentPanel.transform.GetChild(0).gameObject;
             entriesPool.ReturnObject(toRemove);
+            loopCount++;
+        }
+        if(loopCount == maxLoopCount)
+        {
+            Debug.Log("Max loop iterations reached");
         }
     }
 
     private void PopulateEntries() {
-        for (int i = 0; i < entryCount; i++) {
-            GameObject newEntry = entriesPool.GetObject();
-            LeaderBoardEntry entry = newEntry.GetComponent<LeaderBoardEntry>();
-            entry.enabled = true;
-
-            entry.score.name = "Player " + i.ToString();
-            entry.score.score = i * 100;
-
-            newEntry.transform.SetParent(contentPanel);
-            newEntry.transform.position = new Vector3(newEntry.transform.position.x, newEntry.transform.position.y, -1.0f);
+        if (lbManager.CurrentScores != null)
+        {
+            foreach (Score s in lbManager.CurrentScores)
+            {
+                CreateLeaderboardEntry(s);
+            }
         }
+    }
+
+    private void FakePopulateEntries() {
+        for (int i = 0; i < entryCount; i++) {
+            Score s = new Score();
+            s.name = "Player " + i.ToString();
+            s.score = i * 100;
+            CreateLeaderboardEntry(s);
+        }
+    }
+
+    private void CreateLeaderboardEntry(Score s) {
+        GameObject newEntry = entriesPool.GetObject();
+        LeaderBoardEntry entry = newEntry.GetComponent<LeaderBoardEntry>();
+        entry.enabled = true;
+
+        entry.score.name = s.name;
+        entry.score.score = s.score;
+
+        newEntry.transform.SetParent(contentPanel);
+        newEntry.transform.position = new Vector3(newEntry.transform.position.x, newEntry.transform.position.y, -1.0f);
     }
 }

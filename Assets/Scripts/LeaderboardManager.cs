@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class LeaderboardManager : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class LeaderboardManager : MonoBehaviour
     private DreamloLeaderBoard _dreamLoLB;
     private List<Score> _currentScores;
 
-    public GameObject leaderBoardUI;
+    public LeaderboardPopup leaderBoardUI;
 
     public List<Score> CurrentScores
     {
@@ -32,6 +33,9 @@ public class LeaderboardManager : MonoBehaviour
     {
         _dreamLoLB = GetComponent<DreamloLeaderBoard>();
         _dreamLoLB.LoadScores();
+        _dreamLoLB.HighScoresLoadedHandler += OnHighScoresLoaded;
+        //LoadScores();
+        leaderBoardUI.lbManager = this;
         DontDestroyOnLoad(this.gameObject);
     }
 
@@ -39,6 +43,12 @@ public class LeaderboardManager : MonoBehaviour
     void Update()
     {
 
+    }
+
+    private void OnHighScoresLoaded(object sender, EventArgs e) {
+        Debug.Log("Highscores loaded");
+        Debug.Log(_dreamLoLB.HighScores.ToString());
+        LoadScores();
     }
 
     public void SendHighScore(string name, int score)
@@ -58,10 +68,11 @@ public class LeaderboardManager : MonoBehaviour
     }
 
     public void DisplayLeaderboard() {
-        UIHelper.DisplayGameObject(leaderBoardUI);
+        leaderBoardUI.RefreshDisplay();
+        UIHelper.DisplayGameObject(leaderBoardUI.gameObject);
     }
 
     public void CloseLeaderboard() {
-        UIHelper.HideGameObject(leaderBoardUI);
+        UIHelper.HideGameObject(leaderBoardUI.gameObject);
     }
 }

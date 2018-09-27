@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
     public TextMeshProUGUI textHighScore;
     public GameObject endGamePopup;
     public GameObject pausePopup;
+    public GameObject highScorePopupText;
 
     public int globalScore;
 
@@ -21,6 +22,7 @@ public class GameManager : MonoBehaviour {
     private Board _board;
     private PieceManager _pieceManager;
     private AbstractPiece _draggedPiece;
+    private LeaderboardManager _leaderboardManager;
 
     private Timer _helpTimer;
 
@@ -64,6 +66,7 @@ public class GameManager : MonoBehaviour {
     void Start () {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
+        _leaderboardManager = FindObjectOfType<LeaderboardManager>();
         _pieceSlots = new Piece[3];
         InitPiecePositions();
         GetSavedHighScore();
@@ -107,7 +110,6 @@ public class GameManager : MonoBehaviour {
     {
         globalScore += _board.numberFlippedShapes;
         _board.numberFlippedShapes = 0;
-        CheckHighScore();
     }
 
     private void CheckHighScore() 
@@ -115,6 +117,11 @@ public class GameManager : MonoBehaviour {
         if(globalScore > HighScore) {
             HighScore = globalScore;
             PlayerPrefs.SetInt(highScoreKey, HighScore);
+            _leaderboardManager.SendHighScore("Test", HighScore);
+            highScorePopupText.GetComponentInChildren<TextMeshProUGUI>().text = "New high score - " + HighScore + "!";
+            UIHelper.DisplayGameObject(highScorePopupText);
+        } else {
+            UIHelper.HideGameObject(highScorePopupText);
         }
     }
 
@@ -234,6 +241,7 @@ public class GameManager : MonoBehaviour {
         if (!CheckCanPlay())
         {
             Debug.Log("Game Over");
+            CheckHighScore();
             UIHelper.DisplayGameObject(endGamePopup);
         }
     }
@@ -295,9 +303,9 @@ public class GameManager : MonoBehaviour {
         GetThreePieces();
     }
 
-    public void ShuffleUntilPlayable()
+    public void ShuffleUntilPlayable(bool forceShuffle = false)
     {
-        if(ShuffleCount > 0)
+        if(ShuffleCount > 0 || forceShuffle)
         {
             ShuffleShapes();
             while (!CheckCanPlay())
@@ -319,7 +327,7 @@ public class GameManager : MonoBehaviour {
     {
         globalScore = 0;
         _shuffleCount = 0;
-        ShuffleUntilPlayable();
+        ShuffleUntilPlayable(true);
         _board.ResetBoard();
         UIHelper.HideGameObject(endGamePopup);
         UIHelper.HideGameObject(pausePopup);
