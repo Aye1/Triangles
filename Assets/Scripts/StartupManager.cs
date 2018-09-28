@@ -6,14 +6,13 @@ public class StartupManager : MonoBehaviour {
 
     private StringLocalizationManager _locManager;
     private bool startupFinished = false;
-    private Timer _timeoutTimer;
     public bool debugStartupFinished = true;
     public bool locFinished;
     private bool _forceMenuLoading;
 
 	// Use this for initialization
 	void Start () {
-        _timeoutTimer = new Timer(OnTimeoutTimerFinished, null, 5000, 0);
+        Timer _timeoutTimer = new Timer(OnTimeoutTimerFinished, null, 5000, 0);
         StartCoroutine(WaitForAllServicesLaunched());
 	}
 	

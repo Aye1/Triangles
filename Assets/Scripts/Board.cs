@@ -8,14 +8,11 @@ public class Board : MonoBehaviour
 {
 
     private readonly int _minWidth = 9;
-    private readonly float sqr3 = Mathf.Sqrt(3);
     private float _width;
     private float _height;
     private Vector3 _shapeSize;
 
     private List<Shape> shapes;
-    private IEnumerable<Shape> unfilledShapes;
-    private IEnumerable<Shape> playableShapes;
     private List<Shape> _currentHoveredPlayablePositions;
 
     public Shape basicShape;
@@ -232,7 +229,6 @@ public class Board : MonoBehaviour
         newShape.transform.localScale = Vector3.Scale(transform.lossyScale, newShape.transform.localScale);
         newShape.transform.parent = transform;
         shapes.Add(newShape);
-        unfilledShapes = shapes;
     }
 
     private Vector3Int PosABCfromIJ(int i, int j) {
@@ -266,7 +262,6 @@ public class Board : MonoBehaviour
     {
         IEnumerable<Shape> resShapes = new List<Shape>();
         resShapes = shapes.Where(s => IsPiecePlayableOnShape(s, piece));
-        playableShapes = resShapes;
         return resShapes;
     }
 
@@ -521,8 +516,6 @@ public class Board : MonoBehaviour
     {
         shapes.ForEach(s => s.isFilled = false);
         shapes.ForEach(s => s.IsVisuallyFilled = false);
-        unfilledShapes = shapes;
-        playableShapes = null;
         ClearCurrentPiece();
     }
 }

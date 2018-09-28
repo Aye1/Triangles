@@ -9,7 +9,6 @@ public class Shape : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
     bool isUpsideDown = false;
     Color baseColor = new Color(0.87f, 0.87f, 0.90f);
-    Color selectedColor = Color.red;
     Color hoveredColor;
     Color filledColor;
     public bool isFilled = false;
