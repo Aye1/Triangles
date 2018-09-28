@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StartupManager : MonoBehaviour {
 
-    private StringLocalizationManager _locManager;
+    private LocalizationManager _locManager;
     private bool startupFinished = false;
     public bool debugStartupFinished = true;
     public bool locFinished;
@@ -18,7 +18,7 @@ public class StartupManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        locFinished = _locManager.isReady;
+        locFinished = _locManager != null && _locManager.isReady;
         if (startupFinished || _forceMenuLoading){
             StopAllCoroutines();
             SceneController.Instance.GoToMenuScreen();
@@ -39,7 +39,7 @@ public class StartupManager : MonoBehaviour {
 
     private void GetServices() {
         if(_locManager == null) {
-            _locManager = FindObjectOfType<StringLocalizationManager>();
+            _locManager = FindObjectOfType<LocalizationManager>();
         }
     }
 

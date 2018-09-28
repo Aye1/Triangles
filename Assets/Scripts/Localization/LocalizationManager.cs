@@ -3,16 +3,16 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StringLocalizationManager : MonoBehaviour {
+public class LocalizationManager : MonoBehaviour {
 
 
     private Dictionary<string, Dictionary<string, string>> _allLocalizedStrings;
     private readonly string _stringNotFound = "Unknown string";
-    private static StringLocalizationManager _instance;
+    private static LocalizationManager _instance;
 
     public bool isReady = false;
 
-    public static StringLocalizationManager Instance 
+    public static LocalizationManager Instance 
     {
         get { return _instance; }
     }
@@ -55,6 +55,10 @@ public class StringLocalizationManager : MonoBehaviour {
             }
         }
         return _stringNotFound;
+    }
+
+    public string GetLocString(string key, SystemLanguage language) {
+        return GetLocString(key, SystemLanguageToString(language));
     }
 
     private Dictionary<string, Dictionary<string, string>> LoadDicoFromCSV() {
@@ -111,5 +115,27 @@ public class StringLocalizationManager : MonoBehaviour {
         }
         return listLines.ToArray();
     }
-    
+
+    public static string SystemLanguageToString(SystemLanguage language)
+    {
+        switch (language)
+        {
+            case SystemLanguage.French:
+                return Locales.fr_FR;
+            case SystemLanguage.English:
+                return Locales.en_GB;
+        }
+        return Locales.en_GB;
+    }
+
+    public static SystemLanguage StringToSystemLanguage(string language) {
+        if(language == Locales.fr_FR) {
+            return SystemLanguage.French;
+        } 
+        if (language == Locales.en_GB) {
+            return SystemLanguage.English;
+        }
+        return SystemLanguage.English;
+    }
+
 }
