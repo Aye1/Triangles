@@ -326,12 +326,12 @@ public class GameManager : MonoBehaviour {
     public void Restart()
     {
         globalScore = 0;
-        _shuffleCount = 0;
         ShuffleUntilPlayable(true);
         _board.ResetBoard();
         UIHelper.HideGameObject(endGamePopup);
         UIHelper.HideGameObject(pausePopup);
         FindObjectOfType<RewardedVideoManager>().Reset();
+        _shuffleCount = 0;
     }
 
     public void GoToMainMenuScreen()

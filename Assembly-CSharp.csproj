@@ -62,11 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\dreamlo\DreamloLeaderBoard.cs" />
-    <Compile Include="Assets\LanguageButton.cs" />
-    <Compile Include="Assets\LanguagePicker.cs" />
-    <Compile Include="Assets\LanguagePopupButton.cs" />
-    <Compile Include="Assets\PlayerSettingsManager.cs" />
-    <Compile Include="Assets\Popup.cs" />
     <Compile Include="Assets\Scripts\AbstractPiece.cs" />
     <Compile Include="Assets\Scripts\Board.cs" />
     <Compile Include="Assets\Scripts\CameraBehavior.cs" />
@@ -75,6 +70,9 @@
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Helpers\SimpleObjectPool.cs" />
     <Compile Include="Assets\Scripts\Helpers\UIHelper.cs" />
+    <Compile Include="Assets\Scripts\LanguageButton.cs" />
+    <Compile Include="Assets\Scripts\LanguagePicker.cs" />
+    <Compile Include="Assets\Scripts\LanguagePopupButton.cs" />
     <Compile Include="Assets\Scripts\LeaderBoardEntry.cs" />
     <Compile Include="Assets\Scripts\LeaderboardManager.cs" />
     <Compile Include="Assets\Scripts\LeaderboardPopup.cs" />
@@ -86,6 +84,8 @@
     <Compile Include="Assets\Scripts\Piece.cs" />
     <Compile Include="Assets\Scripts\PieceBonusDestroy.cs" />
     <Compile Include="Assets\Scripts\PieceManager.cs" />
+    <Compile Include="Assets\Scripts\PlayerSettingsManager.cs" />
+    <Compile Include="Assets\Scripts\Popup.cs" />
     <Compile Include="Assets\Scripts\PulsingObject.cs" />
     <Compile Include="Assets\Scripts\RewardedVideoButton.cs" />
     <Compile Include="Assets\Scripts\RewardedVideoManager.cs" />
