@@ -327,9 +327,9 @@ public class GameManager : MonoBehaviour {
         _board.ResetBoard();
         ShuffleUntilPlayable(true);
         UIHelper.HideGameObject(endGamePopup);
-        UIHelper.HideGameObject(pausePopup);
         FindObjectOfType<RewardedVideoManager>().Reset();
         _shuffleCount = 0;
+        HidePauseMenu();
     }
 
     public void GoToMainMenuScreen()
