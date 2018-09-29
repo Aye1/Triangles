@@ -12,6 +12,6 @@ public class TextLocalizator : MonoBehaviour {
     }
 
     public void UpdateLocale() {
-        GetComponentInChildren<Text>().text = LocalizationManager.Instance.GetLocString(localizationKey, PlayerSettingsManager.Instance.CurrentLocale);
+        GetComponent<Text>().text = LocalizationManager.Instance.GetLocString(localizationKey, PlayerSettingsManager.Instance.CurrentLocale);
     }
 }

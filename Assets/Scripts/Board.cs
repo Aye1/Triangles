@@ -398,7 +398,6 @@ public class Board : MonoBehaviour
     {
         currentDraggedPiece = null;
         _currentHoveredPlayablePositions.Clear();
-
     }
 
     /// <summary>

@@ -232,8 +232,6 @@ public class GameManager : MonoBehaviour {
         newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
         ListenToPieceEvent(newPiece);
         return newPiece;
-
-
     }
 
     private void ManageGameOver()
@@ -326,8 +324,8 @@ public class GameManager : MonoBehaviour {
     public void Restart()
     {
         globalScore = 0;
-        ShuffleUntilPlayable(true);
         _board.ResetBoard();
+        ShuffleUntilPlayable(true);
         UIHelper.HideGameObject(endGamePopup);
         UIHelper.HideGameObject(pausePopup);
         FindObjectOfType<RewardedVideoManager>().Reset();
