@@ -8,6 +8,7 @@ abstract public class AbstractPiece : MonoBehaviour {
     public Shape refShape;
     public List<Shape> pieceShapes;
     public Shape firstShape;
+    public int poolIndex;
 
     public float dragPositionOffset = 1.5f;
     //public float dragPositionOffset = 0.0f;

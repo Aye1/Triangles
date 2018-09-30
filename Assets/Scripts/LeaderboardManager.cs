@@ -35,7 +35,12 @@ public class LeaderboardManager : MonoBehaviour
         _dreamLoLB.LoadScores();
         _dreamLoLB.HighScoresLoadedHandler += OnHighScoresLoaded;
         //LoadScores();
-        leaderBoardUI.lbManager = this;
+
+        // Test useful only in dev mode, when we directly go to the menu scene
+        if (leaderBoardUI != null)
+        {
+            leaderBoardUI.lbManager = this;
+        }
         DontDestroyOnLoad(this.gameObject);
     }
 

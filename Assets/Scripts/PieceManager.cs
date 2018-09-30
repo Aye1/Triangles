@@ -1,14 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using Random = System.Random;
 
 public class PieceManager : MonoBehaviour {
 
     private List<Piece> pieces;
-    private List<PiecePool> _pools;
+    private Dictionary<int, PiecePool> _manualPools;
     public PieceBonusDestroy pieceBonusDestroy;
     private Random _randomGen;
     public List<Color> colors;
@@ -16,7 +13,7 @@ public class PieceManager : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
         //LoadPieces();
-        LoadPiecePools();
+        LoadPieceWithManualPools();
         _randomGen = new Random();
 	}
 	
@@ -34,21 +31,21 @@ public class PieceManager : MonoBehaviour {
         }
     }
 
-    private void LoadPiecePools() {
-        string path = Application.dataPath + "/Prefabs/Resources/Pieces";
-        _pools = new List<PiecePool>();
-        //pieces = new List<Piece>();
-        foreach(string dir in Directory.GetDirectories(path)) {
-            Debug.Log(dir);
-            string[] pathElements = dir.Split(new char[] {'/'});
-            string localPath = pathElements[pathElements.Length - 2] + "/" + pathElements[pathElements.Length - 1];
-            Piece[] objects = Resources.LoadAll<Piece>(localPath);
-            PiecePool pool = new PiecePool();
-            pool.AddPieces(objects);
-            _pools.Add(pool);
-            /*oreach(Piece obj in objects) {
-                pieces.Add(obj);
-            }*/
+    private void LoadPieceWithManualPools() {
+        _manualPools = new Dictionary<int, PiecePool>();
+        Piece[] objects = Resources.LoadAll<Piece>("Pieces");
+        pieces = new List<Piece>();
+        foreach (Piece obj in objects)
+        {
+            int poolIndex = obj.poolIndex;
+            PiecePool pool;
+            if (!_manualPools.ContainsKey(poolIndex)) {
+                pool = new PiecePool();
+                _manualPools.Add(poolIndex, pool);
+            } else {
+                _manualPools.TryGetValue(poolIndex, out pool);
+            }
+            pool.AddPiece(obj);
         }
     }
 
@@ -65,9 +62,10 @@ public class PieceManager : MonoBehaviour {
     }
 
     public Piece GetNextPieceFromPools(Vector3 position) {
-        if(_pools != null) {
-            int index = _randomGen.Next(0, _pools.Count);
-            PiecePool currentPool = _pools.ToArray()[index];
+        if(_manualPools != null) {
+            int index = _randomGen.Next(0, _manualPools.Count);
+            PiecePool currentPool; 
+            _manualPools.TryGetValue(index, out currentPool);
             Piece newPiece = Instantiate(currentPool.GetRandomPiece(), position, Quaternion.identity);
             newPiece.PieceColor = GetNextColor();
             return newPiece;
