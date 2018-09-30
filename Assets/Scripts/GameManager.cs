@@ -227,7 +227,7 @@ public class GameManager : MonoBehaviour {
 
     private Piece GetNewPiece(Vector3 position)
     {
-        Piece newPiece = _pieceManager.GetNextPiece(position); 
+        Piece newPiece = _pieceManager.GetNextPieceFromPools(position); 
         newPiece.transform.parent = transform;
         newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
         ListenToPieceEvent(newPiece);
