@@ -13,7 +13,7 @@ public class PieceManager : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
         //LoadPieces();
-        LoadPieceWithManualPools();
+        LoadPiecesWithPools();
         _randomGen = new Random();
 	}
 	
@@ -22,6 +22,9 @@ public class PieceManager : MonoBehaviour {
 		
 	}
 
+    /// <summary>
+    /// Loads all pieces, without putting them in pools
+    /// </summary>
     private void LoadPieces() {
         Piece[] objects = Resources.LoadAll<Piece>("Pieces");
         pieces = new List<Piece>();
@@ -31,7 +34,10 @@ public class PieceManager : MonoBehaviour {
         }
     }
 
-    private void LoadPieceWithManualPools() {
+    /// <summary>
+    /// Loads all pieces and dispatches them in pools
+    /// </summary>
+    private void LoadPiecesWithPools() {
         _manualPools = new Dictionary<int, PiecePool>();
         Piece[] objects = Resources.LoadAll<Piece>("Pieces");
         pieces = new List<Piece>();
@@ -49,6 +55,12 @@ public class PieceManager : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Gets the next piece.
+    /// To be used only if LoadPieces has been called
+    /// </summary>
+    /// <returns>The next piece.</returns>
+    /// <param name="position">Position.</param>
     public Piece GetNextPiece(Vector3 position)
     {
         if (pieces != null)
@@ -61,6 +73,12 @@ public class PieceManager : MonoBehaviour {
         return null;
     }
 
+    /// <summary>
+    /// Gets the next piece from pools.
+    /// To be used only if LoadPiecesWithPools has been called
+    /// </summary>
+    /// <returns>The next piece from pools.</returns>
+    /// <param name="position">Position.</param>
     public Piece GetNextPieceFromPools(Vector3 position) {
         if(_manualPools != null) {
             int index = _randomGen.Next(0, _manualPools.Count);
