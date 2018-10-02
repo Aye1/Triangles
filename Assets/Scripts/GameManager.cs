@@ -169,13 +169,12 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    private void GetBonusPiece()
+    private PieceBonusDestroy GetBonusPiece()
     {
         PieceBonusDestroy newPiece = _pieceManager.GetBonusDestroyPiece();
-        newPiece.transform.parent = transform;
         newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
-        newPiece.transform.position = _pieceBonusDestroyPosition;
         ListenToPieceBonusDestroyEvent(newPiece);
+        return newPiece;
     }
 
     private void OnPieceBonusDestroyDragged(object sender, EventArgs e)

@@ -62,8 +62,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\dreamlo\DreamloLeaderBoard.cs" />
+    <Compile Include="Assets\InputManager.cs" />
     <Compile Include="Assets\Scripts\AbstractPiece.cs" />
     <Compile Include="Assets\Scripts\Board.cs" />
+    <Compile Include="Assets\Scripts\BonusView.cs" />
+    <Compile Include="Assets\Scripts\BonusViewMouseHandler.cs" />
     <Compile Include="Assets\Scripts\CameraBehavior.cs" />
     <Compile Include="Assets\Scripts\Constants\Config.cs" />
     <Compile Include="Assets\Scripts\Constants\Constants.cs" />

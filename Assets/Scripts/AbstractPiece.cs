@@ -100,7 +100,6 @@ abstract public class AbstractPiece : MonoBehaviour {
         this.gameObject.layer = Constants.pieceLayerId;
     }
 
-
     private void RegisterCallback(Shape shape)
     {
         shape.ShapeClickedHandler += OnShapeClicked;
