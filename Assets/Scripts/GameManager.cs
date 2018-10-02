@@ -331,6 +331,11 @@ public class GameManager : MonoBehaviour {
         HidePauseMenu();
     }
 
+    public void RestartWithNewBoard() {
+        Restart();
+        _board.GenerateNewBoard();
+    }
+
     public void GoToMainMenuScreen()
     {
         SceneManager.LoadScene(1);

@@ -31,9 +31,7 @@ public class BonusView : MonoBehaviour {
         {
             UIHelper.HideGameObject(bonusViewButton);
             Vector3 pos = transform.position;
-            //this.transform.Translate(_translation, Space.World);
             _targetPosition = _upPosition;
-            //transform.position = new Vector3(pos.x, 100.0f, pos.z);
             emptyPart.SetActive(true);
             isOut = true;
         }
@@ -43,7 +41,6 @@ public class BonusView : MonoBehaviour {
         if (isOut)
         {
             Vector3 pos = transform.position;
-            //transform.Translate(-1 * _translation, Space.World);
             _targetPosition = _downPosition;
             emptyPart.SetActive(false);
             isOut = false;

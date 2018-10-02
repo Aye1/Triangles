@@ -12,7 +12,7 @@ public class Board : MonoBehaviour
     private float _height;
     private Vector3 _shapeSize;
 
-    private List<Shape> shapes;
+    private List<Shape> _shapes;
     private List<Shape> _currentHoveredPlayablePositions;
 
     public Shape basicShape;
@@ -52,7 +52,7 @@ public class Board : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
-        shapes = new List<Shape>();
+        _shapes = new List<Shape>();
         _currentHoveredPlayablePositions = new List<Shape>();
         CreateHexagonalBoard();
         //CreateHourglassBoard();
@@ -111,7 +111,7 @@ public class Board : MonoBehaviour
     /// <returns></returns>
     private IEnumerable<Shape> CheckLine(int index, int pos)
     {
-        IEnumerable<Shape> toValidate = shapes.Where<Shape>(shape => shape.PositionABC[pos] == index);
+        IEnumerable<Shape> toValidate = _shapes.Where<Shape>(shape => shape.PositionABC[pos] == index);
         bool lineValidated = toValidate.All(shape => shape.isFilled);
         if (lineValidated && toValidate.ToList().Count() >=5)
         {
@@ -142,6 +142,17 @@ public class Board : MonoBehaviour
     }
 
     #region Board Creation
+
+    public void GenerateNewBoard() {
+        ResetBoard();
+        foreach(Shape s in _shapes) {
+            Destroy(s.gameObject);
+        }
+        _shapes.Clear();
+        ClearCurrentPiece();
+        CreateBoardFromArray(GetBoardData());
+    }
+
     /// <summary>
     /// Initializes the hexagonal board
     /// </summary>
@@ -228,7 +239,7 @@ public class Board : MonoBehaviour
         newShape.IsUpsideDown = (i + j) % 2 == 0;
         newShape.transform.localScale = Vector3.Scale(transform.lossyScale, newShape.transform.localScale);
         newShape.transform.parent = transform;
-        shapes.Add(newShape);
+        _shapes.Add(newShape);
     }
 
     private Vector3Int PosABCfromIJ(int i, int j) {
@@ -247,7 +258,7 @@ public class Board : MonoBehaviour
 
     private void AdjustBoardPosition() {
         // Totally empirical values, could probably be computed from the paddings in Config
-        foreach(Shape s in shapes) {
+        foreach(Shape s in _shapes) {
             s.transform.position = s.transform.position - new Vector3(Width * 0.415f, -(Height-ShapeSize.y-1.75f) * 0.6f, 0.0f);
         }
     }
@@ -261,7 +272,7 @@ public class Board : MonoBehaviour
     public IEnumerable<Shape> FindPlayableShapes(AbstractPiece piece)
     {
         IEnumerable<Shape> resShapes = new List<Shape>();
-        resShapes = shapes.Where(s => IsPiecePlayableOnShape(s, piece));
+        resShapes = _shapes.Where(s => IsPiecePlayableOnShape(s, piece));
         return resShapes;
     }
 
@@ -276,12 +287,12 @@ public class Board : MonoBehaviour
         IEnumerable<Shape> listShapes;
         if (piece is Piece)
         {
-            listShapes = shapes.Where(s => !s.isFilled);
+            listShapes = _shapes.Where(s => !s.isFilled);
         }
         else
         {
             // Probably for DetroyPiece, to check with Jade
-            listShapes = shapes;
+            listShapes = _shapes;
         }
         IEnumerable<Shape> necessaryShapes = GetNecessaryShapesForPieceWithFirstShape(shape, piece, listShapes);
         return necessaryShapes.Count() == piece.pieceShapes.Count;
@@ -338,7 +349,7 @@ public class Board : MonoBehaviour
     }
 
     public void DisplayPieceOnShape(AbstractPiece piece, Shape sh) {
-        IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPieceWithFirstShape(sh, piece, shapes);
+        IEnumerable<Shape> hoveredShapes = GetNecessaryShapesForPieceWithFirstShape(sh, piece, _shapes);
 
         hoveredShapes.ToList().ForEach(s => s.isPlayable = true);
         hoveredShapes.ToList().ForEach(s => s.HoveredColor = piece.PieceColor);
@@ -411,7 +422,7 @@ public class Board : MonoBehaviour
         Shape playableShape = GetClosestPlayableShape();
         if (playableShape != null)
         {
-            IEnumerable<Shape> addedShapes = GetNecessaryShapesForPieceWithFirstShape(playableShape, piece, shapes);
+            IEnumerable<Shape> addedShapes = GetNecessaryShapesForPieceWithFirstShape(playableShape, piece, _shapes);
             if (piece is Piece)
             {
                 Color pColor = piece.PieceColor;
@@ -513,8 +524,8 @@ public class Board : MonoBehaviour
 
     public void ResetBoard()
     {
-        shapes.ForEach(s => s.isFilled = false);
-        shapes.ForEach(s => s.IsVisuallyFilled = false);
+        _shapes.ForEach(s => s.isFilled = false);
+        _shapes.ForEach(s => s.IsVisuallyFilled = false);
         ClearCurrentPiece();
     }
 }
