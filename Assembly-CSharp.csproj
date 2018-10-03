@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Assets\dreamlo\DreamloLeaderBoard.cs" />
     <Compile Include="Assets\InputManager.cs" />
+    <Compile Include="Assets\LevelManager.cs" />
     <Compile Include="Assets\Scripts\AbstractPiece.cs" />
     <Compile Include="Assets\Scripts\Board.cs" />
     <Compile Include="Assets\Scripts\BonusView.cs" />

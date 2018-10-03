@@ -117,10 +117,11 @@ public class GameManager : MonoBehaviour {
         if(globalScore > HighScore) {
             HighScore = globalScore;
             PlayerPrefs.SetInt(highScoreKey, HighScore);
-            _leaderboardManager.SendHighScore("Test", HighScore);
-            highScorePopupText.GetComponentInChildren<TextMeshProUGUI>().text = "New high score - " + HighScore + "!";
+            _leaderboardManager.SendHighScore(PlayerSettingsManager.Instance.Name, HighScore);
             UIHelper.DisplayGameObject(highScorePopupText);
-        } else {
+            highScorePopupText.GetComponentInChildren<TextMeshProUGUI>().text = "New high score - " + HighScore + "!";
+        }
+        else {
             UIHelper.HideGameObject(highScorePopupText);
         }
     }
