@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Threading;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 
@@ -12,6 +13,8 @@ public class GameManager : MonoBehaviour {
     public GameObject endGamePopup;
     public GameObject pausePopup;
     public GameObject highScorePopupText;
+    public GameObject questsPopup;
+    public List<Quest> currentQuests;
 
     public int globalScore;
 
@@ -71,6 +74,7 @@ public class GameManager : MonoBehaviour {
         InitPiecePositions();
         GetSavedHighScore();
         GetThreePieces();
+        InitQuests();
         //GetBonusPiece();
         ComputeScore();
         UIHelper.HideGameObject(endGamePopup);
@@ -93,6 +97,14 @@ public class GameManager : MonoBehaviour {
         if(PlayerPrefs.HasKey(highScoreKey)) {
             HighScore = PlayerPrefs.GetInt(highScoreKey);
         }
+    }
+
+    private void InitQuests() {
+        if(currentQuests == null) {
+            currentQuests = new List<Quest>();
+        }
+        currentQuests.Clear();
+        currentQuests.Add(QuestManager.Instance.GetQuest());
     }
 	
 	// Update is called once per frame
@@ -328,6 +340,7 @@ public class GameManager : MonoBehaviour {
         ShuffleUntilPlayable(true);
         UIHelper.HideGameObject(endGamePopup);
         FindObjectOfType<RewardedVideoManager>().Reset();
+        InitQuests();
         _shuffleCount = 0;
         HidePauseMenu();
     }
@@ -354,6 +367,22 @@ public class GameManager : MonoBehaviour {
         Time.timeScale = 1.0f;
     }
 
+    public void DisplayQuestsPopup() {
+        UIHelper.DisplayGameObject(questsPopup);
+    }
+
+    private void UnHighlightAllPieces()
+    {
+        foreach (Piece p in _pieceSlots)
+        {
+            if (p != null)
+            {
+                p.Highlight(false);
+            }
+        }
+    }
+
+    #region Timer
     private void LaunchHelpTimer()
     {
         _helpTimer = new Timer(OnHelpTimerFinished, null, 5000, 0);
@@ -375,16 +404,6 @@ public class GameManager : MonoBehaviour {
         //Debug.Log("Timer finished");
         CheckCanPlay(true);
     }
-
-    private void UnHighlightAllPieces()
-    {
-        foreach (Piece p in _pieceSlots)
-        {
-            if (p != null)
-            {
-                p.Highlight(false);
-            }
-        }
-    }
+    #endregion
 
 }

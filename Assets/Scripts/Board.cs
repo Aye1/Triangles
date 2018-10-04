@@ -54,7 +54,8 @@ public class Board : MonoBehaviour
     {
         _shapes = new List<Shape>();
         _currentHoveredPlayablePositions = new List<Shape>();
-        CreateHexagonalBoard();
+       // CreateHexagonalBoard();
+        SelectBoard(PlayerSettingsManager.Instance.MaxLevel);
         //CreateHourglassBoard();
         //CreateBoardFromArray(GetBoardData());
         ClearCurrentPiece();
@@ -150,7 +151,17 @@ public class Board : MonoBehaviour
         }
         _shapes.Clear();
         ClearCurrentPiece();
-        CreateBoardFromArray(GetBoardData());
+        SelectBoard(2);
+    }
+
+    private void SelectBoard(int boardIndex) {
+        if(boardIndex == 1) {
+            CreateHexagonalBoard();
+        } else if (boardIndex == 2) {
+            CreateHourglassBoard();
+        } else {
+            CreateBoardFromArray(GetBoardData());
+        }
     }
 
     /// <summary>
