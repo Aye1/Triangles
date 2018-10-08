@@ -211,6 +211,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    #region Listeners
     private void OnPieceDragged(object sender, EventArgs e)
     {
         _draggedPiece = sender as AbstractPiece;
@@ -307,6 +308,7 @@ public class GameManager : MonoBehaviour
         newPiece.PieceCollidingHandler += OnPieceCollision;
         newPiece.PieceExitCollisionHandler += OnPieceExitCollision;
     }
+    #endregion
     #endregion
 
     #region Suffles
