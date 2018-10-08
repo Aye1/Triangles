@@ -12,11 +12,14 @@ public class PlayerSettingsManager : MonoBehaviour {
     private string _name;
     private int _questsPoints;
     private Random _rand;
+    private int _highScore;
 
     public static string localeKey = "locale";
     public static string levelKey = "level";
     public static string nameKey = "name";
     public static string questPointsKey = "questPoints";
+    public static string highScoreKey = "highScore";
+
 
     #region Properties
     public static PlayerSettingsManager Instance {
@@ -56,6 +59,18 @@ public class PlayerSettingsManager : MonoBehaviour {
         set {
             if(value != _currentLevel) {
                 _currentLevel = value;
+            }
+        }
+    }
+
+    public int HighScore {
+        get {
+            return _highScore;
+        }
+        set {
+            if(value != _highScore) {
+                _highScore = value;
+                PlayerPrefs.SetInt(highScoreKey, _highScore);
             }
         }
     }
@@ -100,6 +115,14 @@ public class PlayerSettingsManager : MonoBehaviour {
         } else {
             _questsPoints = 0;
             PlayerPrefs.SetInt(questPointsKey, 0);
+        }
+
+        if (PlayerPrefs.HasKey(highScoreKey))
+        {
+            _highScore = PlayerPrefs.GetInt(highScoreKey);
+        } else {
+            _highScore = 0;
+            PlayerPrefs.SetInt(highScoreKey, 0);
         }
     }
 

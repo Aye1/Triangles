@@ -4,11 +4,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Threading;
 using System.Collections.Generic;
-using UnityEditor;
 
 public class GameManager : MonoBehaviour
 {
-
+    [Header("UI objects")]
     public TextMeshProUGUI textScore;
     public TextMeshProUGUI textShuffle;
     public TextMeshProUGUI textHighScore;
@@ -17,13 +16,15 @@ public class GameManager : MonoBehaviour
     public GameObject pausePopup;
     public GameObject highScorePopupText;
     public GameObject questsPopup;
+
+    [Header("Readonly")]
     public List<Quest> currentQuests;
 
+    [Header("Game state")]
     public int globalScore;
 
     private int _shuffleCount = 0;
     private int _highScore = 0;
-    private string highScoreKey = "highScore";
 
     private Board _board;
     private PieceManager _pieceManager;
@@ -100,14 +101,45 @@ public class GameManager : MonoBehaviour
         _piecePositions[2].z = -1.0f;
     }
 
-    private void GetSavedHighScore()
+    // Update is called once per frame
+    void Update()
     {
-        if (PlayerPrefs.HasKey(highScoreKey))
+        if (debugPieceDraggedPosition && _draggedPiece != null)
         {
-            HighScore = PlayerPrefs.GetInt(highScoreKey);
+            Debug.Log("Piece dragged at pos " + _draggedPiece.transform.position.ToString());
         }
+        textScore.text = "Score : " + globalScore;
+        textShuffle.text = "Shuffle : " + _shuffleCount;
+        textHighScore.text = "High Score : " + HighScore;
+        textQuestsPoints.text = PlayerSettingsManager.Instance.QuestsPoints.ToString();
     }
 
+    #region Score Management
+    void ComputeScore()
+    {
+        globalScore += _board.numberFlippedShapes;
+        _board.numberFlippedShapes = 0;
+    }
+
+    private void CheckHighScore()
+    {
+        bool newHighScore = globalScore > HighScore;
+        if (newHighScore)
+        {
+            HighScore = globalScore;
+            PlayerSettingsManager.Instance.HighScore = HighScore;
+            LeaderboardManager.Instance.SendHighScore(PlayerSettingsManager.Instance.Name, HighScore);
+        }
+        endGamePopup.DisplayHighScoreInfo(newHighScore);
+    }
+
+    private void GetSavedHighScore()
+    {
+        HighScore = PlayerSettingsManager.Instance.HighScore;
+    }
+    #endregion
+
+    #region Quests Management
     private void InitQuests()
     {
         if (currentQuests == null)
@@ -127,38 +159,56 @@ public class GameManager : MonoBehaviour
             currentQuests.Add(QuestManager.Instance.GetQuest());
         }
     }
+    #endregion
 
-    // Update is called once per frame
-    void Update()
+    #region Pieces Management
+    private int GetPieceSlotId(Piece piece)
     {
-        if (debugPieceDraggedPosition && _draggedPiece != null)
+        for (int i = 0; i < _pieceSlots.Length; i++)
         {
-            Debug.Log("Piece dragged at pos " + _draggedPiece.transform.position.ToString());
+            if (_pieceSlots[i] == piece)
+            {
+                return i;
+            }
         }
-        textScore.text = "Score : " + globalScore;
-        textShuffle.text = "Shuffle : " + _shuffleCount;
-        textHighScore.text = "High Score : " + HighScore;
-        textQuestsPoints.text = PlayerSettingsManager.Instance.QuestsPoints.ToString();
+        return -1;
     }
 
-    void ComputeScore()
+    private Piece GetNewPiece(Vector3 position)
     {
-        globalScore += _board.numberFlippedShapes;
-        _board.numberFlippedShapes = 0;
+        Piece newPiece = _pieceManager.GetNextPieceFromPools(position);
+        newPiece.transform.parent = transform;
+        newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
+        ListenToPieceEvent(newPiece);
+        return newPiece;
     }
 
-    private void CheckHighScore()
+    private void GetThreePieces()
     {
-        bool newHighScore = globalScore > HighScore;
-        if (newHighScore)
+        for (int i = 0; i < _piecePositions.Length; i++)
         {
-            HighScore = globalScore;
-            PlayerPrefs.SetInt(highScoreKey, HighScore);
-            LeaderboardManager.Instance.SendHighScore(PlayerSettingsManager.Instance.Name, HighScore);
-            //UIHelper.DisplayGameObject(highScorePopupText);
-            //highScorePopupText.GetComponentInChildren<TextMeshProUGUI>().text = "New high score - " + HighScore + "!";
+            Piece newPiece = GetNewPiece(_piecePositions[i]);
+            _pieceSlots[i] = newPiece;
         }
-        endGamePopup.DisplayHighScoreInfo(newHighScore);
+    }
+
+    private PieceBonusDestroy GetBonusPiece()
+    {
+        PieceBonusDestroy newPiece = _pieceManager.GetBonusDestroyPiece();
+        newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
+        ListenToPieceBonusDestroyEvent(newPiece);
+        return newPiece;
+    }
+
+    private void UnHighlightAllPieces()
+    {
+        foreach (Piece p in _pieceSlots)
+        {
+            if (p != null)
+            {
+                p.Highlight(false);
+            }
+        }
     }
 
     private void OnPieceDragged(object sender, EventArgs e)
@@ -194,23 +244,6 @@ public class GameManager : MonoBehaviour
         _draggedPiece = null;
         _board.ClearCurrentPiece();
         ResetHelpTimer();
-    }
-
-    private void GetThreePieces()
-    {
-        for (int i = 0; i < _piecePositions.Length; i++)
-        {
-            Piece newPiece = GetNewPiece(_piecePositions[i]);
-            _pieceSlots[i] = newPiece;
-        }
-    }
-
-    private PieceBonusDestroy GetBonusPiece()
-    {
-        PieceBonusDestroy newPiece = _pieceManager.GetBonusDestroyPiece();
-        newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
-        ListenToPieceBonusDestroyEvent(newPiece);
-        return newPiece;
     }
 
     private void OnPieceBonusDestroyDragged(object sender, EventArgs e)
@@ -250,56 +283,6 @@ public class GameManager : MonoBehaviour
         _board.RemoveShapeToCurrentPlayable(collisionShape);
     }
 
-    private int GetPieceSlotId(Piece piece)
-    {
-        for (int i = 0; i < _pieceSlots.Length; i++)
-        {
-            if (_pieceSlots[i] == piece)
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private Piece GetNewPiece(Vector3 position)
-    {
-        Piece newPiece = _pieceManager.GetNextPieceFromPools(position);
-        newPiece.transform.parent = transform;
-        newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
-        ListenToPieceEvent(newPiece);
-        return newPiece;
-    }
-
-    private void ManageGameOver()
-    {
-        if (!CheckCanPlay() || forceGameOver)
-        {
-            forceGameOver = false;
-            Debug.Log("Game Over");
-            UIHelper.DisplayGameObject(endGamePopup.gameObject);
-            CheckHighScore();
-        }
-    }
-
-    private bool CheckCanPlay(bool shouldHighlight = false)
-    {
-        bool canPlay = false;
-        foreach (Piece p in _pieceSlots)
-        {
-            if (p != null)
-            {
-                bool canPlayPiece = _board.CheckCanPlay(p);
-                if (shouldHighlight)
-                {
-                    p.Highlight(canPlayPiece);
-                }
-                canPlay = canPlay || canPlayPiece;
-            }
-        }
-        return canPlay;
-    }
-
     private void CleanDestroyPiece(AbstractPiece piece)
     {
         _board.ClearCurrentPiece();
@@ -324,7 +307,9 @@ public class GameManager : MonoBehaviour
         newPiece.PieceCollidingHandler += OnPieceCollision;
         newPiece.PieceExitCollisionHandler += OnPieceExitCollision;
     }
+    #endregion
 
+    #region Suffles
     /// <summary>
     /// Shuffles shapes. 
     /// Should not be called directly. 
@@ -358,6 +343,36 @@ public class GameManager : MonoBehaviour
         UIHelper.HideGameObject(endGamePopup.gameObject);
         ShuffleUntilPlayable();
     }
+    #endregion
+
+    private void ManageGameOver()
+    {
+        if (!CheckCanPlay() || forceGameOver)
+        {
+            forceGameOver = false;
+            Debug.Log("Game Over");
+            UIHelper.DisplayGameObject(endGamePopup.gameObject);
+            CheckHighScore();
+        }
+    }
+
+    private bool CheckCanPlay(bool shouldHighlight = false)
+    {
+        bool canPlay = false;
+        foreach (Piece p in _pieceSlots)
+        {
+            if (p != null)
+            {
+                bool canPlayPiece = _board.CheckCanPlay(p);
+                if (shouldHighlight)
+                {
+                    p.Highlight(canPlayPiece);
+                }
+                canPlay = canPlay || canPlayPiece;
+            }
+        }
+        return canPlay;
+    }
 
     public void Restart()
     {
@@ -383,6 +398,7 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 
+    #region UI
     public void DisplayPauseMenu()
     {
         UIHelper.DisplayGameObject(pausePopup);
@@ -399,17 +415,7 @@ public class GameManager : MonoBehaviour
     {
         UIHelper.DisplayGameObject(questsPopup);
     }
-
-    private void UnHighlightAllPieces()
-    {
-        foreach (Piece p in _pieceSlots)
-        {
-            if (p != null)
-            {
-                p.Highlight(false);
-            }
-        }
-    }
+    #endregion
 
     #region Timer
     private void LaunchHelpTimer()
