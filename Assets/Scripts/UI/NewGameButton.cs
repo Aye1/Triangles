@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class NewGameButton : MonoBehaviour {
 
     private Button _thisButton;
+    private GameManager _gameManager;
 
 	// Use this for initialization
 	void Start () {
@@ -19,5 +20,9 @@ public class NewGameButton : MonoBehaviour {
 
     private void OnButtonClicked() {
         SceneController.Instance.GoToGameScreen();
+        /*_gameManager = FindObjectOfType<GameManager>();
+        if(_gameManager != null) {
+            _gameManager.Restart();
+        }*/
     }
 }

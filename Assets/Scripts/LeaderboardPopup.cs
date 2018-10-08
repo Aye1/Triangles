@@ -4,7 +4,6 @@ public class LeaderboardPopup : MonoBehaviour {
 
     public int entryCount;
     public Transform contentPanel;
-    public LeaderboardManager lbManager;
     public SimpleObjectPool entriesPool;
 
 	// Use this for initialization
@@ -38,9 +37,9 @@ public class LeaderboardPopup : MonoBehaviour {
     }
 
     private void PopulateEntries() {
-        if (lbManager.CurrentScores != null)
+        if (LeaderboardManager.Instance.CurrentScores != null)
         {
-            foreach (Score s in lbManager.CurrentScores)
+            foreach (Score s in LeaderboardManager.Instance.CurrentScores)
             {
                 CreateLeaderboardEntry(s);
             }

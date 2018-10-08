@@ -10,7 +10,8 @@ public class GameManager : MonoBehaviour {
     public TextMeshProUGUI textScore;
     public TextMeshProUGUI textShuffle;
     public TextMeshProUGUI textHighScore;
-    public GameObject endGamePopup;
+    public TextMeshProUGUI textQuestsPoints;
+    public EndGamePopup endGamePopup;
     public GameObject pausePopup;
     public GameObject highScorePopupText;
     public GameObject questsPopup;
@@ -25,7 +26,6 @@ public class GameManager : MonoBehaviour {
     private Board _board;
     private PieceManager _pieceManager;
     private AbstractPiece _draggedPiece;
-    private LeaderboardManager _leaderboardManager;
 
     private Timer _helpTimer;
 
@@ -69,7 +69,6 @@ public class GameManager : MonoBehaviour {
     void Start () {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
-        _leaderboardManager = FindObjectOfType<LeaderboardManager>();
         _pieceSlots = new Piece[3];
         InitPiecePositions();
         GetSavedHighScore();
@@ -77,9 +76,11 @@ public class GameManager : MonoBehaviour {
         InitQuests();
         //GetBonusPiece();
         ComputeScore();
-        UIHelper.HideGameObject(endGamePopup);
+        UIHelper.HideGameObject(endGamePopup.gameObject);
         UIHelper.HideGameObject(pausePopup);
         LaunchHelpTimer();
+        // Be sure the timeScale is at 1, in case there was an issue with the pause menu
+        Time.timeScale = 1.0f;
 	}
 
     private void InitPiecePositions() {
@@ -106,6 +107,14 @@ public class GameManager : MonoBehaviour {
         currentQuests.Clear();
         currentQuests.Add(QuestManager.Instance.GetQuest());
     }
+
+    public void ReplaceQuests(List<Quest> questsToRemove) {
+        int count = questsToRemove.Count;
+        currentQuests.RemoveAll(q => questsToRemove.Contains(q));
+        for (int i = 0; i < count; i++){
+            currentQuests.Add(QuestManager.Instance.GetQuest());
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -116,6 +125,7 @@ public class GameManager : MonoBehaviour {
         textScore.text = "Score : " + globalScore;
         textShuffle.text = "Shuffle : " + _shuffleCount;
         textHighScore.text = "High Score : " + HighScore;
+        textQuestsPoints.text = PlayerSettingsManager.Instance.QuestsPoints.ToString();
     }
 
     void ComputeScore()
@@ -126,16 +136,15 @@ public class GameManager : MonoBehaviour {
 
     private void CheckHighScore() 
     {
-        if(globalScore > HighScore) {
+        bool newHighScore = globalScore > HighScore;
+        if (newHighScore) {
             HighScore = globalScore;
             PlayerPrefs.SetInt(highScoreKey, HighScore);
-            _leaderboardManager.SendHighScore(PlayerSettingsManager.Instance.Name, HighScore);
-            UIHelper.DisplayGameObject(highScorePopupText);
-            highScorePopupText.GetComponentInChildren<TextMeshProUGUI>().text = "New high score - " + HighScore + "!";
+            LeaderboardManager.Instance.SendHighScore(PlayerSettingsManager.Instance.Name, HighScore);
+            //UIHelper.DisplayGameObject(highScorePopupText);
+            //highScorePopupText.GetComponentInChildren<TextMeshProUGUI>().text = "New high score - " + HighScore + "!";
         }
-        else {
-            UIHelper.HideGameObject(highScorePopupText);
-        }
+        endGamePopup.DisplayHighScoreInfo(newHighScore);
     }
 
     private void OnPieceDragged(object sender, EventArgs e)
@@ -252,7 +261,7 @@ public class GameManager : MonoBehaviour {
         {
             Debug.Log("Game Over");
             CheckHighScore();
-            UIHelper.DisplayGameObject(endGamePopup);
+            UIHelper.DisplayGameObject(endGamePopup.gameObject);
         }
     }
 
@@ -329,7 +338,7 @@ public class GameManager : MonoBehaviour {
 
     public void ShuffleShapesInPopup()
     {
-        UIHelper.HideGameObject(endGamePopup);
+        UIHelper.HideGameObject(endGamePopup.gameObject);
         ShuffleUntilPlayable();
     }
 
@@ -338,7 +347,7 @@ public class GameManager : MonoBehaviour {
         globalScore = 0;
         _board.ResetBoard();
         ShuffleUntilPlayable(true);
-        UIHelper.HideGameObject(endGamePopup);
+        UIHelper.HideGameObject(endGamePopup.gameObject);
         FindObjectOfType<RewardedVideoManager>().Reset();
         InitQuests();
         _shuffleCount = 0;
@@ -352,6 +361,7 @@ public class GameManager : MonoBehaviour {
 
     public void GoToMainMenuScreen()
     {
+        HidePauseMenu();
         SceneManager.LoadScene(1);
     }
 

@@ -62,12 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\dreamlo\DreamloLeaderBoard.cs" />
-    <Compile Include="Assets\LevelManager.cs" />
-    <Compile Include="Assets\Quest.cs" />
-    <Compile Include="Assets\QuestEntry.cs" />
-    <Compile Include="Assets\QuestManager.cs" />
-    <Compile Include="Assets\QuestsPopup.cs" />
-    <Compile Include="Assets\ScoreQuest.cs" />
     <Compile Include="Assets\Scripts\AbstractPiece.cs" />
     <Compile Include="Assets\Scripts\Board.cs" />
     <Compile Include="Assets\Scripts\BonusView.cs" />
@@ -75,6 +69,7 @@
     <Compile Include="Assets\Scripts\CameraBehavior.cs" />
     <Compile Include="Assets\Scripts\Constants\Config.cs" />
     <Compile Include="Assets\Scripts\Constants\Constants.cs" />
+    <Compile Include="Assets\Scripts\EndGamePopup.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Helpers\SimpleObjectPool.cs" />
     <Compile Include="Assets\Scripts\Helpers\UIHelper.cs" />
@@ -82,6 +77,7 @@
     <Compile Include="Assets\Scripts\LeaderBoardEntry.cs" />
     <Compile Include="Assets\Scripts\LeaderboardManager.cs" />
     <Compile Include="Assets\Scripts\LeaderboardPopup.cs" />
+    <Compile Include="Assets\Scripts\LevelManager.cs" />
     <Compile Include="Assets\Scripts\Localization\Locales.cs" />
     <Compile Include="Assets\Scripts\Localization\LocalizationManager.cs" />
     <Compile Include="Assets\Scripts\Localization\TextLocalizator.cs" />
@@ -93,14 +89,21 @@
     <Compile Include="Assets\Scripts\PlayerSettingsManager.cs" />
     <Compile Include="Assets\Scripts\Popup.cs" />
     <Compile Include="Assets\Scripts\PulsingObject.cs" />
+    <Compile Include="Assets\Scripts\Quests\Quest.cs" />
+    <Compile Include="Assets\Scripts\Quests\QuestEntry.cs" />
+    <Compile Include="Assets\Scripts\Quests\QuestManager.cs" />
+    <Compile Include="Assets\Scripts\Quests\QuestsPopup.cs" />
     <Compile Include="Assets\Scripts\RewardedVideoManager.cs" />
     <Compile Include="Assets\Scripts\SceneController.cs" />
     <Compile Include="Assets\Scripts\Score.cs" />
+    <Compile Include="Assets\Scripts\ScoreQuest.cs" />
     <Compile Include="Assets\Scripts\Shape.cs" />
     <Compile Include="Assets\Scripts\SoundManager.cs" />
     <Compile Include="Assets\Scripts\StartupManager.cs" />
     <Compile Include="Assets\Scripts\UI\LanguageButton.cs" />
     <Compile Include="Assets\Scripts\UI\LanguagePopupButton.cs" />
+    <Compile Include="Assets\Scripts\UI\LevelButton.cs" />
+    <Compile Include="Assets\Scripts\UI\LevelScreenButton.cs" />
     <Compile Include="Assets\Scripts\UI\NewGameButton.cs" />
     <Compile Include="Assets\Scripts\UI\RewardedVideoButton.cs" />
     <Compile Include="Assets\Scripts\UI\ShuffleButton.cs" />

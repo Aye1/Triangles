@@ -11,4 +11,8 @@ public static class UIHelper
     {
         obj.SetActive(false);
     }
+
+    public static void DisplayGameObject(GameObject obj, bool shouldDisplay) {
+        obj.SetActive(shouldDisplay);
+    }
 }

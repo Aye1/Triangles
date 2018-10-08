@@ -8,14 +8,17 @@ public class PlayerSettingsManager : MonoBehaviour {
     private static PlayerSettingsManager _instance;
     private string _currentLocale;
     private int _maxLevel;
+    private int _currentLevel;
     private string _name;
+    private int _questsPoints;
     private Random _rand;
 
     public static string localeKey = "locale";
     public static string levelKey = "level";
     public static string nameKey = "name";
+    public static string questPointsKey = "questPoints";
 
-
+    #region Properties
     public static PlayerSettingsManager Instance {
         get { return _instance; }
     }
@@ -31,6 +34,32 @@ public class PlayerSettingsManager : MonoBehaviour {
     public string Name {
         get { return _name; }
     }
+
+    public int QuestsPoints {
+        get { return _questsPoints; }
+        set 
+        { 
+            if(value != _questsPoints) {
+                _questsPoints = value;
+                PlayerPrefs.SetInt(questPointsKey, _questsPoints);
+            }
+        }
+    }
+
+    public int CurrentLevel {
+        get { 
+            if(_currentLevel == 0) {
+                return _maxLevel;
+            }
+            return _currentLevel; 
+        }
+        set {
+            if(value != _currentLevel) {
+                _currentLevel = value;
+            }
+        }
+    }
+    #endregion
 
     // Use this for initialization
     void Awake () {
@@ -64,6 +93,13 @@ public class PlayerSettingsManager : MonoBehaviour {
         } else {
             _name = GenerateRandomName();
             PlayerPrefs.SetString(nameKey, _name);
+        }
+
+        if(PlayerPrefs.HasKey(questPointsKey)) {
+            _questsPoints = PlayerPrefs.GetInt(questPointsKey);
+        } else {
+            _questsPoints = 0;
+            PlayerPrefs.SetInt(questPointsKey, 0);
         }
     }
 

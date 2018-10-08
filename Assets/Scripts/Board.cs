@@ -55,7 +55,7 @@ public class Board : MonoBehaviour
         _shapes = new List<Shape>();
         _currentHoveredPlayablePositions = new List<Shape>();
        // CreateHexagonalBoard();
-        SelectBoard(PlayerSettingsManager.Instance.MaxLevel);
+        SelectBoard(PlayerSettingsManager.Instance.CurrentLevel);
         //CreateHourglassBoard();
         //CreateBoardFromArray(GetBoardData());
         ClearCurrentPiece();
