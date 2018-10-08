@@ -4,8 +4,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Threading;
 using System.Collections.Generic;
+using UnityEditor;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour
+{
 
     public TextMeshProUGUI textScore;
     public TextMeshProUGUI textShuffle;
@@ -34,7 +36,10 @@ public class GameManager : MonoBehaviour {
 
     private Piece[] _pieceSlots;
     private Vector3 _pieceBonusDestroyPosition = new Vector3(-2f, -4f, -1.0f);
+   
+    [Header("Debug")]
     public bool debugPieceDraggedPosition = false;
+    public bool forceGameOver;
 
     #region Properties
     public int ShuffleCount
@@ -66,7 +71,8 @@ public class GameManager : MonoBehaviour {
 
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
         _pieceSlots = new Piece[3];
@@ -81,9 +87,10 @@ public class GameManager : MonoBehaviour {
         LaunchHelpTimer();
         // Be sure the timeScale is at 1, in case there was an issue with the pause menu
         Time.timeScale = 1.0f;
-	}
+    }
 
-    private void InitPiecePositions() {
+    private void InitPiecePositions()
+    {
         _piecePositions = new Vector3[3];
         _piecePositions[0] = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.25f, Screen.height * 0.2f, 0.0f));
         _piecePositions[1] = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.5f, Screen.height * 0.2f, 0.0f));
@@ -93,32 +100,38 @@ public class GameManager : MonoBehaviour {
         _piecePositions[2].z = -1.0f;
     }
 
-    private void GetSavedHighScore() 
+    private void GetSavedHighScore()
     {
-        if(PlayerPrefs.HasKey(highScoreKey)) {
+        if (PlayerPrefs.HasKey(highScoreKey))
+        {
             HighScore = PlayerPrefs.GetInt(highScoreKey);
         }
     }
 
-    private void InitQuests() {
-        if(currentQuests == null) {
+    private void InitQuests()
+    {
+        if (currentQuests == null)
+        {
             currentQuests = new List<Quest>();
         }
         currentQuests.Clear();
         currentQuests.Add(QuestManager.Instance.GetQuest());
     }
 
-    public void ReplaceQuests(List<Quest> questsToRemove) {
+    public void ReplaceQuests(List<Quest> questsToRemove)
+    {
         int count = questsToRemove.Count;
         currentQuests.RemoveAll(q => questsToRemove.Contains(q));
-        for (int i = 0; i < count; i++){
+        for (int i = 0; i < count; i++)
+        {
             currentQuests.Add(QuestManager.Instance.GetQuest());
         }
     }
-	
-	// Update is called once per frame
-	void Update () {
-		if(debugPieceDraggedPosition && _draggedPiece != null)
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (debugPieceDraggedPosition && _draggedPiece != null)
         {
             Debug.Log("Piece dragged at pos " + _draggedPiece.transform.position.ToString());
         }
@@ -134,10 +147,11 @@ public class GameManager : MonoBehaviour {
         _board.numberFlippedShapes = 0;
     }
 
-    private void CheckHighScore() 
+    private void CheckHighScore()
     {
         bool newHighScore = globalScore > HighScore;
-        if (newHighScore) {
+        if (newHighScore)
+        {
             HighScore = globalScore;
             PlayerPrefs.SetInt(highScoreKey, HighScore);
             LeaderboardManager.Instance.SendHighScore(PlayerSettingsManager.Instance.Name, HighScore);
@@ -157,7 +171,7 @@ public class GameManager : MonoBehaviour {
 
     private void OnPieceReleased(object sender, EventArgs e)
     {
-        if(_board.PutPiece(_draggedPiece))
+        if (_board.PutPiece(_draggedPiece))
         {
             _board.ClearCurrentPiece();
 
@@ -184,7 +198,7 @@ public class GameManager : MonoBehaviour {
 
     private void GetThreePieces()
     {
-        for(int i=0; i<_piecePositions.Length; i++)
+        for (int i = 0; i < _piecePositions.Length; i++)
         {
             Piece newPiece = GetNewPiece(_piecePositions[i]);
             _pieceSlots[i] = newPiece;
@@ -210,7 +224,7 @@ public class GameManager : MonoBehaviour {
     {
         if (_board.PutPiece(_draggedPiece))
         {
-            CleanDestroyPiece(_draggedPiece);                    
+            CleanDestroyPiece(_draggedPiece);
             ManageGameOver();
         }
         else
@@ -223,20 +237,22 @@ public class GameManager : MonoBehaviour {
     {
         Shape.CollisionEventArgs args = e as Shape.CollisionEventArgs;
         Shape collisionShape = args.OtherObject.GetComponent<Shape>();
-        if(_board.IsPiecePlayableOnShape(collisionShape, args.CurrentPiece)){
+        if (_board.IsPiecePlayableOnShape(collisionShape, args.CurrentPiece))
+        {
             _board.AddShapeToCurrentlyPlayable(collisionShape);
         }
     }
 
-    private void OnPieceExitCollision(object sender, EventArgs e){
+    private void OnPieceExitCollision(object sender, EventArgs e)
+    {
         Shape.CollisionEventArgs args = e as Shape.CollisionEventArgs;
         Shape collisionShape = args.OtherObject.GetComponent<Shape>();
         _board.RemoveShapeToCurrentPlayable(collisionShape);
     }
-    
+
     private int GetPieceSlotId(Piece piece)
     {
-        for(int i=0; i<_pieceSlots.Length; i++)
+        for (int i = 0; i < _pieceSlots.Length; i++)
         {
             if (_pieceSlots[i] == piece)
             {
@@ -248,7 +264,7 @@ public class GameManager : MonoBehaviour {
 
     private Piece GetNewPiece(Vector3 position)
     {
-        Piece newPiece = _pieceManager.GetNextPieceFromPools(position); 
+        Piece newPiece = _pieceManager.GetNextPieceFromPools(position);
         newPiece.transform.parent = transform;
         newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
         ListenToPieceEvent(newPiece);
@@ -257,15 +273,16 @@ public class GameManager : MonoBehaviour {
 
     private void ManageGameOver()
     {
-        if (!CheckCanPlay())
+        if (!CheckCanPlay() || forceGameOver)
         {
+            forceGameOver = false;
             Debug.Log("Game Over");
-            CheckHighScore();
             UIHelper.DisplayGameObject(endGamePopup.gameObject);
+            CheckHighScore();
         }
     }
 
-    private bool CheckCanPlay(bool shouldHighlight=false)
+    private bool CheckCanPlay(bool shouldHighlight = false)
     {
         bool canPlay = false;
         foreach (Piece p in _pieceSlots)
@@ -315,7 +332,7 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     private void ShuffleShapes()
     {
-        foreach(Piece p in _pieceSlots)
+        foreach (Piece p in _pieceSlots)
         {
             CleanDestroyPiece(p);
         }
@@ -324,7 +341,7 @@ public class GameManager : MonoBehaviour {
 
     public void ShuffleUntilPlayable(bool forceShuffle = false)
     {
-        if(ShuffleCount > 0 || forceShuffle)
+        if (ShuffleCount > 0 || forceShuffle)
         {
             ShuffleShapes();
             while (!CheckCanPlay())
@@ -354,7 +371,8 @@ public class GameManager : MonoBehaviour {
         HidePauseMenu();
     }
 
-    public void RestartWithNewBoard() {
+    public void RestartWithNewBoard()
+    {
         Restart();
         _board.GenerateNewBoard();
     }
@@ -377,7 +395,8 @@ public class GameManager : MonoBehaviour {
         Time.timeScale = 1.0f;
     }
 
-    public void DisplayQuestsPopup() {
+    public void DisplayQuestsPopup()
+    {
         UIHelper.DisplayGameObject(questsPopup);
     }
 
@@ -415,5 +434,4 @@ public class GameManager : MonoBehaviour {
         CheckCanPlay(true);
     }
     #endregion
-
 }

@@ -56,7 +56,7 @@ public class LeaderboardManager : MonoBehaviour
 
     private void OnHighScoresLoaded(object sender, EventArgs e) {
         Debug.Log("Highscores loaded");
-        Debug.Log(_dreamLoLB.HighScores.ToString());
+        //Debug.Log(_dreamLoLB.HighScores.ToString());
         LoadScores();
     }
 
