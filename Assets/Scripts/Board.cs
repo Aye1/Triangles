@@ -6,14 +6,10 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
-
-    private readonly int _minWidth = 9;
-    private float _width;
-    private float _height;
-    private Vector3 _shapeSize;
-
     private List<Shape> _shapes;
     private List<Shape> _currentHoveredPlayablePositions;
+    public List<Level> levels;
+    private Level _currentLevel;
 
     public Shape basicShape;
     public int numberFlippedShapes = 0;
@@ -23,42 +19,14 @@ public class Board : MonoBehaviour
 
     public bool debugHoveredPlayablePositions;
 
-    #region Properties
-    public float Width
-    {
-        get
-        {
-            return _width;
-        }
-    }
-
-    public float Height
-    {
-        get
-        {
-            return _height;
-        }
-    }
-
-    public Vector3 ShapeSize
-    {
-        get
-        {
-            return _shapeSize;
-        }
-    }
-    #endregion
-
     // Use this for initialization
-    void Awake()
+    void Start()
     {
         _shapes = new List<Shape>();
         _currentHoveredPlayablePositions = new List<Shape>();
-       // CreateHexagonalBoard();
         SelectBoard(PlayerSettingsManager.Instance.CurrentLevel);
-        //CreateHourglassBoard();
-        //CreateBoardFromArray(GetBoardData());
         ClearCurrentPiece();
+        _shapes = _currentLevel.Shapes;
     }
 
     // Update is called once per frame
@@ -142,8 +110,33 @@ public class Board : MonoBehaviour
         }
     }
 
-    #region Board Creation
+    public void GenerateNewBoard() {
 
+    }
+
+    private void SelectBoard(int boardIndex)
+    {
+        Level currentLevel = Instantiate(levels.First());
+
+        currentLevel.transform.SetParent(transform);
+        currentLevel.transform.localScale = transform.lossyScale;
+        currentLevel.GenerateBoard();
+        _currentLevel = currentLevel;
+        /*if (boardIndex == 1)
+        {
+            CreateHexagonalBoard();
+        }
+        else if (boardIndex == 2)
+        {
+            CreateHourglassBoard();
+        }
+        else
+        {
+            CreateBoardFromArray(GetBoardData());
+        }*/
+    }
+
+    /*
     public void GenerateNewBoard() {
         ResetBoard();
         foreach(Shape s in _shapes) {
@@ -152,73 +145,6 @@ public class Board : MonoBehaviour
         _shapes.Clear();
         ClearCurrentPiece();
         SelectBoard(2);
-    }
-
-    private void SelectBoard(int boardIndex) {
-        if(boardIndex == 1) {
-            CreateHexagonalBoard();
-        } else if (boardIndex == 2) {
-            CreateHourglassBoard();
-        } else {
-            CreateBoardFromArray(GetBoardData());
-        }
-    }
-
-    /// <summary>
-    /// Initializes the hexagonal board
-    /// </summary>
-    private void CreateHexagonalBoard()
-    {
-        int height = _minWidth - 1;
-        int maxWidth = 2 * _minWidth - 3;
-
-        // Décalage de 1 pour rester sur la bonne parité de grille
-        int offset = height / 2 % 2 == 0 ? 1 : 0;
-
-        for (int j = 0; j < height; j++)
-        {
-            int currentWidth = maxWidth - (int)Mathf.Abs(_minWidth / 2.0f - (j + 1)) * 2;
-            int imin = (maxWidth - currentWidth) / 2 + offset;
-            int imax = imin + currentWidth;
-
-            for (int i = imin; i < imax; i++)
-            {
-                CreateBoardShape(i, j);
-            }
-        }
-
-        ComputeBoardDimensions(maxWidth, height);
-        AdjustBoardPosition();
-    }
-
-    /// <summary>
-    /// Initializes the hourglass board
-    /// </summary>
-    private void CreateHourglassBoard()
-    {
-        int minwidth = 5;
-        int maxwidth = 11;
-        int height = (maxwidth - minwidth) + 2;
-        bool isMinReached = false;
-
-        for (int j = 0; j < height; j++)
-        {
-            int currentWidth = isMinReached ? (int)(minwidth + 2 * (j - (height / 2.0f))) : (int)(maxwidth - 2 * j);
-            if (!isMinReached)
-            {
-                isMinReached = currentWidth == minwidth;
-
-            }
-            int imin = (maxwidth - currentWidth) / 2 + 1;
-            int imax = imin + currentWidth;
-
-            for (int i = imin; i < imax; i++)
-            {
-                CreateBoardShape(i, j);
-            }
-        }
-        ComputeBoardDimensions(maxwidth, height);
-        AdjustBoardPosition();
     }
 
     private void CreateBoardFromArray(int[,] data) {
@@ -232,48 +158,7 @@ public class Board : MonoBehaviour
         }
         ComputeBoardDimensions(data.GetLength(1), data.GetLength(0));
         AdjustBoardPosition();
-    }
-    
-    /// <summary>
-    /// Creates the board shape.
-    /// </summary>
-    private void CreateBoardShape(int i, int j) {
-        Vector3 pos = new Vector3(i * Config.paddingX,
-                    -j * Config.paddingY,
-                    0);
-        Vector3 finalPos = Vector3.Scale(pos, transform.lossyScale);
-        Shape newShape = Instantiate(basicShape, finalPos, Quaternion.identity);
-        newShape.gameObject.tag = Constants.boardTag;
-        newShape.gameObject.layer = Constants.boardLayerId;
-        newShape.PositionABC = PosABCfromIJ(i,j);
-        newShape.PosXY = new Vector2(i,j);
-        newShape.IsUpsideDown = (i + j) % 2 == 0;
-        newShape.transform.localScale = Vector3.Scale(transform.lossyScale, newShape.transform.localScale);
-        newShape.transform.parent = transform;
-        _shapes.Add(newShape);
-    }
-
-    private Vector3Int PosABCfromIJ(int i, int j) {
-        int A = j;
-        int B = (int)Mathf.Ceil((-i - j) / 2.0f);
-        int C = (int)Mathf.Floor(-(i - j) / 2.0f);
-        return new Vector3Int(A, B, C);
-    }
-
-    private void ComputeBoardDimensions(int width, int height) {
-        Shape s = gameObject.GetComponentInChildren<Shape>();
-        _shapeSize = s.GetComponent<Renderer>().bounds.size;
-        _width = Config.paddingX * (width + 1);
-        _height = Config.paddingY * (height + 1);
-    }
-
-    private void AdjustBoardPosition() {
-        // Totally empirical values, could probably be computed from the paddings in Config
-        foreach(Shape s in _shapes) {
-            s.transform.position = s.transform.position - new Vector3(Width * 0.415f, -(Height-ShapeSize.y-1.75f) * 0.6f, 0.0f);
-        }
-    }
-    #endregion
+    }*/
 
     /// <summary>
     /// Returns all playable shapes for the current piece

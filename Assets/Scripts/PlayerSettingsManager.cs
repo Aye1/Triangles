@@ -13,12 +13,14 @@ public class PlayerSettingsManager : MonoBehaviour {
     private int _questsPoints;
     private Random _rand;
     private int _highScore;
+    private Dictionary<int, bool> _levelsUnlocked;
 
     public static string localeKey = "locale";
     public static string levelKey = "level";
     public static string nameKey = "name";
     public static string questPointsKey = "questPoints";
     public static string highScoreKey = "highScore";
+    public static string levelUnlockedBaseKey = "levelUnlocked";
 
 
     #region Properties
@@ -138,5 +140,13 @@ public class PlayerSettingsManager : MonoBehaviour {
     public void ChangeLocale(string locale) {
         _currentLocale = locale;
         PlayerPrefs.SetString(localeKey, locale);
+    }
+
+    private void LoadLevelsUnlocked() {
+
+    }
+
+    private string GenerateKeyForLevelUnlocked(int id) {
+        return levelUnlockedBaseKey + id.ToString();
     }
 }

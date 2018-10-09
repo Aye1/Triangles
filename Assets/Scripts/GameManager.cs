@@ -22,25 +22,21 @@ public class GameManager : MonoBehaviour
 
     [Header("Game state")]
     public int globalScore;
-
-    private int _shuffleCount = 0;
-    private int _highScore = 0;
-
-    private Board _board;
-    private PieceManager _pieceManager;
-    private AbstractPiece _draggedPiece;
-
-    private Timer _helpTimer;
-
-    private Vector3[] _piecePositions;
-
-
-    private Piece[] _pieceSlots;
-    private Vector3 _pieceBonusDestroyPosition = new Vector3(-2f, -4f, -1.0f);
    
     [Header("Debug")]
     public bool debugPieceDraggedPosition = false;
     public bool forceGameOver;
+
+
+    private int _shuffleCount = 0;
+    private int _highScore = 0;
+    private Board _board;
+    private PieceManager _pieceManager;
+    private AbstractPiece _draggedPiece;
+    private Timer _helpTimer;
+    private Vector3[] _piecePositions;
+    private Piece[] _pieceSlots;
+    private Vector3 _pieceBonusDestroyPosition = new Vector3(-2f, -4f, -1.0f);
 
     #region Properties
     public int ShuffleCount

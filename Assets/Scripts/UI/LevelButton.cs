@@ -6,7 +6,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Button))]
 public class LevelButton : MonoBehaviour {
 
-    public int level;
+    public LevelInfo level;
 
 	// Use this for initialization
 	void Start () {
@@ -15,10 +15,10 @@ public class LevelButton : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+        this.GetComponent<Button>().interactable = level.isUnlocked;
 	}
 
     private void LoadLevel(){
-        FindObjectOfType<SceneController>().GoToGameScreen(level);
+        FindObjectOfType<SceneController>().GoToGameScreen(level.id);
     }
 }
