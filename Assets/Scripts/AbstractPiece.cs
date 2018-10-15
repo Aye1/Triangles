@@ -81,13 +81,15 @@ abstract public class AbstractPiece : MonoBehaviour {
     private void GeneratePiece()
     {
         pieceShapes = new List<Shape>();
+        float ratio = FindObjectOfType<Board>().CurrentLevel.Ratio;
         foreach (Vector4 pos in positionsXY)
         {
-            Vector3 position = transform.position + new Vector3(pos.x * Config.paddingX, -pos.y * Config.paddingY, pos.z);
+            Vector3 position = transform.position + new Vector3(pos.x * Config.paddingX*ratio, -pos.y * Config.paddingY*ratio, pos.z);
             Shape newShape = Instantiate(refShape, position, Quaternion.identity);
 
             newShape.IsUpsideDown = pos.w == 1.0f;
             newShape.transform.parent = transform;
+            newShape.transform.localScale = Vector3.Scale(newShape.transform.localScale, new Vector3(ratio, ratio, 1.0f));
 
             newShape.BaseColor = Color.blue;
             RegisterCallback(newShape);

@@ -8,11 +8,16 @@ public abstract class Level : MonoBehaviour {
     protected List<Shape> _shapes;
     private float _width;
     private float _height;
-    private Vector3 _shapeSize;
+    private float _ratio;
+    private float _layoutSizeRatio = 0.9f;
     public Shape basicShape;
 
     public List<Shape> Shapes {
         get { return _shapes; }
+    }
+
+    public float Ratio {
+        get { return _ratio; }
     }
 
     /// <summary>
@@ -28,6 +33,7 @@ public abstract class Level : MonoBehaviour {
 
     protected void CreateBoardFromArray(int[,] data)
     {
+        ComputeBoardDimensions(data.GetLength(1), data.GetLength(0));
         for (int j = 0; j < data.GetLength(1); j++)
         {
             for (int i = 0; i < data.GetLength(0); i++)
@@ -38,7 +44,6 @@ public abstract class Level : MonoBehaviour {
                 }
             }
         }
-        ComputeBoardDimensions(data.GetLength(1), data.GetLength(0));
         AdjustBoardPosition();
     }
 
@@ -47,8 +52,8 @@ public abstract class Level : MonoBehaviour {
     /// </summary>
     protected void CreateBoardShape(int i, int j)
     {
-        Vector3 pos = new Vector3(i * Config.paddingX,
-                    -j * Config.paddingY,
+        Vector3 pos = new Vector3(i * Config.paddingX * _ratio,
+                    -j * Config.paddingY * _ratio,
                     0);
         Vector3 finalPos = Vector3.Scale(pos, transform.lossyScale);
         Shape newShape = Instantiate(basicShape, finalPos, Quaternion.identity);
@@ -58,6 +63,7 @@ public abstract class Level : MonoBehaviour {
         newShape.PosXY = new Vector2(i, j);
         newShape.IsUpsideDown = (i + j) % 2 == 0;
         newShape.transform.localScale = Vector3.Scale(transform.lossyScale, newShape.transform.localScale);
+        newShape.transform.localScale = Vector3.Scale(newShape.transform.localScale, new Vector3(_ratio, _ratio, 1.0f));
         newShape.transform.parent = transform;
         _shapes.Add(newShape);
     }
@@ -73,9 +79,30 @@ public abstract class Level : MonoBehaviour {
     protected void ComputeBoardDimensions(int width, int height)
     {
         Shape s = gameObject.GetComponentInChildren<Shape>();
-        _shapeSize = s.GetComponent<Renderer>().bounds.size;
         _width = Config.paddingX * (width + 1);
         _height = Config.paddingY * (height + 1);
+        ComputeShapeRatio();
+    }
+
+    /// <summary>
+    /// Computes the ratio to be used to create the shapes, scaling with the screen size
+    /// </summary>
+    protected void ComputeShapeRatio() {
+        Vector3 camPos = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0.0f));
+        Vector3 camOrigin = Camera.main.ScreenToWorldPoint(Vector3.zero);
+        Vector3 diff = camPos - camOrigin;
+
+        if (diff.x < diff.y)
+        {
+            // Portrait
+            _ratio = diff.x / _width;
+        }
+        else
+        {
+            // Landscape
+            _ratio = diff.y / _height;
+        }
+        _ratio *= _layoutSizeRatio;
     }
 
     protected void AdjustBoardPosition()
@@ -84,7 +111,7 @@ public abstract class Level : MonoBehaviour {
         foreach (Shape s in _shapes)
         {
             //s.transform.position = s.transform.position - new Vector3(_width * 0.415f, -(_height - _shapeSize.y - 1.75f) * 0.6f, 0.0f);
-            s.transform.position = s.transform.position - new Vector3(_width * 0.5f, -_height * 0.6f, 0.0f);
+            s.transform.position = s.transform.position - new Vector3(_width * 0.5f*_ratio, -_height * 0.6f * _ratio, 0.0f);
         }
     }
 }

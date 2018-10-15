@@ -19,6 +19,10 @@ public class Board : MonoBehaviour
 
     public bool debugHoveredPlayablePositions;
 
+    public Level CurrentLevel {
+        get { return _currentLevel; }
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -122,18 +126,6 @@ public class Board : MonoBehaviour
         currentLevel.transform.localScale = transform.lossyScale;
         currentLevel.GenerateBoard();
         _currentLevel = currentLevel;
-        /*if (boardIndex == 1)
-        {
-            CreateHexagonalBoard();
-        }
-        else if (boardIndex == 2)
-        {
-            CreateHourglassBoard();
-        }
-        else
-        {
-            CreateBoardFromArray(GetBoardData());
-        }*/
     }
 
     /*

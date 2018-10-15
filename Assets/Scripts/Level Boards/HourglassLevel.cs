@@ -6,6 +6,7 @@
         int maxwidth = 11;
         int height = (maxwidth - minwidth) + 2;
         bool isMinReached = false;
+        ComputeBoardDimensions(maxwidth, height);
 
         for (int j = 0; j < height; j++)
         {
@@ -23,7 +24,6 @@
                 CreateBoardShape(i, j);
             }
         }
-        ComputeBoardDimensions(maxwidth, height);
         AdjustBoardPosition();
     }
 }

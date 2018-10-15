@@ -9,6 +9,8 @@ public class HexagonLevel : Level {
         int height = minWidth - 1;
         int maxWidth = 2 * minWidth - 3;
 
+        ComputeBoardDimensions(maxWidth, height);
+
         // Décalage de 1 pour rester sur la bonne parité de grille
         int offset = height / 2 % 2 == 0 ? 1 : 0;
 
@@ -23,7 +25,6 @@ public class HexagonLevel : Level {
                 CreateBoardShape(i, j);
             }
         }
-        ComputeBoardDimensions(maxWidth, height);
         AdjustBoardPosition();
     }
 }
