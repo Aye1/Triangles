@@ -9,6 +9,8 @@ public class LevelManager : MonoBehaviour {
 
     private static LevelManager _instance;
 
+    public LevelInfo[] levels;
+
     public static LevelManager Instance {
         get { return _instance; }
     }
@@ -33,5 +35,9 @@ public class LevelManager : MonoBehaviour {
 
     private int GetNextLevel() {
         throw new NotImplementedException();
+    }
+
+    public Level GetLevelAtIndex(int index) {
+        return index < levels.Length ? levels[index].level : null;
     }
 }

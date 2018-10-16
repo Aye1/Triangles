@@ -34,8 +34,14 @@ public class SceneController : MonoBehaviour {
     }
 
     public void GoToGameScreen(int level) {
-        SceneManager.LoadScene(2);
         PlayerSettingsManager.Instance.CurrentLevel = level;
+        SceneManager.LoadScene(2);
+    }
+
+    public void GoToGameScreen(Level level) {
+        // TODO
+        //PlayerSettingsManager.Instance.CurrentLevel = level.
+        SceneManager.LoadScene(2);
     }
 
     public void GoToMenuScreen() {

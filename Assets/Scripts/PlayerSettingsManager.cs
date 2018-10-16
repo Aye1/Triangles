@@ -53,7 +53,7 @@ public class PlayerSettingsManager : MonoBehaviour {
 
     public int CurrentLevel {
         get { 
-            if(_currentLevel == 0) {
+            if(_currentLevel == -1) {
                 return _maxLevel;
             }
             return _currentLevel; 

@@ -8,7 +8,6 @@ public class Board : MonoBehaviour
 {
     private List<Shape> _shapes;
     private List<Shape> _currentHoveredPlayablePositions;
-    public List<Level> levels;
     private Level _currentLevel;
 
     public Shape basicShape;
@@ -120,7 +119,7 @@ public class Board : MonoBehaviour
 
     private void SelectBoard(int boardIndex)
     {
-        Level currentLevel = Instantiate(levels.First());
+        Level currentLevel = Instantiate(LevelManager.Instance.GetLevelAtIndex(boardIndex));
 
         currentLevel.transform.SetParent(transform);
         currentLevel.transform.localScale = transform.lossyScale;

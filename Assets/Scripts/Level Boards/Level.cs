@@ -111,7 +111,7 @@ public abstract class Level : MonoBehaviour {
         foreach (Shape s in _shapes)
         {
             //s.transform.position = s.transform.position - new Vector3(_width * 0.415f, -(_height - _shapeSize.y - 1.75f) * 0.6f, 0.0f);
-            s.transform.position = s.transform.position - new Vector3(_width * 0.5f*_ratio, -_height * 0.6f * _ratio, 0.0f);
+            s.transform.position = s.transform.position - new Vector3(_width * 0.5f*_ratio, -_height * 0.5f * _ratio, 0.0f);
         }
     }
 }
