@@ -9,6 +9,7 @@ public class QuestManager : MonoBehaviour {
     private Random _rand;
     public List<Quest> quests;
     public ScoreQuest scoreQuest;
+    public ComboQuest comboQuest;
 
     public static QuestManager Instance {
         get { return _instance; }
@@ -33,17 +34,21 @@ public class QuestManager : MonoBehaviour {
 	}
 
     private void PopulateQuests() {
-        ScoreQuest sq = Instantiate(scoreQuest);
-        sq.targetScore = 10;
-        quests.Add(sq);
+       // ScoreQuest sq = Instantiate(scoreQuest);
+       // sq.targetScore = 10;
+       // quests.Add(sq);
+       //
+       // sq = Instantiate(scoreQuest);
+       // sq.targetScore = 20;
+       // quests.Add(sq);
+       //
+       // sq = Instantiate(scoreQuest);
+       // sq.targetScore = 30;
+       // quests.Add(sq);
 
-        sq = Instantiate(scoreQuest);
-        sq.targetScore = 20;
-        quests.Add(sq);
-
-        sq = Instantiate(scoreQuest);
-        sq.targetScore = 30;
-        quests.Add(sq);
+        ComboQuest cq = Instantiate(comboQuest);
+        cq.numberComboTargetScore = 5;
+        quests.Add(cq);
     }
 
     public Quest GetQuest() {

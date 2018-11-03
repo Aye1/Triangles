@@ -1156,9 +1156,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f1c6b4ddd210cc48bc40bf87a4b7bc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levels:
-  - {fileID: 114848551173963564, guid: 69626e6c77c074d8b9493f3c267b9c8e, type: 2}
-  - {fileID: 114622670094906298, guid: e5a540616f61a4b1db73fe47a9d9887d, type: 2}
   basicShape: {fileID: 114020702329699666, guid: 1fd0519ad0b00bd469ee5ddeafac9d5c,
     type: 2}
   numberFlippedShapes: 0
@@ -2743,6 +2740,8 @@ MonoBehaviour:
   quests: []
   scoreQuest: {fileID: 114251147640499160, guid: 2fc38d9b5edf749b8a7e97d5f2bb1a30,
     type: 2}
+  comboQuest: {fileID: 114652261436158956, guid: b2cc65df63b4b7749a667647624114ca,
+    type: 2}
 --- !u!4 &764220080
 Transform:
   m_ObjectHideFlags: 0
@@ -2948,6 +2947,7 @@ MonoBehaviour:
   questsPopup: {fileID: 1877325217}
   currentQuests: []
   globalScore: 0
+  comboScore: 0
   debugPieceDraggedPosition: 0
   forceGameOver: 0
 --- !u!4 &772416204

@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Game state")]
     public int globalScore;
+    public int comboScore;
    
     [Header("Debug")]
     public bool debugPieceDraggedPosition = false;
@@ -115,6 +116,11 @@ public class GameManager : MonoBehaviour
     {
         globalScore += _board.numberFlippedShapes;
         _board.numberFlippedShapes = 0;
+
+        if(_board.lastNumberValidatedLines > 0)
+        {
+            comboScore += _board.lastNumberValidatedLines - 1;
+        }
     }
 
     private void CheckHighScore()
@@ -375,6 +381,7 @@ public class GameManager : MonoBehaviour
     public void Restart()
     {
         globalScore = 0;
+        comboScore = 0;
         _board.ResetBoard();
         ShuffleUntilPlayable(true);
         UIHelper.HideGameObject(endGamePopup.gameObject);
