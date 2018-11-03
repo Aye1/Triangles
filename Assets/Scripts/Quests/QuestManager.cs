@@ -10,7 +10,7 @@ public class QuestManager : MonoBehaviour {
     public List<Quest> quests;
     public ScoreQuest scoreQuest;
     public ComboQuest comboQuest;
-
+    public NumberLineQuest lineQuest;
     public static QuestManager Instance {
         get { return _instance; }
     }
@@ -48,7 +48,12 @@ public class QuestManager : MonoBehaviour {
 
         ComboQuest cq = Instantiate(comboQuest);
         cq.numberComboTargetScore = 5;
+        cq.targetCombo = Combo.Combo3;
         quests.Add(cq);
+
+        NumberLineQuest nq = Instantiate(lineQuest);
+        nq.numberComboTargetScore = 10;
+        quests.Add(nq);
     }
 
     public Quest GetQuest() {

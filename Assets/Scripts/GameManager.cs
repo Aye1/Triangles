@@ -22,8 +22,8 @@ public class GameManager : MonoBehaviour
 
     [Header("Game state")]
     public int globalScore;
-    public int comboScore;
-   
+    public int[] comboArray = new int[(int)Combo.Max];
+
     [Header("Debug")]
     public bool debugPieceDraggedPosition = false;
     public bool forceGameOver;
@@ -87,6 +87,13 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1.0f;
     }
 
+    public void CleanComboArray()
+    {
+        for (Combo type = Combo.Combo1; type < Combo.Max; type++)
+        {
+            comboArray[(int)type] = 0;
+        }
+    }
     private void InitPiecePositions()
     {
         _piecePositions = new Vector3[3];
@@ -117,10 +124,8 @@ public class GameManager : MonoBehaviour
         globalScore += _board.numberFlippedShapes;
         _board.numberFlippedShapes = 0;
 
-        if(_board.lastNumberValidatedLines > 0)
-        {
-            comboScore += _board.lastNumberValidatedLines - 1;
-        }
+        comboArray[(int)_board.lastNumberValidatedLines]++;
+        
     }
 
     private void CheckHighScore()
@@ -381,7 +386,6 @@ public class GameManager : MonoBehaviour
     public void Restart()
     {
         globalScore = 0;
-        comboScore = 0;
         _board.ResetBoard();
         ShuffleUntilPlayable(true);
         UIHelper.HideGameObject(endGamePopup.gameObject);
@@ -389,6 +393,7 @@ public class GameManager : MonoBehaviour
         InitQuests();
         _shuffleCount = 0;
         HidePauseMenu();
+        CleanComboArray();
     }
 
     public void RestartWithNewBoard()

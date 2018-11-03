@@ -2742,6 +2742,8 @@ MonoBehaviour:
     type: 2}
   comboQuest: {fileID: 114652261436158956, guid: b2cc65df63b4b7749a667647624114ca,
     type: 2}
+  lineQuest: {fileID: 114887190410720822, guid: 55d3ef82b83339548951f7fd30885b0a,
+    type: 2}
 --- !u!4 &764220080
 Transform:
   m_ObjectHideFlags: 0
@@ -2947,7 +2949,7 @@ MonoBehaviour:
   questsPopup: {fileID: 1877325217}
   currentQuests: []
   globalScore: 0
-  comboScore: 0
+  comboArray: 000000000000000000000000000000000000000000000000
   debugPieceDraggedPosition: 0
   forceGameOver: 0
 --- !u!4 &772416204
