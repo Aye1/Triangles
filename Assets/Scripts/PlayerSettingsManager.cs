@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 using Random = System.Random;
 
 public class PlayerSettingsManager : MonoBehaviour {
@@ -13,7 +14,7 @@ public class PlayerSettingsManager : MonoBehaviour {
     private int _questsPoints;
     private Random _rand;
     private int _highScore;
-    private Dictionary<int, bool> _levelsUnlocked;
+    private Dictionary<int, int> _levelsUnlocked;
 
     public static string localeKey = "locale";
     public static string levelKey = "level";
@@ -74,6 +75,12 @@ public class PlayerSettingsManager : MonoBehaviour {
                 _highScore = value;
                 PlayerPrefs.SetInt(highScoreKey, _highScore);
             }
+        }
+    }
+
+    public Dictionary<int, int> LevelsUnlocked {
+        get {
+            return _levelsUnlocked;
         }
     }
     #endregion
@@ -142,11 +149,58 @@ public class PlayerSettingsManager : MonoBehaviour {
         PlayerPrefs.SetString(localeKey, locale);
     }
 
-    private void LoadLevelsUnlocked() {
+    public void LoadLevelsUnlocked() {
+        _levelsUnlocked = new Dictionary<int, int>();
+        for (int i = 0; i < LevelManager.Instance.levelCount; i++) {
+            string key = GenerateKeyForLevelUnlocked(i);
+            int value = 0;
+            if (PlayerPrefs.HasKey(key)){
+                value = PlayerPrefs.GetInt(key);
+            } 
+            else 
+            {
+                // Init player pref
 
+                // First level is always unlocked
+                if (i == 0)
+                {
+                    PlayerPrefs.SetInt(key, 1);
+                }
+                // Other levels start locked
+                else
+                {
+                    PlayerPrefs.SetInt(key, 0);
+                }
+            } 
+            _levelsUnlocked.Add(i, value);
+        }
     }
 
-    private string GenerateKeyForLevelUnlocked(int id) {
+    private static string GenerateKeyForLevelUnlocked(int id) {
         return levelUnlockedBaseKey + id.ToString();
+    }
+
+    public bool IsLevelUnlocked(int index) {
+        int value;
+        _levelsUnlocked.TryGetValue(index, out value);
+        return value == 1;
+    }
+
+    public void UnlockLevel(int index, int cost) {
+        string key = GenerateKeyForLevelUnlocked(index);
+        _levelsUnlocked[index] = 1;
+        PlayerPrefs.SetInt(key, 1);
+        QuestsPoints = QuestsPoints - cost;
+    }
+
+    [MenuItem("Debug/Reset levels unlocked")]
+    public static void ResetLevelsUnlocked()
+    {
+        for (int i = 0; i < LevelManager.Instance.levelCount; i++)
+        {
+            string key = GenerateKeyForLevelUnlocked(i);
+            PlayerPrefs.SetInt(key, 0);
+            PlayerSettingsManager.Instance.LevelsUnlocked[i] = 0;
+        }
     }
 }

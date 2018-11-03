@@ -2,25 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-[RequireComponent(typeof(Button))]
 public class LevelButton : MonoBehaviour {
 
     public int id;
+    public int pointsNeeded;
+    public Button goToLevelButton;
+    public Button unlockButton;
     //public LevelInfo level;
 
 	// Use this for initialization
 	void Start () {
-        this.GetComponent<Button>().onClick.AddListener(LoadLevel);
+        goToLevelButton.onClick.AddListener(LoadLevel);
+        unlockButton.onClick.AddListener(UnlockLevel);
+        unlockButton.GetComponentInChildren<Text>().text = pointsNeeded.ToString();
 	}
 	
 	// Update is called once per frame
 	void Update () {
         bool unlocked = LevelManager.Instance.IsLevelAvailable(id);
-        this.GetComponent<Button>().interactable = unlocked;
+        goToLevelButton.interactable = unlocked;
+        unlockButton.gameObject.SetActive(!unlocked);
+        unlockButton.interactable = PlayerSettingsManager.Instance.QuestsPoints >= pointsNeeded;
 	}
 
     private void LoadLevel(){
         FindObjectOfType<SceneController>().GoToGameScreen(id);
+    }
+
+    private void UnlockLevel() {
+        PlayerSettingsManager.Instance.UnlockLevel(id, pointsNeeded);
     }
 }

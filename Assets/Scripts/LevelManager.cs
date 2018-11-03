@@ -5,18 +5,15 @@ using UnityEngine;
 
 public class LevelManager : MonoBehaviour {
 
-    private int _maxLevel;
+    public int levelCount = 2;
 
     private static LevelManager _instance;
+    private Dictionary<int, int> _levelsUnlocked;
 
     public LevelInfo[] levels;
 
     public static LevelManager Instance {
         get { return _instance; }
-    }
-
-    public int MaxLevel {
-        get { return _maxLevel; }
     }
 
 	// Use this for initialization
@@ -27,10 +24,11 @@ public class LevelManager : MonoBehaviour {
             _instance = this;
         }
         DontDestroyOnLoad(this);
+        PlayerSettingsManager.Instance.LoadLevelsUnlocked();
 	}
 
     public bool IsLevelAvailable(int level) {
-        return level <= _maxLevel;
+        return PlayerSettingsManager.Instance.IsLevelUnlocked(level);
     }
 
     private int GetNextLevel() {
