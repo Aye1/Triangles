@@ -34,25 +34,28 @@ public class QuestManager : MonoBehaviour {
 	}
 
     private void PopulateQuests() {
-       // ScoreQuest sq = Instantiate(scoreQuest);
-       // sq.targetScore = 10;
-       // quests.Add(sq);
-       //
-       // sq = Instantiate(scoreQuest);
-       // sq.targetScore = 20;
-       // quests.Add(sq);
-       //
-       // sq = Instantiate(scoreQuest);
-       // sq.targetScore = 30;
-       // quests.Add(sq);
+        ScoreQuest sq = Instantiate(scoreQuest);
+        sq.targetScore = 10;
+        quests.Add(sq);
+       
+        sq = Instantiate(scoreQuest);
+        sq.targetScore = 20;
+        quests.Add(sq);
+       
+        sq = Instantiate(scoreQuest);
+        sq.targetScore = 30;
+        sq.questPointGain = 2;
+        quests.Add(sq);
 
         ComboQuest cq = Instantiate(comboQuest);
-        cq.numberComboTargetScore = 5;
-        cq.targetCombo = Combo.Combo3;
+        cq.numberComboTargetScore = 1;
+        cq.targetCombo = Combo.Combo2;
+        cq.questPointGain = 5;
         quests.Add(cq);
 
         NumberLineQuest nq = Instantiate(lineQuest);
         nq.numberComboTargetScore = 10;
+        nq.questPointGain = 2;
         quests.Add(nq);
     }
 

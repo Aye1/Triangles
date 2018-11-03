@@ -7,6 +7,7 @@ public class Quest : MonoBehaviour {
 
     public string descriptionLocKey;
     public string defaultDescription;
+    public uint questPointGain = 1;
     protected GameManager _gameManager;
 
     public virtual bool IsQuestCompleted() {
