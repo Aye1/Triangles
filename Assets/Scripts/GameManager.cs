@@ -179,9 +179,10 @@ public class GameManager : MonoBehaviour
         uint questPointGain = 0;
         foreach (Quest q in currentQuests)
         {
-            if (q.IsQuestCompleted())
+            if (!q.IsFinished && q.IsQuestCompleted())
             {
                 finishedQuests.Add(q);
+                q.IsFinished = true;
                 questPointGain += q.questPointGain;
             }
         }

@@ -9,6 +9,20 @@ public class Quest : MonoBehaviour {
     public string defaultDescription;
     public uint questPointGain = 1;
     protected GameManager _gameManager;
+    private bool isFinished = false;
+
+    public bool IsFinished
+    {
+        get
+        {
+            return isFinished;
+        }
+
+        set
+        {
+            isFinished = value;
+        }
+    }
 
     public virtual bool IsQuestCompleted() {
         throw new NotImplementedException();

@@ -31,10 +31,6 @@ public abstract class Level : MonoBehaviour {
 
     public abstract void GenerateShapes();
 
-    public virtual bool IsUpsideDown(int rest)
-    {
-        return rest == 0;
-    }
 
     /// <summary>
     /// Creates the board shape.
@@ -50,7 +46,7 @@ public abstract class Level : MonoBehaviour {
         newShape.gameObject.layer = Constants.boardLayerId;
         newShape.PositionABC = PosABCfromIJ(i, j);
         newShape.PosXY = new Vector2(i, j);
-        newShape.IsUpsideDown = IsUpsideDown((i + j) % 2);
+        newShape.IsUpsideDown = (i + j) % 2 ==0;
         newShape.transform.localScale = Vector3.Scale(transform.lossyScale, newShape.transform.localScale);
         newShape.transform.localScale = Vector3.Scale(newShape.transform.localScale, new Vector3(_ratio, _ratio, 1.0f));
         newShape.transform.parent = transform;
