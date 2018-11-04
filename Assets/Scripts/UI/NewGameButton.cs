@@ -19,7 +19,7 @@ public class NewGameButton : MonoBehaviour {
 	}
 
     private void OnButtonClicked() {
-        SceneController.Instance.GoToGameScreen();
+        SceneController.Instance.GoToGameScreen(PlayerSettingsManager.Instance.CurrentLevel);
         /*_gameManager = FindObjectOfType<GameManager>();
         if(_gameManager != null) {
             _gameManager.Restart();
