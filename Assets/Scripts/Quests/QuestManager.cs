@@ -16,16 +16,20 @@ public class QuestManager : MonoBehaviour {
     }
 
 	// Use this for initialization
-	void Start () {
-        if(_instance != null && _instance != this) {
+	void Awake () {
+        if (_instance != null && _instance != this)
+        {
             Destroy(gameObject);
-        } else {
-            _instance = this;
         }
-        DontDestroyOnLoad(gameObject);
-        quests = new List<Quest>();
-        PopulateQuests();
-        _rand = new Random();
+        else
+        {
+            _instance = this;
+
+            DontDestroyOnLoad(gameObject);
+            quests = new List<Quest>();
+            PopulateQuests();
+            _rand = new Random();
+        }
 	}
 	
 	// Update is called once per frame
@@ -36,27 +40,33 @@ public class QuestManager : MonoBehaviour {
     private void PopulateQuests() {
         ScoreQuest sq = Instantiate(scoreQuest);
         sq.targetScore = 10;
-        quests.Add(sq);
+        AddQuest(sq);
        
         sq = Instantiate(scoreQuest);
         sq.targetScore = 20;
-        quests.Add(sq);
+        AddQuest(sq);
        
         sq = Instantiate(scoreQuest);
         sq.targetScore = 30;
         sq.questPointGain = 2;
-        quests.Add(sq);
+        AddQuest(sq);
 
         ComboQuest cq = Instantiate(comboQuest);
         cq.numberComboTargetScore = 1;
         cq.targetCombo = Combo.Combo2;
         cq.questPointGain = 5;
-        quests.Add(cq);
+        AddQuest(cq);
 
         NumberLineQuest nq = Instantiate(lineQuest);
         nq.numberComboTargetScore = 10;
         nq.questPointGain = 2;
-        quests.Add(nq);
+        AddQuest(nq);
+    }
+
+    private void AddQuest(Quest q)
+    {
+        quests.Add(q);
+        q.transform.SetParent(transform);
     }
 
     public Quest GetQuest() {
