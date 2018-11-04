@@ -48,9 +48,13 @@ public class PlayerSettingsManager : MonoBehaviour {
             if(value != _questsPoints) {
                 _questsPoints = value;
                 PlayerPrefs.SetInt(questPointsKey, _questsPoints);
+                OnVariableChange(value);
             }
         }
     }
+
+    public delegate void OnVariableChangeDelegate(int newVal);
+    public event OnVariableChangeDelegate OnVariableChange;
 
     public int CurrentLevel {
         get { 

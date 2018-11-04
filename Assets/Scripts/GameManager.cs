@@ -186,7 +186,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        PlayerSettingsManager.Instance.QuestsPoints += (int)questPointGain;
+        PlayerSettingsManager.Instance.QuestsPoints += (int)questPointGain;        
     }
 
     #endregion
