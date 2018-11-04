@@ -1272,6 +1272,8 @@ GameObject:
   - component: {fileID: 420434007}
   - component: {fileID: 420434009}
   - component: {fileID: 420434008}
+  - component: {fileID: 420434010}
+  - component: {fileID: 420434011}
   m_Layer: 5
   m_Name: QuestsPoints Text
   m_TagString: Untagged
@@ -1417,6 +1419,32 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 420434006}
   m_CullTransparentMesh: 0
+--- !u!114 &420434010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 420434006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef81ed2ab333be64e8cb6ab1890fb4b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!111 &420434011
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 420434006}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: 72b669b6d8182684e9f8e15ef39534b3, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 72b669b6d8182684e9f8e15ef39534b3, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &444395599
 GameObject:
   m_ObjectHideFlags: 0
@@ -2920,6 +2948,7 @@ MonoBehaviour:
   highScorePopupText: {fileID: 1305937531}
   questsPopup: {fileID: 1877325217}
   currentQuests: []
+  finishedQuests: []
   globalScore: 0
   comboArray: 000000000000000000000000000000000000000000000000
   debugPieceDraggedPosition: 0
