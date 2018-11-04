@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Readonly")]
     public List<Quest> currentQuests;
+    public List<Quest> finishedQuests;
 
     [Header("Game state")]
     public int globalScore;
@@ -156,6 +157,12 @@ public class GameManager : MonoBehaviour
         }
         currentQuests.Clear();
         currentQuests.Add(QuestManager.Instance.GetQuest());
+
+        if (finishedQuests == null)
+        {
+            finishedQuests = new List<Quest>();
+        }
+        finishedQuests.Clear();
     }
 
     public void ReplaceQuests(List<Quest> questsToRemove)
@@ -167,6 +174,21 @@ public class GameManager : MonoBehaviour
             currentQuests.Add(QuestManager.Instance.GetQuest());
         }
     }
+    public void ComputeQuest()
+    {
+        uint questPointGain = 0;
+        foreach (Quest q in currentQuests)
+        {
+            if (q.IsQuestCompleted())
+            {
+                finishedQuests.Add(q);
+                questPointGain += q.questPointGain;
+            }
+        }
+
+        PlayerSettingsManager.Instance.QuestsPoints += (int)questPointGain;
+    }
+
     #endregion
 
     #region Pieces Management
@@ -244,6 +266,7 @@ public class GameManager : MonoBehaviour
                 _shuffleCount += _board.lastNumberValidatedLines - 1;
             }
             ComputeScore();
+            ComputeQuest();
             ManageGameOver();
         }
         else

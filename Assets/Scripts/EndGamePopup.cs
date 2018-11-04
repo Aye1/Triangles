@@ -27,20 +27,8 @@ public class EndGamePopup : Popup {
     private void OnEnable()
     {
         if (_gm != null)
-        {
-            List<Quest> quests = _gm.currentQuests;
-            List<Quest> finishedQuests = new List<Quest>();
-            uint questPointGain = 0;
-            foreach (Quest q in quests)
-            {
-                if (q.IsQuestCompleted())
-                {
-                    finishedQuests.Add(q);
-                    questPointGain += q.questPointGain;
-                }
-            }
-            
-            int finishedQuestsCount = finishedQuests.Count;
+        {    
+            int finishedQuestsCount = _gm.finishedQuests.Count;
             if (finishedQuestsCount == 0)
             {
                 questsObject.GetComponentInChildren<TextMeshProUGUI>().text = "No quest completed";
@@ -51,10 +39,8 @@ public class EndGamePopup : Popup {
             }
             else
             {
-                questsObject.GetComponentInChildren<TextMeshProUGUI>().text = finishedQuests.ToString() + " quests completed!";
+                questsObject.GetComponentInChildren<TextMeshProUGUI>().text = _gm.finishedQuests.ToString() + " quests completed!";
             }
-            _gm.ReplaceQuests(finishedQuests);
-            PlayerSettingsManager.Instance.QuestsPoints+= (int)questPointGain;
         }
     }
 }
