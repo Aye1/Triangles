@@ -45,20 +45,6 @@ public class Board : MonoBehaviour
         }
     }
 
-    private int[,] GetBoardData()
-    {
-        int[,] data = new int[,] {
-            {0,0,1,1,1,1,1,1,1,1,1,0,0},
-            {0,1,1,1,1,1,1,1,1,1,1,1,0},
-            {1,1,1,0,0,1,1,1,0,0,1,1,1},
-            {1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {0,1,1,1,1,1,1,1,1,1,1,1,0},
-            {0,0,1,1,1,0,1,0,1,1,1,0,0},
-            {0,0,0,1,1,1,1,1,1,1,0,0,0}
-        };
-        return data;
-    }
-
     // Debug method
     // When called, displays all the playable shapes in color
     private void DebugDisplayAllPlayableShapes() {

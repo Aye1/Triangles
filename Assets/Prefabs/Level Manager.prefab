@@ -38,7 +38,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79c6ebac1b8754d71b2af97b930e3dfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelCount: 2
+  levelCount: 3
   levels:
   - id: 0
     isUnlocked: 0
@@ -46,6 +46,9 @@ MonoBehaviour:
   - id: 1
     isUnlocked: 0
     level: {fileID: 114622670094906298, guid: e5a540616f61a4b1db73fe47a9d9887d, type: 2}
+  - id: 2
+    isUnlocked: 0
+    level: {fileID: 114537224791801874, guid: 19e96b88f6b60734294db96bbd3aa314, type: 2}
 --- !u!224 &224148721703197828
 RectTransform:
   m_ObjectHideFlags: 1

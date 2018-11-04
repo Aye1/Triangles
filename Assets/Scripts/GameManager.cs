@@ -85,6 +85,7 @@ public class GameManager : MonoBehaviour
         LaunchHelpTimer();
         // Be sure the timeScale is at 1, in case there was an issue with the pause menu
         Time.timeScale = 1.0f;
+        CleanComboArray();
     }
 
     public void CleanComboArray()

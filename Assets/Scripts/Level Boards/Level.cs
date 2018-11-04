@@ -31,20 +31,9 @@ public abstract class Level : MonoBehaviour {
 
     public abstract void GenerateShapes();
 
-    protected void CreateBoardFromArray(int[,] data)
+    public virtual bool IsUpsideDown(int rest)
     {
-        ComputeBoardDimensions(data.GetLength(1), data.GetLength(0));
-        for (int j = 0; j < data.GetLength(1); j++)
-        {
-            for (int i = 0; i < data.GetLength(0); i++)
-            {
-                if (data[i, j] == 1)
-                {
-                    CreateBoardShape(j, i);
-                }
-            }
-        }
-        AdjustBoardPosition();
+        return rest == 0;
     }
 
     /// <summary>
@@ -61,7 +50,7 @@ public abstract class Level : MonoBehaviour {
         newShape.gameObject.layer = Constants.boardLayerId;
         newShape.PositionABC = PosABCfromIJ(i, j);
         newShape.PosXY = new Vector2(i, j);
-        newShape.IsUpsideDown = (i + j) % 2 == 0;
+        newShape.IsUpsideDown = IsUpsideDown((i + j) % 2);
         newShape.transform.localScale = Vector3.Scale(transform.lossyScale, newShape.transform.localScale);
         newShape.transform.localScale = Vector3.Scale(newShape.transform.localScale, new Vector3(_ratio, _ratio, 1.0f));
         newShape.transform.parent = transform;
