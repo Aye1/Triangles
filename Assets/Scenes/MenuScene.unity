@@ -817,7 +817,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColor: {r: 0.38443395, g: 0.5, b: 0.43425077, a: 1}
   m_enableVertexGradient: 0
   m_fontColorGradient:
     topLeft: {r: 1, g: 1, b: 1, a: 1}
@@ -974,7 +974,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColor: {r: 0.38443395, g: 0.5, b: 0.43425077, a: 1}
   m_enableVertexGradient: 0
   m_fontColorGradient:
     topLeft: {r: 1, g: 1, b: 1, a: 1}
@@ -2125,7 +2125,7 @@ RectTransform:
   - {fileID: 1004410740}
   - {fileID: 409313739}
   m_Father: {fileID: 1827544324}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -2844,7 +2844,7 @@ Prefab:
     - target: {fileID: 224434817858730676, guid: 34a205c2e75e148eab90c7c12c45a966,
         type: 2}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 224434817858730676, guid: 34a205c2e75e148eab90c7c12c45a966,
         type: 2}
@@ -3305,8 +3305,8 @@ RectTransform:
   - {fileID: 1331380595}
   - {fileID: 1541239637}
   - {fileID: 332799776}
-  - {fileID: 1060541425}
   - {fileID: 573634846}
+  - {fileID: 1060541425}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
