@@ -39,20 +39,17 @@ public class QuestManager : MonoBehaviour {
 
     private void PopulateQuests() {
         ScoreQuest sq = Instantiate(scoreQuest);
-        sq.targetScore = 10;
-        AddQuest(sq);
-       
-        sq = Instantiate(scoreQuest);
-        sq.targetScore = 20;
-        AddQuest(sq);
-       
-        sq = Instantiate(scoreQuest);
-        sq.targetScore = 30;
-        sq.questPointGain = 2;
+        sq.targetScore = 50;
+        sq.questPointGain = 1;
         AddQuest(sq);
 
         ComboQuest cq = Instantiate(comboQuest);
         cq.numberComboTargetScore = 1;
+        cq.targetCombo = Combo.Combo3;
+        cq.questPointGain = 5;
+        AddQuest(cq);
+
+        cq.numberComboTargetScore = 2;
         cq.targetCombo = Combo.Combo2;
         cq.questPointGain = 5;
         AddQuest(cq);
