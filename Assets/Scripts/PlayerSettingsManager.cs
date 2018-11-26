@@ -197,7 +197,7 @@ public class PlayerSettingsManager : MonoBehaviour {
         QuestsPoints = QuestsPoints - cost;
     }
 
-    [MenuItem("Debug/Reset levels unlocked")]
+    //[MenuItem("Debug/Reset levels unlocked")]
     public static void ResetLevelsUnlocked()
     {
         for (int i = 0; i < LevelManager.Instance.levelCount; i++)
@@ -208,7 +208,7 @@ public class PlayerSettingsManager : MonoBehaviour {
         }
     }
 
-    [MenuItem("Debug/Reset quest points")]
+    //[MenuItem("Debug/Reset quest points")]
     public static void ResetQuestPoints()
     {
         PlayerSettingsManager.Instance.QuestsPoints = 0;
