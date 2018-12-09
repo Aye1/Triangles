@@ -7,6 +7,7 @@ using TMPro;
 public class LevelButton : MonoBehaviour {
 
     public int id;
+    public bool isUnlockedByDefault = false;
     public int pointsNeeded;
     public Button goToLevelButton;
     public Button unlockButton;
@@ -17,6 +18,10 @@ public class LevelButton : MonoBehaviour {
         goToLevelButton.onClick.AddListener(LoadLevel);
         unlockButton.onClick.AddListener(UnlockLevel);
         unlockButton.GetComponentInChildren<Text>().text = pointsNeeded.ToString();
+        if(isUnlockedByDefault)
+        {
+            UnlockLevel();
+        }
 	}
 	
 	// Update is called once per frame
