@@ -844,6 +844,7 @@ GameObject:
   - component: {fileID: 246225744}
   - component: {fileID: 246225743}
   - component: {fileID: 246225745}
+  - component: {fileID: 246225746}
   m_Layer: 5
   m_Name: Game Over Text
   m_TagString: Untagged
@@ -1010,6 +1011,18 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &246225746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 246225741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34ed8d25832854d3d86961181f0ee532, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localizationKey: pause
 --- !u!1 &284414987
 GameObject:
   m_ObjectHideFlags: 0
