@@ -9,7 +9,9 @@ public abstract class Level : MonoBehaviour {
     private float _width;
     private float _height;
     private float _ratio;
-    private float _layoutSizeRatio = 0.9f;
+    protected int _visualWidth;
+    protected int _visualHeight;
+    private readonly float _layoutSizeRatio = 0.9f;
     public Shape basicShape;
 
     public List<Shape> Shapes {
@@ -30,7 +32,6 @@ public abstract class Level : MonoBehaviour {
     }
 
     public abstract void GenerateShapes();
-
 
     /// <summary>
     /// Creates the board shape.
@@ -61,11 +62,10 @@ public abstract class Level : MonoBehaviour {
         return new Vector3Int(A, B, C);
     }
 
-    protected void ComputeBoardDimensions(int width, int height)
+    protected void ComputeBoardDimensions()
     {
-        Shape s = gameObject.GetComponentInChildren<Shape>();
-        _width = Config.paddingX * (width + 1);
-        _height = Config.paddingY * (height + 1);
+        _width = Config.paddingX * (_visualWidth + 1);
+        _height = Config.paddingY * (_visualHeight + 1);
         ComputeShapeRatio();
     }
 
@@ -92,11 +92,6 @@ public abstract class Level : MonoBehaviour {
 
     protected void AdjustBoardPosition()
     {
-        // Totally empirical values, could probably be computed from the paddings in Config
-        foreach (Shape s in _shapes)
-        {
-            //s.transform.position = s.transform.position - new Vector3(_width * 0.415f, -(_height - _shapeSize.y - 1.75f) * 0.6f, 0.0f);
-            s.transform.position = s.transform.position - new Vector3(_width * 0.5f*_ratio, -_height * 0.5f * _ratio, 0.0f);
-        }
+        transform.position = transform.position - new Vector3(_width * 0.5f * _ratio, -_height * 0.5f * _ratio, 0.0f);
     }
 }

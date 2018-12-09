@@ -4,7 +4,11 @@ using UnityEngine;
 
 public class HeartLevel : ArrayLevel
 {
-
+    protected override void SetVisualSize()
+    {
+        _visualWidth = 13;
+        _visualHeight = 7;
+    }
     protected override int[,] GetBoardData()
 	 {
         int[,] data = new int[,] {
