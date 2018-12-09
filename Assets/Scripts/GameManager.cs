@@ -114,9 +114,13 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("Piece dragged at pos " + _draggedPiece.transform.position.ToString());
         }
-        textScore.text = "Score : " + globalScore;
-        textShuffle.text = "Shuffle : " + _shuffleCount;
-        textHighScore.text = "High Score : " + HighScore;
+        string loc = PlayerSettingsManager.Instance.CurrentLocale;
+        string scoreText = LocalizationManager.Instance.GetLocString("score", loc);
+        string shuffleText = LocalizationManager.Instance.GetLocString("shuffle_count", loc);
+        string hsText = LocalizationManager.Instance.GetLocString("highscore", loc);
+        textScore.text = scoreText + ": " + globalScore;
+        textShuffle.text = shuffleText + ": " + _shuffleCount;
+        textHighScore.text = hsText + ": " + HighScore;
         textQuestsPoints.text = PlayerSettingsManager.Instance.QuestsPoints.ToString();
     }
 

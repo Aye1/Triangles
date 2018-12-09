@@ -70,11 +70,19 @@ public class LocalizationManager : MonoBehaviour {
         {
             if (keys[i] != "")
             {
-                Dictionary<string, string> newLocaleDic = new Dictionary<string, string>();
-                for (int j = 1; j < splitLines.Length;j++) {
-                    newLocaleDic.Add(splitLines[j][0], splitLines[j][i]);
+                if (res.ContainsKey(keys[i]))
+                {
+                    Debug.LogWarning("Key " + keys[i] + " already loaded");
                 }
-                res.Add(keys[i], newLocaleDic);
+                else
+                {
+                    Dictionary<string, string> newLocaleDic = new Dictionary<string, string>();
+                    for (int j = 1; j < splitLines.Length; j++)
+                    {
+                        newLocaleDic.Add(splitLines[j][0], splitLines[j][i]);
+                    }
+                    res.Add(keys[i], newLocaleDic);
+                }
             }
         }
         return res;
@@ -92,7 +100,7 @@ public class LocalizationManager : MonoBehaviour {
     }
 
     private string[] RawToLines(string rawText) {
-        string[] separators = { "\r\n" };
+        string[] separators = { "\n" };
         return rawText.Split(separators, System.StringSplitOptions.None);
     }
 
