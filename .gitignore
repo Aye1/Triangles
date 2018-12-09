@@ -42,3 +42,4 @@ sysinfo.txt
 *.apk
 *.unitypackage
 /Assembly-CSharp.csproj
+/ProjectSettings/UnityConnectSettings.asset

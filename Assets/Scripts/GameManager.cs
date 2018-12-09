@@ -63,14 +63,21 @@ public class GameManager : MonoBehaviour
 
         set
         {
-            _highScore = value;
+            if (value != _highScore)
+            {
+                _highScore = value;
+                OnHighScoreChange(value);
+            }
         }
     }
     #endregion
 
+public delegate void OnHighScoreChangeDelegate(int newVal);
+public event OnHighScoreChangeDelegate OnHighScoreChange;
 
-    // Use this for initialization
-    void Start()
+
+// Use this for initialization
+void Start()
     {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
