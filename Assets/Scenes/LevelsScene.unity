@@ -267,7 +267,7 @@ Prefab:
     - target: {fileID: 114366582104316592, guid: c181ebfa59ab94291837392cbfc9e04a,
         type: 2}
       propertyPath: pointsNeeded
-      value: 0
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 114970367570069808, guid: c181ebfa59ab94291837392cbfc9e04a,
         type: 2}
@@ -607,7 +607,7 @@ Prefab:
     - target: {fileID: 114366582104316592, guid: c181ebfa59ab94291837392cbfc9e04a,
         type: 2}
       propertyPath: pointsNeeded
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 114839030673026064, guid: c181ebfa59ab94291837392cbfc9e04a,
         type: 2}
@@ -1113,7 +1113,7 @@ Prefab:
     - target: {fileID: 224027192952909574, guid: c181ebfa59ab94291837392cbfc9e04a,
         type: 2}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1453142157349940, guid: c181ebfa59ab94291837392cbfc9e04a, type: 2}
       propertyPath: m_IsActive
@@ -1239,6 +1239,11 @@ Prefab:
         type: 2}
       propertyPath: m_ChildAlignment
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114366582104316592, guid: c181ebfa59ab94291837392cbfc9e04a,
+        type: 2}
+      propertyPath: isUnlockedByDefault
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c181ebfa59ab94291837392cbfc9e04a, type: 2}
