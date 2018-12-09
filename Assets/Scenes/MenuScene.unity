@@ -1605,7 +1605,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 742677551}
+      - m_Target: {fileID: 972625568}
         m_MethodName: CloseLeaderboard
         m_Mode: 1
         m_Arguments:
@@ -1708,12 +1708,6 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ba3da3e70bea14af58974ff378b4a322, type: 2}
   m_IsPrefabAsset: 0
---- !u!114 &742677551 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114103884471230672, guid: ba3da3e70bea14af58974ff378b4a322,
-    type: 2}
-  m_PrefabInternal: {fileID: 742677550}
-  m_Script: {fileID: 11500000, guid: 1e535cd56c49749a7920329af003f359, type: 3}
 --- !u!1 &772736559
 GameObject:
   m_ObjectHideFlags: 0
@@ -1858,6 +1852,7 @@ GameObject:
   - component: {fileID: 972625566}
   - component: {fileID: 972625565}
   - component: {fileID: 972625564}
+  - component: {fileID: 972625568}
   m_Layer: 5
   m_Name: LeaderboardButton
   m_TagString: Untagged
@@ -1941,18 +1936,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 972625566}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 742677551}
-        m_MethodName: DisplayLeaderboard
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &972625566
@@ -1989,6 +1973,18 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 972625562}
   m_CullTransparentMesh: 0
+--- !u!114 &972625568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 972625562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12f076a36ccf6481f986ad9b4b64ecc3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leaderBoardUI: {fileID: 1060541426}
 --- !u!1 &1004410739
 GameObject:
   m_ObjectHideFlags: 0

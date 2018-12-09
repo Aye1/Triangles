@@ -14,8 +14,6 @@ public class LeaderboardManager : MonoBehaviour
     private List<Score> _currentScores;
     private static LeaderboardManager _instance;
 
-    public LeaderboardPopup leaderBoardUI;
-
     public List<Score> CurrentScores
     {
         get
@@ -74,14 +72,5 @@ public class LeaderboardManager : MonoBehaviour
             scores.Add(simpleScore);
         }
         CurrentScores = scores;
-    }
-
-    public void DisplayLeaderboard() {
-        leaderBoardUI.RefreshDisplay();
-        UIHelper.DisplayGameObject(leaderBoardUI.gameObject);
-    }
-
-    public void CloseLeaderboard() {
-        UIHelper.HideGameObject(leaderBoardUI.gameObject);
     }
 }
