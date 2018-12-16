@@ -21,7 +21,7 @@ public class EndGamePopup : Popup {
 
     public void DisplayHighScoreInfo(bool shouldDisplay) {
         UIHelper.DisplayGameObject(highScoreObject, shouldDisplay);
-        highScoreObject.GetComponentInChildren<TextMeshProUGUI>().text = "New high score - " +  _gm.HighScore + "!";
+        highScoreObject.GetComponentInChildren<TextMeshProUGUI>().text = "New high score : " +  _gm.HighScore + "!";
     }
 
     private void OnEnable()
