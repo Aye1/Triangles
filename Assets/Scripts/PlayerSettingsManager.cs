@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Random = System.Random;
+using UnityEngine.Analytics;
 
-public class PlayerSettingsManager : MonoBehaviour {
+public class PlayerSettingsManager : MonoBehaviour
+{
 
     private static PlayerSettingsManager _instance;
     private string _currentLocale;
@@ -25,27 +27,33 @@ public class PlayerSettingsManager : MonoBehaviour {
 
 
     #region Properties
-    public static PlayerSettingsManager Instance {
+    public static PlayerSettingsManager Instance
+    {
         get { return _instance; }
     }
 
-    public string CurrentLocale {
+    public string CurrentLocale
+    {
         get { return _currentLocale; }
     }
 
-    public int MaxLevel {
+    public int MaxLevel
+    {
         get { return _maxLevel; }
     }
 
-    public string Name {
+    public string Name
+    {
         get { return _name; }
     }
 
-    public int QuestsPoints {
+    public int QuestsPoints
+    {
         get { return _questsPoints; }
-        set 
-        { 
-            if(value != _questsPoints) {
+        set
+        {
+            if (value != _questsPoints)
+            {
                 _questsPoints = value;
                 PlayerPrefs.SetInt(questPointsKey, _questsPoints);
                 OnVariableChange(value);
@@ -56,44 +64,59 @@ public class PlayerSettingsManager : MonoBehaviour {
     public delegate void OnVariableChangeDelegate(int newVal);
     public event OnVariableChangeDelegate OnVariableChange;
 
-    public int CurrentLevel {
-        get { 
-            if(_currentLevel == -1) {
+    public int CurrentLevel
+    {
+        get
+        {
+            if (_currentLevel == -1)
+            {
                 return _maxLevel;
             }
-            return _currentLevel; 
+            return _currentLevel;
         }
-        set {
-            if(value != _currentLevel) {
+        set
+        {
+            if (value != _currentLevel)
+            {
                 _currentLevel = value;
             }
         }
     }
 
-    public int HighScore {
-        get {
+    public int HighScore
+    {
+        get
+        {
             return _highScore;
         }
-        set {
-            if(value != _highScore) {
+        set
+        {
+            if (value != _highScore)
+            {
                 _highScore = value;
                 PlayerPrefs.SetInt(highScoreKey, _highScore);
             }
         }
     }
 
-    public Dictionary<int, int> LevelsUnlocked {
-        get {
+    public Dictionary<int, int> LevelsUnlocked
+    {
+        get
+        {
             return _levelsUnlocked;
         }
     }
     #endregion
 
     // Use this for initialization
-    void Awake () {
-        if(_instance != null && _instance != this) {
+    void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
             Destroy(this.gameObject);
-        } else {
+        }
+        else
+        {
             _instance = this;
         }
         _rand = new Random();
@@ -101,31 +124,43 @@ public class PlayerSettingsManager : MonoBehaviour {
         LoadPlayerSettings();
     }
 
-    private void LoadPlayerSettings() {
+    private void LoadPlayerSettings()
+    {
         if (PlayerPrefs.HasKey(localeKey))
         {
             _currentLocale = PlayerPrefs.GetString(localeKey);
-        } else {
+        }
+        else
+        {
             GetLocaleFromDevice();
         }
 
-        if(PlayerPrefs.HasKey(levelKey)) {
+        if (PlayerPrefs.HasKey(levelKey))
+        {
             _maxLevel = PlayerPrefs.GetInt(levelKey);
-        } else {
+        }
+        else
+        {
             _maxLevel = 1;
             PlayerPrefs.SetInt(levelKey, _maxLevel);
         }
 
-        if(PlayerPrefs.HasKey(nameKey)) {
+        if (PlayerPrefs.HasKey(nameKey))
+        {
             _name = PlayerPrefs.GetString(nameKey);
-        } else {
+        }
+        else
+        {
             _name = GenerateRandomName();
             PlayerPrefs.SetString(nameKey, _name);
         }
 
-        if(PlayerPrefs.HasKey(questPointsKey)) {
+        if (PlayerPrefs.HasKey(questPointsKey))
+        {
             _questsPoints = PlayerPrefs.GetInt(questPointsKey);
-        } else {
+        }
+        else
+        {
             _questsPoints = 0;
             PlayerPrefs.SetInt(questPointsKey, 0);
         }
@@ -133,35 +168,43 @@ public class PlayerSettingsManager : MonoBehaviour {
         if (PlayerPrefs.HasKey(highScoreKey))
         {
             _highScore = PlayerPrefs.GetInt(highScoreKey);
-        } else {
+        }
+        else
+        {
             _highScore = 0;
             PlayerPrefs.SetInt(highScoreKey, 0);
         }
     }
 
-    private void GetLocaleFromDevice() {
+    private void GetLocaleFromDevice()
+    {
         _currentLocale = LocalizationManager.SystemLanguageToString(Application.systemLanguage);
     }
 
-    private string GenerateRandomName() {
-        return "Unicorn"+_rand.Next().ToString();
+    private string GenerateRandomName()
+    {
+        return "Unicorn" + _rand.Next().ToString();
     }
 
 
-    public void ChangeLocale(string locale) {
+    public void ChangeLocale(string locale)
+    {
         _currentLocale = locale;
         PlayerPrefs.SetString(localeKey, locale);
     }
 
-    public void LoadLevelsUnlocked() {
+    public void LoadLevelsUnlocked()
+    {
         _levelsUnlocked = new Dictionary<int, int>();
-        for (int i = 0; i < LevelManager.Instance.levelCount; i++) {
+        for (int i = 0; i < LevelManager.Instance.levelCount; i++)
+        {
             string key = GenerateKeyForLevelUnlocked(i);
             int value = 0;
-            if (PlayerPrefs.HasKey(key)){
+            if (PlayerPrefs.HasKey(key))
+            {
                 value = PlayerPrefs.GetInt(key);
-            } 
-            else 
+            }
+            else
             {
                 // Init player pref
 
@@ -175,28 +218,32 @@ public class PlayerSettingsManager : MonoBehaviour {
                 {
                     PlayerPrefs.SetInt(key, 0);
                 }
-            } 
+            }
             _levelsUnlocked.Add(i, value);
         }
     }
 
-    private static string GenerateKeyForLevelUnlocked(int id) {
+    private static string GenerateKeyForLevelUnlocked(int id)
+    {
         return levelUnlockedBaseKey + id.ToString();
     }
 
-    public bool IsLevelUnlocked(int index) {
+    public bool IsLevelUnlocked(int index)
+    {
         int value;
         _levelsUnlocked.TryGetValue(index, out value);
         return value == 1;
     }
 
-    public void UnlockLevel(int index, int cost) {
+    public void UnlockLevel(int index, int cost)
+    {
         string key = GenerateKeyForLevelUnlocked(index);
         _levelsUnlocked[index] = 1;
         PlayerPrefs.SetInt(key, 1);
         QuestsPoints = QuestsPoints - cost;
     }
 
+#if UNITY_EDITOR
     [MenuItem("Debug/Reset levels unlocked")]
     public static void ResetLevelsUnlocked()
     {
@@ -213,4 +260,6 @@ public class PlayerSettingsManager : MonoBehaviour {
     {
         PlayerSettingsManager.Instance.QuestsPoints = 0;
     }
+#endif
+
 }

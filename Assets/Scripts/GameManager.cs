@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Analytics;
 using System.Threading;
 using System.Collections.Generic;
 
@@ -379,6 +380,7 @@ void Start()
                 ShuffleShapes();
             }
             ShuffleCount--;
+            AnalyticsEvent.Custom("shuffle_used");
         }
         ResetHelpTimer();
     }
