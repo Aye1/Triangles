@@ -5,12 +5,13 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Analytics;
 using System.Threading;
 using System.Collections.Generic;
+using UnityEditor;
 
 public class GameManager : MonoBehaviour
 {
     [Header("UI objects")]
     public TextMeshProUGUI textScore;
-    public TextMeshProUGUI textShuffle;
+    public TextMeshProUGUI textShuffleCount;
     public TextMeshProUGUI textHighScore;
     public TextMeshProUGUI textQuestsPoints;
     public EndGamePopup endGamePopup;
@@ -73,12 +74,12 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-public delegate void OnHighScoreChangeDelegate(int newVal);
-public event OnHighScoreChangeDelegate OnHighScoreChange;
+    public delegate void OnHighScoreChangeDelegate(int newVal);
+    public event OnHighScoreChangeDelegate OnHighScoreChange;
 
 
-// Use this for initialization
-void Start()
+    // Use this for initialization
+    void Start()
     {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
@@ -124,10 +125,9 @@ void Start()
         }
         string loc = PlayerSettingsManager.Instance.CurrentLocale;
         string scoreText = LocalizationManager.Instance.GetLocString("score", loc);
-        string shuffleText = LocalizationManager.Instance.GetLocString("shuffle_count", loc);
         string hsText = LocalizationManager.Instance.GetLocString("highscore", loc);
         textScore.text = scoreText + ": " + globalScore;
-        textShuffle.text = shuffleText + ": " + _shuffleCount;
+        textShuffleCount.text = _shuffleCount.ToString();
         textHighScore.text = hsText + ": " + HighScore;
         textQuestsPoints.text = PlayerSettingsManager.Instance.QuestsPoints.ToString();
     }
@@ -139,7 +139,7 @@ void Start()
         _board.numberFlippedShapes = 0;
 
         comboArray[(int)_board.lastNumberValidatedLines]++;
-        
+
     }
 
     private void CheckHighScore()
@@ -199,7 +199,7 @@ void Start()
             }
         }
 
-        PlayerSettingsManager.Instance.QuestsPoints += (int)questPointGain;        
+        PlayerSettingsManager.Instance.QuestsPoints += (int)questPointGain;
     }
 
     #endregion
@@ -494,6 +494,14 @@ void Start()
     {
         //Debug.Log("Timer finished");
         CheckCanPlay(true);
+    }
+    #endregion
+
+    #region Debug
+    [MenuItem("Debug/Give 10 shuffles")]
+    public static void GiveTenShuffles()
+    {
+        FindObjectOfType<GameManager>().ShuffleCount += 10;
     }
     #endregion
 }
