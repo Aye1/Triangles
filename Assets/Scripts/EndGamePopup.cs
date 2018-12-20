@@ -9,6 +9,9 @@ public class EndGamePopup : Popup {
     public GameObject questsObject;
     private GameManager _gm;
 
+    private readonly string noQuestLocKey = "no_quest";
+    private readonly string questCompletedLocKey = "quest_completed";
+
 	// Use this for initialization
 	void Awake () {
         _gm = FindObjectOfType<GameManager>();
@@ -19,9 +22,9 @@ public class EndGamePopup : Popup {
 		
 	}
 
-    public void DisplayHighScoreInfo(bool shouldDisplay) {
-        UIHelper.DisplayGameObject(highScoreObject, shouldDisplay);
-        highScoreObject.GetComponentInChildren<TextMeshProUGUI>().text = "New high score : " +  _gm.HighScore + "!";
+    public void UpdateHighScoreInfo(bool shouldDisplay) {
+        //UIHelper.DisplayGameObject(highScoreObject, shouldDisplay);
+        highScoreObject.GetComponentInChildren<TextMeshProUGUI>().text = _gm.HighScore.ToString();
     }
 
     private void OnEnable()
@@ -31,15 +34,15 @@ public class EndGamePopup : Popup {
             int finishedQuestsCount = _gm.finishedQuests.Count;
             if (finishedQuestsCount == 0)
             {
-                questsObject.GetComponentInChildren<TextMeshProUGUI>().text = "No quest completed";
+                questsObject.GetComponentInChildren<TextMeshProUGUI>().text = LocalizationManager.Instance.GetLocString(noQuestLocKey, PlayerSettingsManager.Instance.CurrentLocale);
             }
             else if (finishedQuestsCount == 1)
             {
-                questsObject.GetComponentInChildren<TextMeshProUGUI>().text = "1 quest completed!";
+                questsObject.GetComponentInChildren<TextMeshProUGUI>().text = LocalizationManager.Instance.GetLocString(questCompletedLocKey, PlayerSettingsManager.Instance.CurrentLocale);
             }
             else
             {
-                questsObject.GetComponentInChildren<TextMeshProUGUI>().text = _gm.finishedQuests.ToString() + " quests completed!";
+                //TODO if we can have more than 1 quest
             }
         }
     }

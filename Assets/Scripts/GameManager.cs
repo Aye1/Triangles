@@ -151,7 +151,7 @@ void Start()
             PlayerSettingsManager.Instance.HighScore = HighScore;
             LeaderboardManager.Instance.SendHighScore(PlayerSettingsManager.Instance.Name, HighScore);
         }
-        endGamePopup.DisplayHighScoreInfo(newHighScore);
+        endGamePopup.UpdateHighScoreInfo(newHighScore);
     }
 
     private void GetSavedHighScore()
@@ -370,7 +370,7 @@ void Start()
         GetThreePieces();
     }
 
-    public void ShuffleUntilPlayable(bool forceShuffle = false)
+    public void ShuffleUntilPlayable(bool forceShuffle = false, bool withRewarded = false)
     {
         if (ShuffleCount > 0 || forceShuffle)
         {
@@ -380,15 +380,23 @@ void Start()
                 ShuffleShapes();
             }
             ShuffleCount--;
-            AnalyticsEvent.Custom("shuffle_used");
+            if (!forceShuffle)
+            {
+                // At the moment, the force shuffle is only done when restarting
+                // If we change, that, we may want to add more precise information
+                // of where the shuffle were made from
+                IDictionary<string, object> args = new Dictionary<string, object>();
+                args.Add("rewarded", withRewarded.ToString());
+                AnalyticsEvent.Custom("shuffle_used", args);
+            }
         }
         ResetHelpTimer();
     }
 
-    public void ShuffleShapesInPopup()
+    public void ShuffleShapesInPopup(bool withRewarded = false)
     {
         UIHelper.HideGameObject(endGamePopup.gameObject);
-        ShuffleUntilPlayable();
+        ShuffleUntilPlayable(false, withRewarded);
     }
     #endregion
 
