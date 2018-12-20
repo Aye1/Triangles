@@ -241,6 +241,7 @@ public class PlayerSettingsManager : MonoBehaviour
         _levelsUnlocked[index] = 1;
         PlayerPrefs.SetInt(key, 1);
         QuestsPoints = QuestsPoints - cost;
+        AnalyticsEvent.ItemAcquired(AcquisitionType.Soft, "levels", 1, key);
     }
 
 #if UNITY_EDITOR

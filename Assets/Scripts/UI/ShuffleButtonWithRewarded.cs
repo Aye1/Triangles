@@ -6,6 +6,9 @@ public class ShuffleButtonWithRewarded : ShuffleButton
 
     RewardedVideoManager _rewardedVideoManager;
     private bool _isWaitingForVideo = false;
+    private readonly string noShuffleLocKey = "no_shuffle";
+    private readonly string shuffleLocKey = "shuffle";
+    private readonly string videoLocKey = "show_video";
 
     // Use this for initialization
     new void Start()
@@ -24,19 +27,16 @@ public class ShuffleButtonWithRewarded : ShuffleButton
 
     override protected void ManageText()
     {
+        string locKey = noShuffleLocKey;
         if (base.IsInteractable())
         {
-            GetComponentInChildren<Text>().text = "Shuffle";
+            locKey = shuffleLocKey;
         }
         else if (_rewardedVideoManager.IsVideoAvailable())
         {
-            GetComponentInChildren<Text>().text = "Show video";
+            locKey = videoLocKey;
         }
-        else
-        {
-            GetComponentInChildren<Text>().text = "No More Shuffle";
-        }
-
+        GetComponentInChildren<Text>().text = LocalizationManager.Instance.GetLocString(locKey, PlayerSettingsManager.Instance.CurrentLocale);
     }
 
     override public void OnShuffleButtonClick()
@@ -61,7 +61,7 @@ public class ShuffleButtonWithRewarded : ShuffleButton
         {
             _isWaitingForVideo = false;
             _gameManager.ShuffleCount++;
-            _gameManager.ShuffleShapesInPopup();
+            _gameManager.ShuffleShapesInPopup(true);
         }
     }
 }
