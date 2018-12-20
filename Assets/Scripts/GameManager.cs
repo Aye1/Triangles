@@ -497,6 +497,8 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
+#if UNITY_EDITOR
+
     #region Debug
     [MenuItem("Debug/Give 10 shuffles")]
     public static void GiveTenShuffles()
@@ -504,4 +506,5 @@ public class GameManager : MonoBehaviour
         FindObjectOfType<GameManager>().ShuffleCount += 10;
     }
     #endregion
+#endif
 }
