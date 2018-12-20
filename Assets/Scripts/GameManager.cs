@@ -72,6 +72,17 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
+    public bool ForceGameOver
+    {
+        set 
+        {
+            if (!forceGameOver && value) {
+                forceGameOver = true;
+                ManageGameOver();
+            }
+        }
+    }
     #endregion
 
     public delegate void OnHighScoreChangeDelegate(int newVal);
@@ -504,6 +515,12 @@ public class GameManager : MonoBehaviour
     public static void GiveTenShuffles()
     {
         FindObjectOfType<GameManager>().ShuffleCount += 10;
+    }
+
+    [MenuItem("Debug/Force game over")]
+    public static void GameOver()
+    {
+        FindObjectOfType<GameManager>().ForceGameOver = true;
     }
     #endregion
 #endif
