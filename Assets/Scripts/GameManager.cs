@@ -137,9 +137,9 @@ public class GameManager : MonoBehaviour
         string loc = PlayerSettingsManager.Instance.CurrentLocale;
         string scoreText = LocalizationManager.Instance.GetLocString("score", loc);
         string hsText = LocalizationManager.Instance.GetLocString("highscore", loc);
-        textScore.text = scoreText + ": " + globalScore;
+        textScore.text = globalScore.ToString();
         textShuffleCount.text = _shuffleCount.ToString();
-        textHighScore.text = hsText + ": " + HighScore;
+        textHighScore.text = HighScore.ToString();
         textQuestsPoints.text = PlayerSettingsManager.Instance.QuestsPoints.ToString();
     }
 
