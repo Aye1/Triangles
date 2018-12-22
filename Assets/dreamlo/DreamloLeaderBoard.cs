@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class DreamloLeaderBoard : MonoBehaviour {
 	
@@ -8,8 +9,14 @@ public class DreamloLeaderBoard : MonoBehaviour {
 	
     private string privateCode = "ainU-KkNx0Wl5Fki7YfFKwlbJ0wzSPpEqF8EH2jjth-A";
 	public string publicCode = "5b9b488fcb934a0e1094801d";
+
+    public EventHandler HighScoresLoadedHandler;
 	
-	string highScores = "";
+    string _highScores = "";
+
+    public string HighScores {
+        get { return _highScores; }
+    }
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -35,24 +42,23 @@ public class DreamloLeaderBoard : MonoBehaviour {
 	
 	void Start()
 	{
-		this.highScores = "";
+		_highScores = "";
 	}
-	
 
 
-	public static double DateDiffInSeconds(System.DateTime now, System.DateTime olderdate)
+	public static double DateDiffInSeconds(DateTime now, DateTime olderdate)
 	{
 	    var difference = now.Subtract(olderdate);
 	    return difference.TotalSeconds;
 	}
 
-	System.DateTime _lastRequest = System.DateTime.Now;
+	DateTime _lastRequest = DateTime.Now;
 	int _requestTotal = 0;
 
 
 	bool TooManyRequests()
 	{
-		var now = System.DateTime.Now;
+		var now = DateTime.Now;
 
 		if (DateDiffInSeconds(now, _lastRequest) <= 2)
 		{
@@ -100,7 +106,7 @@ public class DreamloLeaderBoard : MonoBehaviour {
 		
 		WWW www = new WWW(dreamloWebserviceURL + privateCode + "/add-pipe/" + WWW.EscapeURL(playerName) + "/" + totalScore.ToString());
 		yield return www;
-		highScores = www.text;
+		_highScores = www.text;
 	}
 	
 	IEnumerator AddScoreWithPipe(string playerName, int totalScore, int totalSeconds)
@@ -109,7 +115,7 @@ public class DreamloLeaderBoard : MonoBehaviour {
 		
 		WWW www = new WWW(dreamloWebserviceURL + privateCode + "/add-pipe/" + WWW.EscapeURL(playerName) + "/" + totalScore.ToString()+ "/" + totalSeconds.ToString());
 		yield return www;
-		highScores = www.text;
+		_highScores = www.text;
 	}
 	
 	IEnumerator AddScoreWithPipe(string playerName, int totalScore, int totalSeconds, string shortText)
@@ -119,23 +125,26 @@ public class DreamloLeaderBoard : MonoBehaviour {
 		
 		WWW www = new WWW(dreamloWebserviceURL + privateCode + "/add-pipe/" + WWW.EscapeURL(playerName) + "/" + totalScore.ToString() + "/" + totalSeconds.ToString()+ "/" + shortText);
 		yield return www;
-		highScores = www.text;
+		_highScores = www.text;
 	}
 	
 	IEnumerator GetScores()
 	{
-		highScores = "";
+		_highScores = "";
 		WWW www = new WWW(dreamloWebserviceURL +  publicCode  + "/pipe");
 		yield return www;
-		highScores = www.text;
+		_highScores = www.text;
+        if(HighScoresLoadedHandler != null) {
+            HighScoresLoadedHandler(this, new EventArgs());
+        }
 	}
 	
 	IEnumerator GetSingleScore(string playerName)
 	{
-		highScores = "";
+		_highScores = "";
 		WWW www = new WWW(dreamloWebserviceURL +  publicCode  + "/pipe-get/" + WWW.EscapeURL(playerName));
 		yield return www;
-		highScores = www.text;
+		_highScores = www.text;
 	}
 	
 	public void LoadScores()
@@ -147,10 +156,10 @@ public class DreamloLeaderBoard : MonoBehaviour {
 	
 	public string[] ToStringArray()
 	{
-		if (this.highScores == null) return null;
-		if (this.highScores == "") return null;
+		if (this._highScores == null) return null;
+		if (this._highScores == "") return null;
 		
-		string[] rows = this.highScores.Split(new char[] {'\n'}, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] rows = this._highScores.Split(new char[] {'\n'}, System.StringSplitOptions.RemoveEmptyEntries);
 		return rows;
 	}
 	

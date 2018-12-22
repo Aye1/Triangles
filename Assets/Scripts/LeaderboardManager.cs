@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class LeaderboardManager : MonoBehaviour
 {
@@ -11,8 +12,7 @@ public class LeaderboardManager : MonoBehaviour
 
     private DreamloLeaderBoard _dreamLoLB;
     private List<Score> _currentScores;
-
-    public GameObject leaderBoardUI;
+    private static LeaderboardManager _instance;
 
     public List<Score> CurrentScores
     {
@@ -27,18 +27,35 @@ public class LeaderboardManager : MonoBehaviour
         }
     }
 
+    public static LeaderboardManager Instance {
+        get { return _instance; }
+    }
+
     // Use this for initialization
     void Start()
     {
+        if(_instance != null && _instance != this) {
+            Destroy(gameObject);
+        } else {
+            _instance = this;
+        }
         _dreamLoLB = GetComponent<DreamloLeaderBoard>();
         _dreamLoLB.LoadScores();
-        DontDestroyOnLoad(this.gameObject);
+        _dreamLoLB.HighScoresLoadedHandler += OnHighScoresLoaded;
+        //LoadScores();
+        DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    private void OnHighScoresLoaded(object sender, EventArgs e) {
+        Debug.Log("Highscores loaded");
+        //Debug.Log(_dreamLoLB.HighScores.ToString());
+        LoadScores();
     }
 
     public void SendHighScore(string name, int score)
@@ -55,13 +72,5 @@ public class LeaderboardManager : MonoBehaviour
             scores.Add(simpleScore);
         }
         CurrentScores = scores;
-    }
-
-    public void DisplayLeaderboard() {
-        UIHelper.DisplayGameObject(leaderBoardUI);
-    }
-
-    public void CloseLeaderboard() {
-        UIHelper.HideGameObject(leaderBoardUI);
     }
 }

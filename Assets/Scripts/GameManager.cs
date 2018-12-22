@@ -2,35 +2,45 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Analytics;
 using System.Threading;
+using System.Collections.Generic;
+using UnityEditor;
 
-public class GameManager : MonoBehaviour {
-
+public class GameManager : MonoBehaviour
+{
+    [Header("UI objects")]
     public TextMeshProUGUI textScore;
-    public TextMeshProUGUI textShuffle;
+    public TextMeshProUGUI textShuffleCount;
     public TextMeshProUGUI textHighScore;
-    public GameObject endGamePopup;
+    public TextMeshProUGUI textQuestsPoints;
+    public EndGamePopup endGamePopup;
     public GameObject pausePopup;
+    public GameObject highScorePopupText;
+    public GameObject questsPopup;
 
+    [Header("Readonly")]
+    public List<Quest> currentQuests;
+    public List<Quest> finishedQuests;
+
+    [Header("Game state")]
     public int globalScore;
+    public int[] comboArray = new int[(int)Combo.Max];
+
+    [Header("Debug")]
+    public bool debugPieceDraggedPosition = false;
+    public bool forceGameOver;
+
 
     private int _shuffleCount = 0;
     private int _highScore = 0;
-    private string highScoreKey = "highScore";
-
     private Board _board;
     private PieceManager _pieceManager;
     private AbstractPiece _draggedPiece;
-
     private Timer _helpTimer;
-
-    private Vector3[] _piecePositions = {new Vector3(-1.5f, -2.5f, -1.0f),
-        new Vector3(0.0f, -2.5f, -1.0f),
-        new Vector3(1.5f, -2.5f, -1.0f) };
-
+    private Vector3[] _piecePositions;
     private Piece[] _pieceSlots;
     private Vector3 _pieceBonusDestroyPosition = new Vector3(-2f, -4f, -1.0f);
-    public bool debugPieceDraggedPosition = false;
 
     #region Properties
     public int ShuffleCount
@@ -55,142 +65,160 @@ public class GameManager : MonoBehaviour {
 
         set
         {
-            _highScore = value;
+            if (value != _highScore)
+            {
+                _highScore = value;
+                OnHighScoreChange(value);
+            }
+        }
+    }
+
+    public bool ForceGameOver
+    {
+        set 
+        {
+            if (!forceGameOver && value) {
+                forceGameOver = true;
+                ManageGameOver();
+            }
         }
     }
     #endregion
 
+    public delegate void OnHighScoreChangeDelegate(int newVal);
+    public event OnHighScoreChangeDelegate OnHighScoreChange;
+
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         _board = FindObjectOfType<Board>();
         _pieceManager = FindObjectOfType<PieceManager>();
         _pieceSlots = new Piece[3];
+        InitPiecePositions();
         GetSavedHighScore();
         GetThreePieces();
-        GetBonusPiece();
+        InitQuests();
+        //GetBonusPiece();
         ComputeScore();
-        UIHelper.HideGameObject(endGamePopup);
+        UIHelper.HideGameObject(endGamePopup.gameObject);
         UIHelper.HideGameObject(pausePopup);
-        //LaunchHelpTimer();
-	}
+        LaunchHelpTimer();
+        // Be sure the timeScale is at 1, in case there was an issue with the pause menu
+        Time.timeScale = 1.0f;
+        CleanComboArray();
+    }
 
-    private void GetSavedHighScore() 
+    public void CleanComboArray()
     {
-        if(PlayerPrefs.HasKey(highScoreKey)) {
-            HighScore = PlayerPrefs.GetInt(highScoreKey);
+        for (Combo type = Combo.Combo1; type < Combo.Max; type++)
+        {
+            comboArray[(int)type] = 0;
         }
     }
-	
-	// Update is called once per frame
-	void Update () {
-		if(debugPieceDraggedPosition && _draggedPiece != null)
+    private void InitPiecePositions()
+    {
+        _piecePositions = new Vector3[3];
+        _piecePositions[0] = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.25f, Screen.height * 0.2f, 0.0f));
+        _piecePositions[1] = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.5f, Screen.height * 0.2f, 0.0f));
+        _piecePositions[2] = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width * 0.75f, Screen.height * 0.2f, 0.0f));
+        _piecePositions[0].z = -1.0f;
+        _piecePositions[1].z = -1.0f;
+        _piecePositions[2].z = -1.0f;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (debugPieceDraggedPosition && _draggedPiece != null)
         {
             Debug.Log("Piece dragged at pos " + _draggedPiece.transform.position.ToString());
         }
-        DisplayPieceHover();
-        textScore.text = "Score : " + globalScore;
-        textShuffle.text = "Shuffle : " + _shuffleCount;
-        textHighScore.text = "High Score : " + HighScore;
+        string loc = PlayerSettingsManager.Instance.CurrentLocale;
+        string scoreText = LocalizationManager.Instance.GetLocString("score", loc);
+        string hsText = LocalizationManager.Instance.GetLocString("highscore", loc);
+        textScore.text = scoreText + ": " + globalScore;
+        textShuffleCount.text = _shuffleCount.ToString();
+        textHighScore.text = hsText + ": " + HighScore;
+        textQuestsPoints.text = PlayerSettingsManager.Instance.QuestsPoints.ToString();
     }
 
+    #region Score Management
     void ComputeScore()
     {
         globalScore += _board.numberFlippedShapes;
         _board.numberFlippedShapes = 0;
-        CheckHighScore();
+
+        comboArray[(int)_board.lastNumberValidatedLines]++;
+
     }
 
-    private void CheckHighScore() 
+    private void CheckHighScore()
     {
-        if(globalScore > HighScore) {
+        bool newHighScore = globalScore > HighScore;
+        if (newHighScore)
+        {
             HighScore = globalScore;
-            PlayerPrefs.SetInt(highScoreKey, HighScore);
+            PlayerSettingsManager.Instance.HighScore = HighScore;
+            LeaderboardManager.Instance.SendHighScore(PlayerSettingsManager.Instance.Name, HighScore);
+        }
+        endGamePopup.UpdateHighScoreInfo(newHighScore);
+    }
+
+    private void GetSavedHighScore()
+    {
+        HighScore = PlayerSettingsManager.Instance.HighScore;
+    }
+    #endregion
+
+    #region Quests Management
+    private void InitQuests()
+    {
+        if (currentQuests == null)
+        {
+            currentQuests = new List<Quest>();
+        }
+        currentQuests.Clear();
+        currentQuests.Add(QuestManager.Instance.GetQuest());
+
+        if (finishedQuests == null)
+        {
+            finishedQuests = new List<Quest>();
+        }
+        finishedQuests.Clear();
+    }
+
+    public void ReplaceQuests(List<Quest> questsToRemove)
+    {
+        int count = questsToRemove.Count;
+        currentQuests.RemoveAll(q => questsToRemove.Contains(q));
+        for (int i = 0; i < count; i++)
+        {
+            currentQuests.Add(QuestManager.Instance.GetQuest());
         }
     }
-
-    private void DisplayPieceHover()
+    public void ComputeQuest()
     {
-        if (_draggedPiece != null)
+        uint questPointGain = 0;
+        foreach (Quest q in currentQuests)
         {
-            //_board.DisplayPieceHover(_draggedPiece);
-            _board.DisplayFirstPlayablePieceHover(_draggedPiece);
-        }
-    }
-
-    private void OnPieceDragged(object sender, EventArgs e)
-    {
-        _draggedPiece = sender as AbstractPiece;
-        _board.FindPlayableShapes(_draggedPiece);
-        ResetHelpTimer();
-    }
-
-    private void OnPieceReleased(object sender, EventArgs e)
-    {
-        if(_board.PutPiece(_draggedPiece))
-        {
-            int idPos = GetPieceSlotId(_draggedPiece as Piece);
-            CleanDestroyPiece(_draggedPiece);
-            Piece newPiece = GetNewPiece();
-            newPiece.transform.position = _piecePositions[idPos];
-            _pieceSlots[idPos] = newPiece;
-
-            if (_board.lastNumberValidatedLines > 1)
+            if (!q.IsFinished && q.IsQuestCompleted())
             {
-                _shuffleCount += _board.lastNumberValidatedLines - 1;
+                finishedQuests.Add(q);
+                q.IsFinished = true;
+                questPointGain += q.questPointGain;
             }
-            ComputeScore();
-            ManageGameOver();
         }
-        else
-        {
-            _draggedPiece.transform.position = _piecePositions[GetPieceSlotId(_draggedPiece as Piece)];
-        }
-        _draggedPiece = null;
-        ResetHelpTimer();
+
+        PlayerSettingsManager.Instance.QuestsPoints += (int)questPointGain;
     }
 
-    private void GetThreePieces()
-    {
-        for(int i=0; i<_piecePositions.Length; i++)
-        {
-            Piece newPiece = GetNewPiece();
-            newPiece.transform.position = _piecePositions[i];
-            _pieceSlots[i] = newPiece;
-        }
-    }
+    #endregion
 
-    private void GetBonusPiece()
-    {
-        PieceBonusDestroy newPiece = _pieceManager.GetBonusDestroyPiece();
-        newPiece.transform.parent = transform;
-        newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
-        newPiece.transform.position = _pieceBonusDestroyPosition;
-        ListenToPieceBonusDestroyEvent(newPiece);
-    }
-
-    private void OnPieceBonusDestroyDragged(object sender, EventArgs e)
-    {
-        _draggedPiece = sender as AbstractPiece;
-        _board.FindPlayableShapes(_draggedPiece);
-    }
-
-    private void OnPieceBonusDestroyReleased(object sender, EventArgs e)
-    {
-        if (_board.PutPiece(_draggedPiece))
-        {
-            CleanDestroyPiece(_draggedPiece);                    
-            ManageGameOver();
-        }
-        else
-        {
-            _draggedPiece.transform.position = _pieceBonusDestroyPosition;
-        }
-    }
-
+    #region Pieces Management
     private int GetPieceSlotId(Piece piece)
     {
-        for(int i=0; i<_pieceSlots.Length; i++)
+        for (int i = 0; i < _pieceSlots.Length; i++)
         {
             if (_pieceSlots[i] == piece)
             {
@@ -200,25 +228,201 @@ public class GameManager : MonoBehaviour {
         return -1;
     }
 
-    private Piece GetNewPiece()
+    private Piece GetNewPiece(Vector3 position)
     {
-        Piece newPiece = _pieceManager.GetNextPiece();
+        Piece newPiece = _pieceManager.GetNextPieceFromPools(position);
         newPiece.transform.parent = transform;
         newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
         ListenToPieceEvent(newPiece);
         return newPiece;
     }
 
-    private void ManageGameOver()
+    private void GetThreePieces()
     {
-        if (!CheckCanPlay())
+        for (int i = 0; i < _piecePositions.Length; i++)
         {
-            Debug.Log("Game Over");
-            UIHelper.DisplayGameObject(endGamePopup);
+            Piece newPiece = GetNewPiece(_piecePositions[i]);
+            _pieceSlots[i] = newPiece;
         }
     }
 
-    private bool CheckCanPlay(bool shouldHighlight=false)
+    private PieceBonusDestroy GetBonusPiece()
+    {
+        PieceBonusDestroy newPiece = _pieceManager.GetBonusDestroyPiece();
+        newPiece.transform.localScale = Vector3.Scale(newPiece.transform.localScale, _board.transform.lossyScale);
+        ListenToPieceBonusDestroyEvent(newPiece);
+        return newPiece;
+    }
+
+    private void UnHighlightAllPieces()
+    {
+        foreach (Piece p in _pieceSlots)
+        {
+            if (p != null)
+            {
+                p.Highlight(false);
+            }
+        }
+    }
+
+    #region Listeners
+    private void OnPieceDragged(object sender, EventArgs e)
+    {
+        _draggedPiece = sender as AbstractPiece;
+        _board.currentDraggedPiece = _draggedPiece;
+        _board.FindPlayableShapes(_draggedPiece);
+        ResetHelpTimer();
+    }
+
+    private void OnPieceReleased(object sender, EventArgs e)
+    {
+        if (_board.PutPiece(_draggedPiece))
+        {
+            _board.ClearCurrentPiece();
+
+            int idPos = GetPieceSlotId(_draggedPiece as Piece);
+            CleanDestroyPiece(_draggedPiece);
+            Piece newPiece = GetNewPiece(_piecePositions[idPos]);
+            _pieceSlots[idPos] = newPiece;
+
+            if (_board.lastNumberValidatedLines > 1)
+            {
+                _shuffleCount += _board.lastNumberValidatedLines - 1;
+            }
+            ComputeScore();
+            ComputeQuest();
+            ManageGameOver();
+        }
+        else
+        {
+            _draggedPiece.transform.position = _piecePositions[GetPieceSlotId(_draggedPiece as Piece)];
+        }
+        _draggedPiece = null;
+        _board.ClearCurrentPiece();
+        ResetHelpTimer();
+    }
+
+    private void OnPieceBonusDestroyDragged(object sender, EventArgs e)
+    {
+        _draggedPiece = sender as AbstractPiece;
+        _board.currentDraggedPiece = _draggedPiece;
+        _board.FindPlayableShapes(_draggedPiece);
+    }
+
+    private void OnPieceBonusDestroyReleased(object sender, EventArgs e)
+    {
+        if (_board.PutPiece(_draggedPiece))
+        {
+            CleanDestroyPiece(_draggedPiece);
+            ManageGameOver();
+        }
+        else
+        {
+            _draggedPiece.transform.position = _pieceBonusDestroyPosition;
+        }
+    }
+
+    private void OnPieceCollision(object sender, EventArgs e)
+    {
+        Shape.CollisionEventArgs args = e as Shape.CollisionEventArgs;
+        Shape collisionShape = args.OtherObject.GetComponent<Shape>();
+        if (_board.IsPiecePlayableOnShape(collisionShape, args.CurrentPiece))
+        {
+            _board.AddShapeToCurrentlyPlayable(collisionShape);
+        }
+    }
+
+    private void OnPieceExitCollision(object sender, EventArgs e)
+    {
+        Shape.CollisionEventArgs args = e as Shape.CollisionEventArgs;
+        Shape collisionShape = args.OtherObject.GetComponent<Shape>();
+        _board.RemoveShapeToCurrentPlayable(collisionShape);
+    }
+
+    private void CleanDestroyPiece(AbstractPiece piece)
+    {
+        _board.ClearCurrentPiece();
+        piece.PieceDraggedHandler -= OnPieceDragged;
+        piece.PieceReleasedHandler -= OnPieceReleased;
+        piece.PieceCollidingHandler -= OnPieceCollision;
+        piece.PieceExitCollisionHandler -= OnPieceExitCollision;
+        piece.DestroyPiece();
+    }
+
+    private void ListenToPieceEvent(Piece newPiece)
+    {
+        newPiece.PieceDraggedHandler += OnPieceDragged;
+        newPiece.PieceReleasedHandler += OnPieceReleased;
+        newPiece.PieceCollidingHandler += OnPieceCollision;
+        newPiece.PieceExitCollisionHandler += OnPieceExitCollision;
+    }
+    private void ListenToPieceBonusDestroyEvent(PieceBonusDestroy newPiece)
+    {
+        newPiece.PieceDraggedHandler += OnPieceBonusDestroyDragged;
+        newPiece.PieceReleasedHandler += OnPieceBonusDestroyReleased;
+        newPiece.PieceCollidingHandler += OnPieceCollision;
+        newPiece.PieceExitCollisionHandler += OnPieceExitCollision;
+    }
+    #endregion
+    #endregion
+
+    #region Suffles
+    /// <summary>
+    /// Shuffles shapes. 
+    /// Should not be called directly. 
+    /// Call ShuffleUntilPlayable instead.
+    /// </summary>
+    private void ShuffleShapes()
+    {
+        foreach (Piece p in _pieceSlots)
+        {
+            CleanDestroyPiece(p);
+        }
+        GetThreePieces();
+    }
+
+    public void ShuffleUntilPlayable(bool forceShuffle = false, bool withRewarded = false)
+    {
+        if (ShuffleCount > 0 || forceShuffle)
+        {
+            ShuffleShapes();
+            while (!CheckCanPlay())
+            {
+                ShuffleShapes();
+            }
+            ShuffleCount--;
+            if (!forceShuffle)
+            {
+                // At the moment, the force shuffle is only done when restarting
+                // If we change, that, we may want to add more precise information
+                // of where the shuffle were made from
+                IDictionary<string, object> args = new Dictionary<string, object>();
+                args.Add("rewarded", withRewarded.ToString());
+                AnalyticsEvent.Custom("shuffle_used", args);
+            }
+        }
+        ResetHelpTimer();
+    }
+
+    public void ShuffleShapesInPopup(bool withRewarded = false)
+    {
+        UIHelper.HideGameObject(endGamePopup.gameObject);
+        ShuffleUntilPlayable(false, withRewarded);
+    }
+    #endregion
+
+    private void ManageGameOver()
+    {
+        if (!CheckCanPlay() || forceGameOver)
+        {
+            forceGameOver = false;
+            Debug.Log("Game Over");
+            UIHelper.DisplayGameObject(endGamePopup.gameObject);
+            CheckHighScore();
+        }
+    }
+
+    private bool CheckCanPlay(bool shouldHighlight = false)
     {
         bool canPlay = false;
         foreach (Piece p in _pieceSlots)
@@ -236,74 +440,32 @@ public class GameManager : MonoBehaviour {
         return canPlay;
     }
 
-    private void CleanDestroyPiece(AbstractPiece piece)
-    {
-        piece.PieceDraggedHandler -= OnPieceDragged;
-        piece.PieceReleasedHandler -= OnPieceReleased;
-        piece.DestroyPiece();
-    }
-
-    private void ListenToPieceEvent(Piece newPiece)
-    {
-        newPiece.PieceDraggedHandler += OnPieceDragged;
-        newPiece.PieceReleasedHandler += OnPieceReleased;
-    }
-    private void ListenToPieceBonusDestroyEvent(AbstractPiece newPiece)
-    {
-        newPiece.PieceDraggedHandler += OnPieceBonusDestroyDragged;
-        newPiece.PieceReleasedHandler += OnPieceBonusDestroyReleased;
-    }
-
-    /// <summary>
-    /// Shuffles shapes. 
-    /// Should not be called directly. 
-    /// Call ShuffleUntilPlayable instead.
-    /// </summary>
-    private void ShuffleShapes()
-    {
-        foreach(Piece p in _pieceSlots)
-        {
-            CleanDestroyPiece(p);
-        }
-        GetThreePieces();
-    }
-
-    public void ShuffleUntilPlayable()
-    {
-        if(ShuffleCount > 0)
-        {
-            ShuffleShapes();
-            while (!CheckCanPlay())
-            {
-                ShuffleShapes();
-            }
-            ShuffleCount--;
-        }
-        ResetHelpTimer();
-    }
-
-    public void ShuffleShapesInPopup()
-    {
-        UIHelper.HideGameObject(endGamePopup);
-        ShuffleUntilPlayable();
-    }
-
     public void Restart()
     {
         globalScore = 0;
-        _shuffleCount = 0;
-        ShuffleUntilPlayable();
         _board.ResetBoard();
-        UIHelper.HideGameObject(endGamePopup);
-        UIHelper.HideGameObject(pausePopup);
+        ShuffleUntilPlayable(true);
+        UIHelper.HideGameObject(endGamePopup.gameObject);
         FindObjectOfType<RewardedVideoManager>().Reset();
+        InitQuests();
+        _shuffleCount = 0;
+        HidePauseMenu();
+        CleanComboArray();
+    }
+
+    public void RestartWithNewBoard()
+    {
+        Restart();
+        _board.GenerateNewBoard();
     }
 
     public void GoToMainMenuScreen()
     {
-        SceneManager.LoadScene(0);
+        HidePauseMenu();
+        SceneManager.LoadScene(1);
     }
 
+    #region UI
     public void DisplayPauseMenu()
     {
         UIHelper.DisplayGameObject(pausePopup);
@@ -316,6 +478,13 @@ public class GameManager : MonoBehaviour {
         Time.timeScale = 1.0f;
     }
 
+    public void DisplayQuestsPopup()
+    {
+        UIHelper.DisplayGameObject(questsPopup);
+    }
+    #endregion
+
+    #region Timer
     private void LaunchHelpTimer()
     {
         _helpTimer = new Timer(OnHelpTimerFinished, null, 5000, 0);
@@ -328,7 +497,7 @@ public class GameManager : MonoBehaviour {
         {
             _helpTimer.Dispose();
         }
-        //LaunchHelpTimer();
+        LaunchHelpTimer();
         UnHighlightAllPieces();
     }
 
@@ -337,15 +506,22 @@ public class GameManager : MonoBehaviour {
         //Debug.Log("Timer finished");
         CheckCanPlay(true);
     }
+    #endregion
 
-    private void UnHighlightAllPieces()
+#if UNITY_EDITOR
+
+    #region Debug
+    [MenuItem("Debug/Give 10 shuffles")]
+    public static void GiveTenShuffles()
     {
-        foreach (Piece p in _pieceSlots)
-        {
-            if (p != null)
-            {
-                p.Highlight(false);
-            }
-        }
+        FindObjectOfType<GameManager>().ShuffleCount += 10;
     }
+
+    [MenuItem("Debug/Force game over")]
+    public static void GameOver()
+    {
+        FindObjectOfType<GameManager>().ForceGameOver = true;
+    }
+    #endregion
+#endif
 }

@@ -58,3 +58,7 @@ MonoBehaviour:
   - {x: -1, y: 1, z: 0, w: 0}
   refShape: {fileID: 114020702329699666, guid: 1fd0519ad0b00bd469ee5ddeafac9d5c, type: 2}
   pieceShapes: []
+  firstShape: {fileID: 0}
+  poolIndex: 2
+  dragPositionOffset: 1.5
+  debugPrintPosition: 0

@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
+[Serializable]
 public class Shape : MonoBehaviour
 { 
     Vector3Int position;
@@ -8,7 +9,6 @@ public class Shape : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
     bool isUpsideDown = false;
     Color baseColor = new Color(0.87f, 0.87f, 0.90f);
-    Color selectedColor = Color.red;
     Color hoveredColor;
     Color filledColor;
     public bool isFilled = false;
@@ -20,6 +20,10 @@ public class Shape : MonoBehaviour
 
     public EventHandler ShapeClickedHandler;
     public EventHandler ShapeReleasedHandler;
+    public EventHandler ShapeCollidingHandler;
+    public EventHandler ShapeExitCollisionHandler;
+
+    public bool debugIsFirstShape = false;
 
     #region Properties
     public Vector3Int PositionABC
@@ -47,7 +51,8 @@ public class Shape : MonoBehaviour
             if (isUpsideDown != value)
             {
                 isUpsideDown = value;
-                transform.Rotate(0.0f, 0.0f, 180.0f);
+                transform.localScale = new Vector3(transform.localScale.x, -transform.localScale.y, transform.localScale.z);
+                //transform.Rotate(0.0f, 0.0f, 180.0f);
             }
         }
     }
@@ -159,6 +164,12 @@ public class Shape : MonoBehaviour
         isPlayable = false;
     }
 
+    private void AdaptPositionWithParity() {
+        if (isUpsideDown) {
+            transform.position = new Vector3(transform.position.x, transform.position.y - 0.16f, transform.position.z);
+        }
+    }
+
     void OnMouseDown()
     {
         if (ShapeClickedHandler != null)
@@ -179,4 +190,28 @@ public class Shape : MonoBehaviour
     {
         _spriteRenderer.color = color;
     }
+
+    public class CollisionEventArgs : EventArgs {
+        public GameObject OtherObject { get; set; }
+        public AbstractPiece CurrentPiece { get; set; }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(ShapeCollidingHandler != null) {
+            CollisionEventArgs args = new CollisionEventArgs();
+            args.OtherObject = collision.gameObject;
+            ShapeCollidingHandler(this, args);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if(ShapeExitCollisionHandler != null) {
+            CollisionEventArgs args = new CollisionEventArgs();
+            args.OtherObject = collision.gameObject;
+            ShapeExitCollisionHandler(this, args);
+        }
+    }
+
 }

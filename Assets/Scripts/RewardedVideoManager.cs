@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Advertisements;
+using UnityEngine.Analytics;
 
 
 public class RewardedVideoManager : MonoBehaviour {
@@ -72,6 +73,7 @@ public class RewardedVideoManager : MonoBehaviour {
         {
             ShowOptions options = new ShowOptions();
             options.resultCallback = HandleDisplayResult;
+            AnalyticsEvent.AdStart(true,AdvertisingNetwork.UnityAds);
             Advertisement.Show("rewardedVideo", options);
             _numberRewardedVideo++;
         }
@@ -92,6 +94,7 @@ public class RewardedVideoManager : MonoBehaviour {
         {
             case ShowResult.Finished:
                 Debug.Log("Video completed");
+                AnalyticsEvent.AdComplete(true, AdvertisingNetwork.UnityAds);
                 if (OnVideoCompleted != null)
                 {
                     OnVideoCompleted(this, new EventArgs());
@@ -99,9 +102,11 @@ public class RewardedVideoManager : MonoBehaviour {
                 break;
             case ShowResult.Skipped:
                 Debug.Log("Video skipped");
+                AnalyticsEvent.AdSkip(true, AdvertisingNetwork.UnityAds);
                 break;
             case ShowResult.Failed:
                 Debug.Log("Error during video");
+                AnalyticsEvent.Custom("ad_fail");
                 break;
         }
     }
