@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
     public List<Quest> finishedQuests;
 
     [Header("Game state")]
-    public int globalScore;
+    private int globalScore;
     public int[] comboArray = new int[(int)Combo.Max];
 
     [Header("Debug")]
@@ -84,6 +84,19 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
+    public int GlobalScore
+    {
+        get
+        {
+            return globalScore;
+        }
+
+        set
+        {
+            globalScore = value;
+        }
+    }
     #endregion
 
     public delegate void OnHighScoreChangeDelegate(int newVal);
@@ -138,7 +151,7 @@ public class GameManager : MonoBehaviour
         string loc = PlayerSettingsManager.Instance.CurrentLocale;
         string scoreText = LocalizationManager.Instance.GetLocString("score", loc);
         string hsText = LocalizationManager.Instance.GetLocString("highscore", loc);
-        textScore.text = globalScore.ToString();
+        textScore.text = GlobalScore.ToString();
         textShuffleCount.text = _shuffleCount.ToString();
         textHighScore.text = HighScore.ToString();
         textQuestsPoints.text = PlayerSettingsManager.Instance.QuestsPoints.ToString();
@@ -147,7 +160,7 @@ public class GameManager : MonoBehaviour
     #region Score Management
     void ComputeScore()
     {
-        globalScore += _board.numberFlippedShapes;
+        GlobalScore += _board.numberFlippedShapes;
         _board.numberFlippedShapes = 0;
 
         comboArray[(int)_board.lastNumberValidatedLines]++;
@@ -156,10 +169,10 @@ public class GameManager : MonoBehaviour
 
     private void CheckHighScore()
     {
-        bool newHighScore = globalScore > HighScore;
+        bool newHighScore = GlobalScore > HighScore;
         if (newHighScore)
         {
-            HighScore = globalScore;
+            HighScore = GlobalScore;
             PlayerSettingsManager.Instance.HighScore = HighScore;
             LeaderboardManager.Instance.SendHighScore(PlayerSettingsManager.Instance.Name, HighScore);
         }
@@ -443,7 +456,7 @@ public class GameManager : MonoBehaviour
 
     public void Restart()
     {
-        globalScore = 0;
+        GlobalScore = 0;
         _board.ResetBoard();
         ShuffleUntilPlayable(true);
         UIHelper.HideGameObject(endGamePopup.gameObject);
@@ -528,7 +541,7 @@ public class GameManager : MonoBehaviour
     public static void SetNewHighscore()
     {
         GameManager gm = FindObjectOfType<GameManager>();
-        gm.globalScore = gm.HighScore + 1;
+        gm.GlobalScore = gm.HighScore + 1;
     }
     #endregion
 #endif

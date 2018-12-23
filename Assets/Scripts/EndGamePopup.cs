@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class EndGamePopup : Popup {
 
-    public GameObject highScoreObject;
+    public GameObject scoreObject;
     public GameObject questsObject;
     private GameManager _gm;
 
@@ -24,7 +25,9 @@ public class EndGamePopup : Popup {
 
     public void UpdateHighScoreInfo(bool shouldDisplay) {
         //UIHelper.DisplayGameObject(highScoreObject, shouldDisplay);
-        highScoreObject.GetComponentInChildren<TextMeshProUGUI>().text = _gm.HighScore.ToString();
+        UIHelper.DisplayGameObject(scoreObject.GetComponentInChildren<Image>().gameObject, _gm.HighScore == _gm.GlobalScore);
+        
+        scoreObject.GetComponentInChildren<TextMeshProUGUI>().text = _gm.GlobalScore.ToString();
     }
 
     private void OnEnable()
