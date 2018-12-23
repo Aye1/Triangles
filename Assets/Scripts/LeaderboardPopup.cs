@@ -6,6 +6,8 @@ public class LeaderboardPopup : MonoBehaviour {
     public Transform contentPanel;
     public SimpleObjectPool entriesPool;
 
+    private int maxEntries = 50;
+
 	// Use this for initialization
 	void Start () {
         RefreshDisplay();
@@ -39,9 +41,14 @@ public class LeaderboardPopup : MonoBehaviour {
     private void PopulateEntries() {
         if (LeaderboardManager.Instance.CurrentScores != null)
         {
+            int count = 0;
             foreach (Score s in LeaderboardManager.Instance.CurrentScores)
             {
                 CreateLeaderboardEntry(s);
+                count++;
+                if(count == maxEntries) {
+                    return;
+                }
             }
         }
     }
