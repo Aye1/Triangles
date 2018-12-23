@@ -75,9 +75,10 @@ public class GameManager : MonoBehaviour
 
     public bool ForceGameOver
     {
-        set 
+        set
         {
-            if (!forceGameOver && value) {
+            if (!forceGameOver && value)
+            {
                 forceGameOver = true;
                 ManageGameOver();
             }
@@ -521,6 +522,13 @@ public class GameManager : MonoBehaviour
     public static void GameOver()
     {
         FindObjectOfType<GameManager>().ForceGameOver = true;
+    }
+
+    [MenuItem("Debug/Set new highscore")]
+    public static void SetNewHighscore()
+    {
+        GameManager gm = FindObjectOfType<GameManager>();
+        gm.globalScore = gm.HighScore + 1;
     }
     #endregion
 #endif

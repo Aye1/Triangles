@@ -45,6 +45,12 @@ public class PlayerSettingsManager : MonoBehaviour
     public string Name
     {
         get { return _name; }
+        set {
+            if (value != _name){
+                _name = value;
+                PlayerPrefs.SetString(nameKey, _name);
+            } 
+        }
     }
 
     public int QuestsPoints

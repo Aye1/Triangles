@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
+using TMPro;
 
 public class LeaderboardPopup : MonoBehaviour {
 
     public int entryCount;
     public Transform contentPanel;
     public SimpleObjectPool entriesPool;
+    public TMP_InputField pseudoInputField;
 
     private int maxEntries = 50;
 
 	// Use this for initialization
-	void Start () {
+	void OnEnable () {
         RefreshDisplay();
+        SetPseudonym();
 	}
 	
 	// Update is called once per frame
@@ -72,5 +75,13 @@ public class LeaderboardPopup : MonoBehaviour {
 
         newEntry.transform.SetParent(contentPanel);
         newEntry.transform.position = new Vector3(newEntry.transform.position.x, newEntry.transform.position.y, -1.0f);
+    }
+
+    public void OnPseudoTextFielEndEdit(string value) {
+        PlayerSettingsManager.Instance.Name = value;
+    }
+
+    private void SetPseudonym() {
+        pseudoInputField.text = PlayerSettingsManager.Instance.Name;
     }
 }
