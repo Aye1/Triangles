@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI textShuffleCount;
     public TextMeshProUGUI textHighScore;
     public TextMeshProUGUI textQuestsPoints;
+    public TextMeshProUGUI textQuests;
     public EndGamePopup endGamePopup;
     public GameObject pausePopup;
     public GameObject highScorePopupText;
@@ -22,6 +23,7 @@ public class GameManager : MonoBehaviour
     [Header("Readonly")]
     public List<Quest> currentQuests;
     public List<Quest> finishedQuests;
+    private bool isCurrentQuestFinished = false;
 
     [Header("Game state")]
     private int globalScore;
@@ -84,6 +86,8 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    public delegate void OnHighScoreChangeDelegate(int newVal);
+    public event OnHighScoreChangeDelegate OnHighScoreChange;
 
     public int GlobalScore
     {
@@ -97,10 +101,27 @@ public class GameManager : MonoBehaviour
             globalScore = value;
         }
     }
+
+    public bool IsCurrentQuestFinished
+    {
+        get
+        {
+            return isCurrentQuestFinished;
+        }
+
+        set
+        {
+            if(value != isCurrentQuestFinished)
+            {
+            isCurrentQuestFinished = value;
+                IsCurrentQuestFinishedEvent(value);
+            }
+        }
+    }
+    public delegate void IsCurrentQuestFinishedDelegate(bool newVal);
+    public event IsCurrentQuestFinishedDelegate IsCurrentQuestFinishedEvent;
     #endregion
 
-    public delegate void OnHighScoreChangeDelegate(int newVal);
-    public event OnHighScoreChangeDelegate OnHighScoreChange;
 
 
     // Use this for initialization
@@ -110,7 +131,6 @@ public class GameManager : MonoBehaviour
         _pieceManager = FindObjectOfType<PieceManager>();
         _pieceSlots = new Piece[3];
         InitPiecePositions();
-        GetSavedHighScore();
         GetThreePieces();
         InitQuests();
         //GetBonusPiece();
@@ -121,6 +141,7 @@ public class GameManager : MonoBehaviour
         // Be sure the timeScale is at 1, in case there was an issue with the pause menu
         Time.timeScale = 1.0f;
         CleanComboArray();
+        InitUI();
     }
 
     public void CleanComboArray()
@@ -141,8 +162,12 @@ public class GameManager : MonoBehaviour
         _piecePositions[2].z = -1.0f;
     }
 
-    // Update is called once per frame
-    void Update()
+    void InitUI()
+    {
+        _highScore = PlayerSettingsManager.Instance.HighScore;
+        UpdateUI();
+    }
+    void UpdateUI()
     {
         if (debugPieceDraggedPosition && _draggedPiece != null)
         {
@@ -155,6 +180,7 @@ public class GameManager : MonoBehaviour
         textShuffleCount.text = _shuffleCount.ToString();
         textHighScore.text = HighScore.ToString();
         textQuestsPoints.text = PlayerSettingsManager.Instance.QuestsPoints.ToString();
+        DisplayCurrentQuest();
     }
 
     #region Score Management
@@ -179,10 +205,6 @@ public class GameManager : MonoBehaviour
         endGamePopup.UpdateHighScoreInfo(newHighScore);
     }
 
-    private void GetSavedHighScore()
-    {
-        HighScore = PlayerSettingsManager.Instance.HighScore;
-    }
     #endregion
 
     #region Quests Management
@@ -200,6 +222,14 @@ public class GameManager : MonoBehaviour
             finishedQuests = new List<Quest>();
         }
         finishedQuests.Clear();
+    }
+    public void DisplayCurrentQuest()
+    {
+        if (currentQuests.Count != 0)
+        {
+            textQuests.text = currentQuests[0].GetDescription() + " : " + currentQuests[0].SpecificInformation();
+            IsCurrentQuestFinished = currentQuests[0].IsFinished;
+        }
     }
 
     public void ReplaceQuests(List<Quest> questsToRemove)
@@ -305,6 +335,7 @@ public class GameManager : MonoBehaviour
             }
             ComputeScore();
             ComputeQuest();
+            UpdateUI();
             ManageGameOver();
         }
         else
@@ -465,6 +496,7 @@ public class GameManager : MonoBehaviour
         _shuffleCount = 0;
         HidePauseMenu();
         CleanComboArray();
+        InitUI();
     }
 
     public void RestartWithNewBoard()
@@ -542,6 +574,7 @@ public class GameManager : MonoBehaviour
     {
         GameManager gm = FindObjectOfType<GameManager>();
         gm.GlobalScore = gm.HighScore + 1;
+        gm.UpdateUI();
     }
     #endregion
 #endif

@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine.UI;
-
+using TMPro;
 public class ShuffleButtonWithRewarded : ShuffleButton
 {
 
@@ -36,7 +36,7 @@ public class ShuffleButtonWithRewarded : ShuffleButton
         {
             locKey = videoLocKey;
         }
-        GetComponentInChildren<Text>().text = LocalizationManager.Instance.GetLocString(locKey, PlayerSettingsManager.Instance.CurrentLocale);
+        GetComponentInChildren<TextMeshProUGUI>().text = LocalizationManager.Instance.GetLocString(locKey, PlayerSettingsManager.Instance.CurrentLocale);
     }
 
     override public void OnShuffleButtonClick()

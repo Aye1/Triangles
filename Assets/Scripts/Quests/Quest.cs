@@ -32,13 +32,12 @@ public class Quest : MonoBehaviour {
         throw new NotImplementedException();
     }
 
-    // Use this for initialization
-    void Start () {
+    public virtual string GetDescription()
+    {
+        throw new NotImplementedException();
+    }
+    public void LinkGameManager () {
         _gameManager = FindObjectOfType<GameManager>();
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
 }

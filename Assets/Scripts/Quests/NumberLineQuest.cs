@@ -4,9 +4,10 @@
     {
         targetCombo = Combo.Combo1;
     }
-    private void Update()
+    public override string GetDescription()
     {
         defaultDescription = "_Faites " + numberComboTargetScore.ToString() + " lignes";
+        return defaultDescription;
     }
     protected override uint ComputeCurrentScore()
     {

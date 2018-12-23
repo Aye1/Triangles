@@ -2,9 +2,10 @@
 
     public uint targetScore;
 
-    private void Update()
+    public override string GetDescription()
     {
         defaultDescription = "_Atteignez " + targetScore.ToString() + " points";
+        return defaultDescription;
     }
 
     public override bool IsQuestCompleted() {

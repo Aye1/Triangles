@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuestPointDisplay : MonoBehaviour {
-    Animation gainAnimation;
-    private void Start()
+public class QuestPointDisplay : TextAnimation {
+    protected override void InternalStart()
     {
-        gainAnimation = FindObjectOfType<Animation>();
        PlayerSettingsManager.Instance.OnVariableChange += VariableChangeHandler;
     }
 
     private void VariableChangeHandler(int newVal)
     {
-        gainAnimation.Play();
+        PlayAnimation();
     }
 }

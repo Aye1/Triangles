@@ -6,9 +6,10 @@ public class ComboQuest : Quest {
 
     public uint numberComboTargetScore;
     public Combo targetCombo = Combo.Combo1;
-    private void Update()
+    public override string GetDescription()
     {
         defaultDescription = "_Faites " + numberComboTargetScore.ToString() + " fois un combo de "+ ((int)targetCombo + 1) + " lignes ou plus";
+        return defaultDescription;
     }
 
     public override bool IsQuestCompleted()

@@ -46,17 +46,17 @@ public class QuestManager : MonoBehaviour {
         ComboQuest cq = Instantiate(comboQuest);
         cq.numberComboTargetScore = 1;
         cq.targetCombo = Combo.Combo3;
-        cq.questPointGain = 5;
+        cq.questPointGain = 1;
         AddQuest(cq);
 
         cq.numberComboTargetScore = 2;
         cq.targetCombo = Combo.Combo2;
-        cq.questPointGain = 5;
+        cq.questPointGain = 1;
         AddQuest(cq);
 
         NumberLineQuest nq = Instantiate(lineQuest);
         nq.numberComboTargetScore = 10;
-        nq.questPointGain = 2;
+        nq.questPointGain = 1;
         AddQuest(nq);
     }
 
@@ -69,6 +69,8 @@ public class QuestManager : MonoBehaviour {
     public Quest GetQuest() {
         int id = _rand.Next(0, quests.Count);
         Quest selectedQuest = quests.ToArray()[id];
-        return Instantiate(selectedQuest);
+        Quest returnQuest = Instantiate(selectedQuest);
+        returnQuest.LinkGameManager();
+        return returnQuest;
     }
 }

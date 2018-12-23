@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HighScoreDisplay : MonoBehaviour {
-    Animation gainAnimation;
-    private void Start()
+public class HighScoreDisplay : TextAnimation {
+    protected override void InternalStart()
     {
-        gainAnimation = FindObjectOfType<Animation>();
         FindObjectOfType<GameManager>().OnHighScoreChange += VariableChangeHandler;
     }
 
     private void VariableChangeHandler(int newVal)
     {
-        gainAnimation.Play();
+        PlayAnimation();
     }
 }
