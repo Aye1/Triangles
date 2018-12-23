@@ -3696,10 +3696,10 @@ GameObject:
   m_Component:
   - component: {fileID: 573046630}
   - component: {fileID: 573046634}
-  - component: {fileID: 573046633}
   - component: {fileID: 573046632}
   - component: {fileID: 573046631}
   - component: {fileID: 573046635}
+  - component: {fileID: 573046633}
   m_Layer: 5
   m_Name: Quest Point
   m_TagString: Untagged
@@ -3757,9 +3757,9 @@ Animation:
   m_GameObject: {fileID: 573046629}
   m_Enabled: 1
   serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 9dd7807a0b08718468f90ea4a668fc23, type: 2}
+  m_Animation: {fileID: 7400000, guid: 72b669b6d8182684e9f8e15ef39534b3, type: 2}
   m_Animations:
-  - {fileID: 7400000, guid: 9dd7807a0b08718468f90ea4a668fc23, type: 2}
+  - {fileID: 7400000, guid: 72b669b6d8182684e9f8e15ef39534b3, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 0
   m_AnimatePhysics: 0
@@ -3772,7 +3772,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 573046629}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6fdea491f2aa31b4dad608de28c21129, type: 3}
+  m_Script: {fileID: 11500000, guid: ef81ed2ab333be64e8cb6ab1890fb4b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!222 &573046634
@@ -5432,7 +5432,7 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 32.9
+  m_fontSize: 50
   m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -7577,7 +7577,7 @@ GameObject:
   - component: {fileID: 1562212266}
   - component: {fileID: 1562212265}
   m_Layer: 5
-  m_Name: QuestText
+  m_Name: QuestPointText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8382,9 +8382,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1757995160}
   - component: {fileID: 1757995164}
-  - component: {fileID: 1757995163}
   - component: {fileID: 1757995162}
   - component: {fileID: 1757995161}
+  - component: {fileID: 1757995163}
   m_Layer: 5
   m_Name: Score
   m_TagString: Untagged
@@ -8441,9 +8441,9 @@ Animation:
   m_GameObject: {fileID: 1757995159}
   m_Enabled: 1
   serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 9dd7807a0b08718468f90ea4a668fc23, type: 2}
+  m_Animation: {fileID: 7400000, guid: d9cb062ab3a2593448c9714174268562, type: 2}
   m_Animations:
-  - {fileID: 7400000, guid: 9dd7807a0b08718468f90ea4a668fc23, type: 2}
+  - {fileID: 7400000, guid: d9cb062ab3a2593448c9714174268562, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 0
   m_AnimatePhysics: 0
@@ -8456,7 +8456,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1757995159}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6fdea491f2aa31b4dad608de28c21129, type: 3}
+  m_Script: {fileID: 11500000, guid: 982c40202df376c4dacdbe34d5b24cdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!222 &1757995164
@@ -9928,5 +9928,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6061e998dfa494cfe90d6edc185de073, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreObject: {fileID: 1305937531}
+  scoreObject: {fileID: 1525854709}
   questsObject: {fileID: 1360699102}
+  highScoreImage: {fileID: 1093228648}

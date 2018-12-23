@@ -5,7 +5,6 @@ using System;
 public class TextAnimation : MonoBehaviour
 {
     Animation animation;
-    
     private void Start()
     {
         animation = GetComponent<Animation>();

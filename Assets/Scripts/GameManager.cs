@@ -98,10 +98,16 @@ public class GameManager : MonoBehaviour
 
         set
         {
-            globalScore = value;
+            if(value!= globalScore)
+            {
+                globalScore = value;
+                OnScoreChange(value);
+            }
         }
     }
 
+    public delegate void OnScoreChangeDelegate(int newVal);
+    public event OnScoreChangeDelegate OnScoreChange;
     public bool IsCurrentQuestFinished
     {
         get
@@ -253,7 +259,7 @@ public class GameManager : MonoBehaviour
                 questPointGain += q.questPointGain;
             }
         }
-
+        
         PlayerSettingsManager.Instance.QuestsPoints += (int)questPointGain;
     }
 
@@ -464,6 +470,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Game Over");
             UIHelper.DisplayGameObject(endGamePopup.gameObject);
             CheckHighScore();
+            UpdateUI();
         }
     }
 
@@ -574,6 +581,7 @@ public class GameManager : MonoBehaviour
     {
         GameManager gm = FindObjectOfType<GameManager>();
         gm.GlobalScore = gm.HighScore + 1;
+        gm.ComputeQuest();
         gm.UpdateUI();
     }
     #endregion

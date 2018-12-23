@@ -1,12 +1,15 @@
 ﻿using TMPro;
 using UnityEngine;
 
-public class ScoreDisplay : MonoBehaviour {
-    [Header("UI objects")]
-    public TextMeshProUGUI textScore;
-    // Use this for initialization
-    private void Update()
+public class ScoreDisplay : TextAnimation
+{
+    protected override void InternalStart()
     {
-        textScore.text = PlayerSettingsManager.Instance.QuestsPoints.ToString();
+        FindObjectOfType<GameManager>().OnScoreChange += VariableChangeHandler;
+    }
+
+    private void VariableChangeHandler(int newVal)
+    {
+        PlayAnimation();
     }
 }

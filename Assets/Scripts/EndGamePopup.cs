@@ -8,6 +8,7 @@ public class EndGamePopup : Popup {
 
     public GameObject scoreObject;
     public GameObject questsObject;
+    public Image highScoreImage;
     private GameManager _gm;
 
     private readonly string noQuestLocKey = "no_quest";
@@ -25,7 +26,8 @@ public class EndGamePopup : Popup {
 
     public void UpdateHighScoreInfo(bool shouldDisplay) {
         //UIHelper.DisplayGameObject(highScoreObject, shouldDisplay);
-        UIHelper.DisplayGameObject(scoreObject.GetComponentInChildren<Image>().gameObject, _gm.HighScore == _gm.GlobalScore);
+        bool isNewHighScore = (_gm.HighScore == _gm.GlobalScore);
+        UIHelper.DisplayGameObject(highScoreImage.gameObject, isNewHighScore);
         
         scoreObject.GetComponentInChildren<TextMeshProUGUI>().text = _gm.GlobalScore.ToString();
     }
