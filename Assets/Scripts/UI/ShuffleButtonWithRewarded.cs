@@ -36,7 +36,7 @@ public class ShuffleButtonWithRewarded : ShuffleButton
         {
             locKey = videoLocKey;
         }
-        GetComponentInChildren<TextMeshProUGUI>().text = LocalizationManager.Instance.GetLocString(locKey, PlayerSettingsManager.Instance.CurrentLocale);
+        GetComponentInChildren<TextMeshProUGUI>().text = LocalizationManager.Instance.GetLocString(locKey);
     }
 
     override public void OnShuffleButtonClick()

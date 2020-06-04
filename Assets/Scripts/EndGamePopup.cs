@@ -39,11 +39,11 @@ public class EndGamePopup : Popup {
             int finishedQuestsCount = _gm.finishedQuests.Count;
             if (finishedQuestsCount == 0)
             {
-                questsObject.GetComponentInChildren<TextMeshProUGUI>().text = LocalizationManager.Instance.GetLocString(noQuestLocKey, PlayerSettingsManager.Instance.CurrentLocale);
+                questsObject.GetComponentInChildren<TextMeshProUGUI>().text = LocalizationManager.Instance.GetLocString(noQuestLocKey);
             }
             else if (finishedQuestsCount == 1)
             {
-                questsObject.GetComponentInChildren<TextMeshProUGUI>().text = LocalizationManager.Instance.GetLocString(questCompletedLocKey, PlayerSettingsManager.Instance.CurrentLocale);
+                questsObject.GetComponentInChildren<TextMeshProUGUI>().text = LocalizationManager.Instance.GetLocString(questCompletedLocKey);
             }
             else
             {

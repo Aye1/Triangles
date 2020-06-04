@@ -14,6 +14,6 @@ public class TextMeshProLocalizator : MonoBehaviour {
 	}
 
     public void UpdateLocale() {
-        GetComponent<TextMeshProUGUI>().text = LocalizationManager.Instance.GetLocString(localizationKey, PlayerSettingsManager.Instance.CurrentLocale);
+        GetComponent<TextMeshProUGUI>().text = LocalizationManager.Instance.GetLocString(localizationKey);
     }
 }

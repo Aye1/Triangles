@@ -135,6 +135,7 @@ public class PlayerSettingsManager : MonoBehaviour
         if (PlayerPrefs.HasKey(localeKey))
         {
             _currentLocale = PlayerPrefs.GetString(localeKey);
+            LocalizationManager.Instance.locale = LocalizationManager.StringToSystemLanguage(_currentLocale);
         }
         else
         {

@@ -6,18 +6,13 @@ using UnityEditor;
 
 public class LocalizationManager : MonoBehaviour
 {
-
-
     private Dictionary<string, Dictionary<string, string>> _allLocalizedStrings;
     private readonly string _stringNotFound = "Unknown string";
-    private static LocalizationManager _instance;
 
     public bool isReady = false;
+    public SystemLanguage locale;
 
-    public static LocalizationManager Instance
-    {
-        get { return _instance; }
-    }
+    public static LocalizationManager Instance { get; private set; }
 
     public Dictionary<string, Dictionary<string, string>> AllLocalizedStrings {
         get {
@@ -26,24 +21,16 @@ public class LocalizationManager : MonoBehaviour
     }
     private void Awake()
     {
-        if (_instance != null && _instance != this)
+        if (Instance != null && Instance != this)
         {
             Destroy(this.gameObject);
         }
         else
         {
-            _instance = this;
+            Instance = this;
         }
         DontDestroyOnLoad(gameObject);
         LoadLocalizedStrings();
-    }
-
-    private IEnumerable<string> GetLocalesList()
-    {
-        List<string> locales = new List<string>();
-        locales.Add(Locales.en_GB);
-        locales.Add(Locales.fr_FR);
-        return locales;
     }
 
     private void LoadLocalizedStrings()
@@ -52,25 +39,21 @@ public class LocalizationManager : MonoBehaviour
         isReady = true;
     }
 
-    public string GetLocString(string key, string locale)
+    public string GetLocString(string key)
     {
         if (!isReady)
         {
             return null;
         }
-        if (_allLocalizedStrings.ContainsKey(locale))
+        string localeString = SystemLanguageToString(locale);
+        if (_allLocalizedStrings.ContainsKey(localeString))
         {
-            if (_allLocalizedStrings[locale].ContainsKey(key))
+            if (_allLocalizedStrings[localeString].ContainsKey(key))
             {
-                return _allLocalizedStrings[locale][key];
+                return _allLocalizedStrings[localeString][key];
             }
         }
         return _stringNotFound;
-    }
-
-    public string GetLocString(string key, SystemLanguage language)
-    {
-        return GetLocString(key, SystemLanguageToString(language));
     }
 
     private Dictionary<string, Dictionary<string, string>> LoadDicoFromCSV()

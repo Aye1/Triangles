@@ -179,9 +179,8 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("Piece dragged at pos " + _draggedPiece.transform.position.ToString());
         }
-        string loc = PlayerSettingsManager.Instance.CurrentLocale;
-        string scoreText = LocalizationManager.Instance.GetLocString("score", loc);
-        string hsText = LocalizationManager.Instance.GetLocString("highscore", loc);
+        string scoreText = LocalizationManager.Instance.GetLocString("score");
+        string hsText = LocalizationManager.Instance.GetLocString("highscore");
         textScore.text = GlobalScore.ToString();
         textShuffleCount.text = _shuffleCount.ToString();
         textHighScore.text = HighScore.ToString();
